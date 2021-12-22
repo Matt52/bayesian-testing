@@ -1,0 +1,30 @@
+[tool.poetry]
+name = "bayes-ab-test"
+version = "0.1.0"
+description = "Bayesian A/B testing with simple probabilities."
+authors = ["Matus Baniar"]
+license = "MIT"
+homepage = "https://github.com/Matt52/bayes-ab-test"
+repository = "https://github.com/Matt52/bayes-ab-test"
+include = [
+    "LICENSE",
+]
+
+packages = [
+    {include = "bayes_ab_test"}
+]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+numpy = "^1.20.0"
+
+[tool.poetry.dev-dependencies]
+jupyter = "^1.0.0"
+jupyterlab = "^3.0.9"
+black = "^20.8b1"
+pytest = "^6.2.4"
+coverage = "^6.1.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

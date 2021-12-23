@@ -22,6 +22,14 @@ PBB_BERNOULLI_AGG_INPUTS = [
         },
         "expected_output": [0.4977, 0.5023],
     },
+    {
+        "input": {
+            "totals": [],
+            "successes": [],
+            "sim_count": 20000,
+        },
+        "expected_output": [],
+    }
 ]
 
 PBB_LOGNORMAL_AGG_INPUTS = [

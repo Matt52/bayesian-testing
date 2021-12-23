@@ -75,6 +75,9 @@ def pbb_bernoulli_agg(
     """
     validate_bernoulli_input(totals, successes)
 
+    if len(totals) == 0:
+        return []
+
     # Default prior for all variants is Beta(0.5, 0.5) which is non-information prior.
     if not a_priors_beta:
         a_priors_beta = [0.5] * len(totals)

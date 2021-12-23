@@ -2,7 +2,7 @@ name: Coverage
 on: push
 
 jobs:
-  tests:
+  coverage:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository code
@@ -22,7 +22,7 @@ jobs:
           poetry run coverage report
           poetry run coverage xml
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v2
         with:
           fail_ci_if_error: true
           token: ${{ secrets.CODECOV_TOKEN }}

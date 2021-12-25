@@ -1,5 +1,6 @@
 import numpy as np
 import pytest
+
 from bayes_ab_test.metrics.simulations import beta_posteriors_all, lognormal_posteriors
 
 BETA_POSTERIORS_ALL_INPUTS = [

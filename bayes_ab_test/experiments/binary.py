@@ -1,8 +1,9 @@
-from typing import List
+import warnings
 from numbers import Number
+from typing import List
+
 from bayes_ab_test.metrics import pbb_bernoulli_agg
 from bayes_ab_test.utilities import get_logger
-import warnings
 
 logger = get_logger("bayes_ab_test")
 

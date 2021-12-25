@@ -1,6 +1,5 @@
 import pytest
 
-
 from bayes_ab_test.metrics import pbb_bernoulli_agg, pbb_lognormal_agg
 
 PBB_BERNOULLI_AGG_INPUTS = [

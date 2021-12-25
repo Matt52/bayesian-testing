@@ -1,4 +1,5 @@
 import pytest
+
 from bayes_ab_test.metrics.simulations import validate_bernoulli_input
 from bayes_ab_test.utilities.common import check_list_lengths
 

@@ -1,8 +1,9 @@
+# import warnings
+# from numbers import Number
 from typing import List
-from numbers import Number
+
 from bayes_ab_test.metrics import pbb_lognormal_agg
 from bayes_ab_test.utilities import get_logger
-import warnings
 
 logger = get_logger("bayes_ab_test")
 
@@ -110,3 +111,4 @@ class DeltaLognormalDataTest:
             "avg non-zero revenue",
             "prob. being best",
         ]
+        print(keys)

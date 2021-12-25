@@ -1,6 +1,6 @@
-from os import path
 import logging
 import logging.config
+from os import path
 
 log_file_path = path.join(
     path.dirname(path.abspath(__file__)), "../../config/logging.conf"

@@ -1,6 +1,8 @@
-from typing import List
 from numbers import Number
+from typing import List
+
 import numpy as np
+
 from bayes_ab_test.utilities import get_logger
 
 logger = get_logger("bayes_ab_test")
@@ -132,10 +134,12 @@ def lognormal_posteriors(
     sum_logs_2 : Sum of logarithms squared of original data.
     sim_count : Number of simulations.
     prior_m : Prior mean of logarithms of original data.
-    prior_a : Prior alpha from inverse gamma dist approximating variance of logarithms of original data.
-        In theory a > 0, but as we always have at least one observation, we can start at 0.
-    prior_b : Prior beta from inverse gamma dist approximating variance of logarithms of original data.
-        In theory b > 0, but as we always have at least one observation, we can start at 0.
+    prior_a : Prior alpha from inverse gamma dist approximating variance of logarithms
+        of original data. In theory a > 0, but as we always have at least one observation,
+        we can start at 0.
+    prior_b : Prior beta from inverse gamma dist approximating variance of logarithms
+        of original data. In theory b > 0, but as we always have at least one observation,
+        we can start at 0.
     prior_w : Effective sample size.
     seed : Random seed.
 

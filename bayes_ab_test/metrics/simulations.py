@@ -11,7 +11,9 @@ def validate_bernoulli_input(totals: List[int], positives: List[int]) -> None:
     Simple validation for pbb_bernoulli_agg inputs.
     """
     if len(totals) != len(positives):
-        msg = f"Totals ({totals}) and positives ({positives}) needs to have same length!"
+        msg = (
+            f"Totals ({totals}) and positives ({positives}) needs to have same length!"
+        )
         logger.error(msg)
         raise ValueError(msg)
 

@@ -73,7 +73,9 @@ PBB_LOGNORMAL_AGG_INPUTS = [
 @pytest.mark.parametrize("inp", PBB_BERNOULLI_AGG_INPUTS)
 def test_pbb_bernoulli_agg(inp):
     i = inp["input"]
-    res = pbb_bernoulli_agg(i["totals"], i["successes"], sim_count=i["sim_count"], seed=i["seed"])
+    res = pbb_bernoulli_agg(
+        i["totals"], i["successes"], sim_count=i["sim_count"], seed=i["seed"]
+    )
     assert res == inp["expected_output"]
 
 

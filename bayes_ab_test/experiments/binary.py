@@ -109,9 +109,13 @@ class BinaryDataTest:
         if a_prior <= 0 or b_prior <= 0:
             raise ValueError("Both [a_prior, b_prior] have to be positive numbers.")
         if totals <= 0:
-            raise ValueError("Input variable 'totals' is expected to be positive integer.")
+            raise ValueError(
+                "Input variable 'totals' is expected to be positive integer."
+            )
         if positives < 0:
-            raise ValueError("Input variable 'positives' is expected to be non-negative integer.")
+            raise ValueError(
+                "Input variable 'positives' is expected to be non-negative integer."
+            )
         if totals < positives:
             raise ValueError("Not possible to have more positives that totals!")
 
@@ -191,6 +195,8 @@ class BinaryDataTest:
         if not isinstance(name, str):
             raise ValueError("Variant name has to be a string.")
         if name not in self.variant_names:
-            warnings.warn(f"Nothing to be deleted. Variant {name} is not in experiment.")
+            warnings.warn(
+                f"Nothing to be deleted. Variant {name} is not in experiment."
+            )
         else:
             del self.data[name]

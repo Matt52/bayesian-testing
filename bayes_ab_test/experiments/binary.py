@@ -7,7 +7,7 @@ import warnings
 logger = get_logger("bayes_ab_test")
 
 
-class ConversionTest:
+class BinaryDataTest:
     def __init__(self) -> None:
         """
         Initialize ConversionTest class.
@@ -23,8 +23,8 @@ class ConversionTest:
         return [self.data[k]["totals"] for k in self.data]
 
     @property
-    def successes(self):
-        return [self.data[k]["successes"] for k in self.data]
+    def positives(self):
+        return [self.data[k]["positives"] for k in self.data]
 
     @property
     def a_priors(self):
@@ -48,7 +48,7 @@ class ConversionTest:
         res : Dictionary with probabilities of being best for all variants in experiment.
         """
         pbbs = pbb_bernoulli_agg(
-            self.totals, self.successes, self.a_priors, self.b_priors, sim_count, seed
+            self.totals, self.positives, self.a_priors, self.b_priors, sim_count, seed
         )
         res = dict(zip(self.variant_names, pbbs))
         return res
@@ -66,13 +66,13 @@ class ConversionTest:
         -------
         res : List of dictionaries with results per variant.
         """
-        keys = ["variant", "totals", "successes", "conv. rate", "prob. being best"]
-        conv_rates = [round(i[0] / i[1], 5) for i in zip(self.successes, self.totals)]
+        keys = ["variant", "totals", "positives", "conv. rate", "prob. being best"]
+        conv_rates = [round(i[0] / i[1], 5) for i in zip(self.positives, self.totals)]
         pbbs = list(self.probabs_of_being_best(sim_count, seed).values())
         data = [
             self.variant_names,
             self.totals,
-            self.successes,
+            self.positives,
             conv_rates,
             pbbs,
         ]
@@ -84,7 +84,7 @@ class ConversionTest:
         self,
         name: str,
         totals: int,
-        successes: int,
+        positives: int,
         a_prior: Number = 0.5,
         b_prior: Number = 0.5,
         replace: bool = True,
@@ -96,7 +96,7 @@ class ConversionTest:
         ----------
         name : Variant name.
         totals : Total number of experiment observations (e.g. number of sessions).
-        successes : Total number of successes from given observations (e.g. number of conversions).
+        positives : Total number of ones from given observations (e.g. number of conversions).
         a_prior : Prior alpha parameter for Beta distributions.
             Default value 0.5 is based on non-information prior Beta(0.5, 0.5).
         b_prior : Prior beta parameter for Beta distributions.
@@ -110,15 +110,15 @@ class ConversionTest:
             raise ValueError("Both [a_prior, b_prior] have to be positive numbers.")
         if totals <= 0:
             raise ValueError("Input variable 'totals' is expected to be positive integer.")
-        if successes < 0:
-            raise ValueError("Input variable 'successes' is expected to be non-negative integer.")
-        if totals < successes:
-            raise ValueError("Not possible to have more successes that totals!")
+        if positives < 0:
+            raise ValueError("Input variable 'positives' is expected to be non-negative integer.")
+        if totals < positives:
+            raise ValueError("Not possible to have more positives that totals!")
 
         if name not in self.variant_names:
             self.data[name] = {
                 "totals": totals,
-                "successes": successes,
+                "positives": positives,
                 "a_priors": a_prior,
                 "b_priors": b_prior,
             }
@@ -130,7 +130,7 @@ class ConversionTest:
             logger.info(msg)
             self.data[name] = {
                 "totals": totals,
-                "successes": successes,
+                "positives": positives,
                 "a_priors": a_prior,
                 "b_priors": b_prior,
             }
@@ -142,7 +142,7 @@ class ConversionTest:
             )
             logger.info(msg)
             self.data[name]["totals"] += totals
-            self.data[name]["successes"] += successes
+            self.data[name]["positives"] += positives
 
     def add_variant_data(
         self,
@@ -176,9 +176,9 @@ class ConversionTest:
             raise ValueError("Input data needs to be a list of zeros and ones.")
 
         totals = len(data)
-        successes = sum(data)
+        positives = sum(data)
 
-        self.add_variant_data_agg(name, totals, successes, a_prior, b_prior, replace)
+        self.add_variant_data_agg(name, totals, positives, a_prior, b_prior, replace)
 
     def delete_variant(self, name: str) -> None:
         """

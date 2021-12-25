@@ -1,3 +1,3 @@
-from .conversion import ConversionTest
+from .binary import BinaryDataTest
 
-__all__ = ["ConversionTest"]
+__all__ = ["BinaryDataTest"]

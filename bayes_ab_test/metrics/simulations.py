@@ -6,19 +6,19 @@ from bayes_ab_test.utilities import get_logger
 logger = get_logger("bayes_ab_test")
 
 
-def validate_bernoulli_input(totals: List[int], successes: List[int]) -> None:
+def validate_bernoulli_input(totals: List[int], positives: List[int]) -> None:
     """
     Simple validation for pbb_bernoulli_agg inputs.
     """
-    if len(totals) != len(successes):
-        msg = f"Totals ({totals}) and successes ({successes}) needs to have same length!"
+    if len(totals) != len(positives):
+        msg = f"Totals ({totals}) and positives ({positives}) needs to have same length!"
         logger.error(msg)
         raise ValueError(msg)
 
 
 def beta_posteriors_all(
     totals: List[int],
-    successes: List[int],
+    positives: List[int],
     sim_count: int,
     a_priors_beta: List[Number],
     b_priors_beta: List[Number],
@@ -30,7 +30,7 @@ def beta_posteriors_all(
     Parameters
     ----------
     totals : List of numbers of experiment observations (e.g. number of sessions) for each variant.
-    successes : List of numbers of successes (e.g. number of conversions) for each variant.
+    positives : List of numbers of ones (e.g. number of conversions) for each variant.
     sim_count : Number of simulations to be used for probability estimation.
     a_priors_beta : List of prior alpha parameters for Beta distributions for each variant.
     b_priors_beta : List of prior beta parameters for Beta distributions for each variant.
@@ -47,8 +47,8 @@ def beta_posteriors_all(
     beta_samples = np.array(
         [
             rng.beta(
-                successes[i] + a_priors_beta[i],
-                totals[i] - successes[i] + b_priors_beta[i],
+                positives[i] + a_priors_beta[i],
+                totals[i] - positives[i] + b_priors_beta[i],
                 sim_count,
             )
             for i in range(len(totals))
@@ -59,7 +59,7 @@ def beta_posteriors_all(
 
 def pbb_bernoulli_agg(
     totals: List[int],
-    successes: List[int],
+    positives: List[int],
     a_priors_beta: List[Number] = None,
     b_priors_beta: List[Number] = None,
     sim_count: int = 20000,
@@ -71,7 +71,7 @@ def pbb_bernoulli_agg(
     Parameters
     ----------
     totals : List of numbers of experiment observations (e.g. number of sessions) for each variant.
-    successes : List of numbers of successes (e.g. number of conversions) for each variant.
+    positives : List of numbers of ones (e.g. number of conversions) for each variant.
     sim_count : Number of simulations to be used for probability estimation.
     a_priors_beta : List of prior alpha parameters for Beta distributions for each variant.
     b_priors_beta : List of prior beta parameters for Beta distributions for each variant.
@@ -81,7 +81,7 @@ def pbb_bernoulli_agg(
     -------
     res : List of probabilities of being best for each variant.
     """
-    validate_bernoulli_input(totals, successes)
+    validate_bernoulli_input(totals, positives)
 
     if len(totals) == 0:
         return []
@@ -93,7 +93,7 @@ def pbb_bernoulli_agg(
         b_priors_beta = [0.5] * len(totals)
 
     beta_samples = beta_posteriors_all(
-        totals, successes, sim_count, a_priors_beta, b_priors_beta, seed
+        totals, positives, sim_count, a_priors_beta, b_priors_beta, seed
     )
 
     max_values = np.argmax(beta_samples, axis=0)
@@ -172,7 +172,7 @@ def lognormal_posteriors(
 
 def pbb_lognormal_agg(
     totals: List[int],
-    successes: List[int],
+    non_zeros: List[int],
     sum_logs: List[float],
     sum_logs_2: List[float],
     sim_count: int = 20000,
@@ -189,12 +189,12 @@ def pbb_lognormal_agg(
     For convenience, this method allows working with underling data containing also zeros
     which is more practical as revenue-like data can contain many cases with no-revenue
     (e.g. revenue per online shop session where most of the sessions are without any order).
-    For that reason the method works with both totals and successes.
+    For that reason the method works with both totals and non_zeros.
 
     Parameters
     ----------
     totals : List of numbers of experiment observations (e.g. number of sessions) for each variant.
-    successes : List of numbers of successes (e.g. number of conversions) for each variant.
+    non_zeros : List of numbers of non-zeros (e.g. number of conversions) for each variant.
     sum_logs : List of sum of logarithms of original data for each variant.
     sum_logs_2 : List of sum of logarithms squared of original data for each variant.
     sim_count : Number of simulations.
@@ -225,18 +225,18 @@ def pbb_lognormal_agg(
     if not w_priors:
         w_priors = [0.01] * len(totals)
 
-    if max(successes) <= 0:
-        # if no success
+    if max(non_zeros) <= 0:
+        # if only zeros in all variants
         return list(np.full(len(totals), round(1 / len(totals), 7)))
     else:
         beta_samples = beta_posteriors_all(
-            totals, successes, sim_count, a_priors_beta, b_priors_beta, seed
+            totals, non_zeros, sim_count, a_priors_beta, b_priors_beta, seed
         )
 
         lognormal_samples = np.array(
             [
                 lognormal_posteriors(
-                    successes[i],
+                    non_zeros[i],
                     sum_logs[i],
                     sum_logs_2[i],
                     sim_count,

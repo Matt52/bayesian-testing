@@ -1,11 +1,11 @@
 import pytest
 
-from bayes_ab_test.experiments import ConversionTest
+from bayes_ab_test.experiments import BinaryDataTest
 
 
 @pytest.fixture
 def conv_test():
-    cv = ConversionTest()
+    cv = BinaryDataTest()
     cv.add_variant_data("A", [0, 1, 0, 1, 0, 0, 0, 0, 0, 1])
     cv.add_variant_data("B", [0, 0, 0, 1, 0, 0, 0, 0, 0, 1])
     cv.add_variant_data_agg("C", 11, 2, a_prior=1, b_prior=2)
@@ -24,8 +24,8 @@ def test_totals(conv_test):
     assert conv_test.totals == [10, 10, 11]
 
 
-def test_successes(conv_test):
-    assert conv_test.successes == [3, 2, 2]
+def test_positives(conv_test):
+    assert conv_test.positives == [3, 2, 2]
 
 
 def test_a_priors(conv_test):
@@ -48,21 +48,21 @@ def test_evaluate(conv_test):
         {
             "variant": "A",
             "totals": 10,
-            "successes": 3,
+            "positives": 3,
             "conv. rate": 0.3,
             "prob. being best": 0.57225,
         },
         {
             "variant": "B",
             "totals": 10,
-            "successes": 2,
+            "positives": 2,
             "conv. rate": 0.2,
             "prob. being best": 0.233,
         },
         {
             "variant": "C",
             "totals": 11,
-            "successes": 2,
+            "positives": 2,
             "conv. rate": 0.18182,
             "prob. being best": 0.19475,
         },

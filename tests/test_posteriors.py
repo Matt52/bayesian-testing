@@ -32,6 +32,12 @@ LOGNORMAL_POSTERIORS_INPUTS = [
         "sum_logs_2": 12357.911862914,
         "sim_count": 100,
     },
+    {
+        "totals": 0,
+        "sum_logs": 0,
+        "sum_logs_2": 0,
+        "sim_count": 100,
+    },
 ]
 
 

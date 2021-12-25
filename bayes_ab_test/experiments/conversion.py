@@ -1,98 +1,159 @@
 from typing import List
 from numbers import Number
 from bayes_ab_test.metrics import pbb_bernoulli_agg
-from bayes_ab_test.utilities.common import check_list_lengths
 from bayes_ab_test.utilities import get_logger
+import warnings
 
 logger = get_logger("bayes_ab_test")
 
 
 class ConversionTest:
-    def __init__(
-        self,
-        variant_names: List[str] = [],
-        totals: List[int] = [],
-        successes: List[int] = [],
-        a_priors_beta: List[Number] = [],
-        b_priors_beta: List[Number] = [],
-        sim_count: int = 20000,
-    ) -> None:
+    def __init__(self) -> None:
         """
-        Initialize ConversionTest.
+        Initialize ConversionTest class.
+        """
+        self.data = {}
+
+    @property
+    def variant_names(self):
+        return [k for k in self.data]
+
+    @property
+    def totals(self):
+        return [self.data[k]["totals"] for k in self.data]
+
+    @property
+    def successes(self):
+        return [self.data[k]["successes"] for k in self.data]
+
+    @property
+    def a_priors(self):
+        return [self.data[k]["a_priors"] for k in self.data]
+
+    @property
+    def b_priors(self):
+        return [self.data[k]["b_priors"] for k in self.data]
+
+    def probabs_of_being_best(self, sim_count: int = 20000, seed: int = None) -> dict:
+        """
+        Calculate probabilities of being best for a current class state.
 
         Parameters
         ----------
-        variant_names : List of variant names as strings.
-        totals : List of numbers of experiment observations (e.g. number of sessions) for each variant.
-        successes : List of numbers of successes (e.g. number of conversions) for each variant.
-        a_priors_beta : List of prior alpha parameters for Beta distributions for each variant.
-        b_priors_beta : List of prior beta parameters for Beta distributions for each variant.
+        sim_count : Number of simulations to be used for probability estimation.
+        seed : Random seed.
+
+        Returns
+        -------
+        res : Dictionary with probabilities of being best for all variants in experiment.
         """
-        self.variant_names = variant_names.copy()
-        self.totals = totals.copy()
-        self.successes = successes.copy()
-        self.a_priors_beta = a_priors_beta.copy()
-        self.b_priors_beta = b_priors_beta.copy()
-        self.sim_count = sim_count
-        self.validate_init_input()
-
-    def validate_init_input(self) -> None:
-        """
-        Basic initialization validation. Applying default priors in case they were not specified.
-        """
-        if not self.a_priors_beta and not self.b_priors_beta:
-            # default prior is non-information prior Beta(0.5, 0.5) for all variants.
-            self.a_priors_beta = [0.5] * len(self.totals)
-            self.b_priors_beta = [0.5] * len(self.totals)
-        elif not self.a_priors_beta or not self.b_priors_beta:
-            msg = "As one of [a_priors_beta, b_priors_beta] is empty, both will be set to 0.5 for all variants."
-            logger.warning(msg)
-            self.a_priors_beta = [0.5] * len(self.totals)
-            self.b_priors_beta = [0.5] * len(self.totals)
-
-        check_list_lengths(
-            [
-                self.variant_names,
-                self.totals,
-                self.successes,
-                self.a_priors_beta,
-                self.b_priors_beta,
-            ]
-        )
-
-        for v in self.variant_names:
-            if not isinstance(v, str):
-                raise ValueError("All variant names need to be strings.")
-
-        if len(set(self.variant_names)) != len(self.variant_names):
-            raise ValueError("All variant names need to be unique.")
-
-    @property
-    def probabs_of_being_best(self):
         pbbs = pbb_bernoulli_agg(
-            self.totals, self.successes, self.a_priors_beta, self.b_priors_beta, self.sim_count
+            self.totals, self.successes, self.a_priors, self.b_priors, sim_count, seed
         )
-        return pbbs
+        res = dict(zip(self.variant_names, pbbs))
+        return res
 
-    def evaluate(self):
+    def evaluate(self, sim_count: int = 20000, seed: int = None) -> List[dict]:
+        """
+        Evaluation of experiment.
+
+        Parameters
+        ----------
+        sim_count : Number of simulations to be used for probability estimation.
+        seed : Random seed.
+
+        Returns
+        -------
+        res : List of dictionaries with results per variant.
+        """
         keys = ["variant", "totals", "successes", "conv. rate", "prob. being best"]
         conv_rates = [round(i[0] / i[1], 5) for i in zip(self.successes, self.totals)]
+        pbbs = list(self.probabs_of_being_best(sim_count, seed).values())
         data = [
             self.variant_names,
             self.totals,
             self.successes,
             conv_rates,
-            self.probabs_of_being_best,
+            pbbs,
         ]
         res = [dict(zip(keys, item)) for item in zip(*data)]
 
         return res
 
-    def add_variant(
-        self, name: str, data: List[int], a_prior: Number = 0.5, b_prior: Number = 0.5
+    def add_variant_data_agg(
+        self,
+        name: str,
+        totals: int,
+        successes: int,
+        a_prior: Number = 0.5,
+        b_prior: Number = 0.5,
+        replace: bool = True,
     ) -> None:
         """
-        Add variant to test class using raw conversion data.
+        Add variant data to test class using aggregated conversion data.
+
+        Parameters
+        ----------
+        name : Variant name.
+        totals : Total number of experiment observations (e.g. number of sessions).
+        successes : Total number of successes from given observations (e.g. number of conversions).
+        a_prior : Prior alpha parameter for Beta distributions.
+            Default value 0.5 is based on non-information prior Beta(0.5, 0.5).
+        b_prior : Prior beta parameter for Beta distributions.
+            Default value 0.5 is based on non-information prior Beta(0.5, 0.5).
+        replace : Replace data if variant already exists.
+            If set to False, data of existing variant will be appended to existing data.
+        """
+        if not isinstance(name, str):
+            raise ValueError("Variant name has to be a string.")
+        if a_prior <= 0 or b_prior <= 0:
+            raise ValueError("Both [a_prior, b_prior] have to be positive numbers.")
+        if totals <= 0:
+            raise ValueError("Input variable 'totals' is expected to be positive integer.")
+        if successes < 0:
+            raise ValueError("Input variable 'successes' is expected to be non-negative integer.")
+        if totals < successes:
+            raise ValueError("Not possible to have more successes that totals!")
+
+        if name not in self.variant_names:
+            self.data[name] = {
+                "totals": totals,
+                "successes": successes,
+                "a_priors": a_prior,
+                "b_priors": b_prior,
+            }
+        elif name in self.variant_names and replace:
+            msg = (
+                f"Variant {name} already exists - new data is replacing it. "
+                "If you wish to append instead, use replace=False."
+            )
+            logger.info(msg)
+            self.data[name] = {
+                "totals": totals,
+                "successes": successes,
+                "a_priors": a_prior,
+                "b_priors": b_prior,
+            }
+        elif name in self.variant_names and not replace:
+            msg = (
+                f"Variant {name} already exists - new data is appended to variant, "
+                "keeping its original prior setup. "
+                "If you wish to replace data instead, use replace=True."
+            )
+            logger.info(msg)
+            self.data[name]["totals"] += totals
+            self.data[name]["successes"] += successes
+
+    def add_variant_data(
+        self,
+        name: str,
+        data: List[int],
+        a_prior: Number = 0.5,
+        b_prior: Number = 0.5,
+        replace: bool = True,
+    ) -> None:
+        """
+        Add variant data to test class using raw conversion data.
 
         Parameters
         ----------
@@ -102,20 +163,34 @@ class ConversionTest:
             Default value 0.5 is based on non-information prior Beta(0.5, 0.5).
         b_prior : Prior beta parameter for Beta distributions.
             Default value 0.5 is based on non-information prior Beta(0.5, 0.5).
+        replace : Replace data if variant already exists.
+            If set to False, data of existing variant will be appended to existing data.
         """
         if not isinstance(name, str):
             raise ValueError("Variant name has to be a string.")
-        if name in self.variant_names:
-            raise ValueError(f"Variant {name} already exists.")
-        if a_prior < 0 or b_prior < 0:
-            raise ValueError("Both [a_prior, b_prior] have to be non-negative.")
+        if a_prior <= 0 or b_prior <= 0:
+            raise ValueError("Both [a_prior, b_prior] have to be positive numbers.")
         if len(data) == 0:
             raise ValueError("Data of new variant needs to have some observations.")
         if not min([i in [0, 1] for i in data]):
-            raise ValueError("Input data needs to be a list with zeros and ones.")
+            raise ValueError("Input data needs to be a list of zeros and ones.")
 
-        self.variant_names.append(name)
-        self.totals.append(len(data))
-        self.successes.append(sum(data))
-        self.a_priors_beta.append(a_prior)
-        self.b_priors_beta.append(b_prior)
+        totals = len(data)
+        successes = sum(data)
+
+        self.add_variant_data_agg(name, totals, successes, a_prior, b_prior, replace)
+
+    def delete_variant(self, name: str) -> None:
+        """
+        Delete variant and all its data from experiment.
+
+        Parameters
+        ----------
+        name : Variant name.
+        """
+        if not isinstance(name, str):
+            raise ValueError("Variant name has to be a string.")
+        if name not in self.variant_names:
+            warnings.warn(f"Nothing to be deleted. Variant {name} is not in experiment.")
+        else:
+            del self.data[name]

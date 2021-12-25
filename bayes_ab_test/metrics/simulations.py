@@ -22,6 +22,7 @@ def beta_posteriors_all(
     sim_count: int,
     a_priors_beta: List[Number],
     b_priors_beta: List[Number],
+    seed: int = None,
 ) -> List[List[float]]:
     """
     Draw from beta posterior distributions for all variants at once.
@@ -33,14 +34,19 @@ def beta_posteriors_all(
     sim_count : Number of simulations to be used for probability estimation.
     a_priors_beta : List of prior alpha parameters for Beta distributions for each variant.
     b_priors_beta : List of prior beta parameters for Beta distributions for each variant.
+    seed : Random seed.
 
     Returns
     -------
-
+    beta_samples : List of lists of beta distribution samples for all variants.
     """
+    if isinstance(seed, int):
+        rng = np.random.default_rng(seed)
+    else:
+        rng = np.random
     beta_samples = np.array(
         [
-            np.random.beta(
+            rng.beta(
                 successes[i] + a_priors_beta[i],
                 totals[i] - successes[i] + b_priors_beta[i],
                 sim_count,
@@ -57,6 +63,7 @@ def pbb_bernoulli_agg(
     a_priors_beta: List[Number] = None,
     b_priors_beta: List[Number] = None,
     sim_count: int = 20000,
+    seed: int = None,
 ) -> List[float]:
     """
     Method estimating probabilities of being best for beta-bernoulli aggregated data per variant.
@@ -68,6 +75,7 @@ def pbb_bernoulli_agg(
     sim_count : Number of simulations to be used for probability estimation.
     a_priors_beta : List of prior alpha parameters for Beta distributions for each variant.
     b_priors_beta : List of prior beta parameters for Beta distributions for each variant.
+    seed : Random seed.
 
     Returns
     -------
@@ -84,7 +92,9 @@ def pbb_bernoulli_agg(
     if not b_priors_beta:
         b_priors_beta = [0.5] * len(totals)
 
-    beta_samples = beta_posteriors_all(totals, successes, sim_count, a_priors_beta, b_priors_beta)
+    beta_samples = beta_posteriors_all(
+        totals, successes, sim_count, a_priors_beta, b_priors_beta, seed
+    )
 
     max_values = np.argmax(beta_samples, axis=0)
     unique, counts = np.unique(max_values, return_counts=True)
@@ -106,6 +116,7 @@ def lognormal_posteriors(
     prior_a: Number = 0,
     prior_b: Number = 0,
     prior_w: Number = 0.01,
+    seed: int = None,
 ) -> List[float]:
     """
     Drawing from lognormal distribution using logarithms of original (lognormal) data
@@ -124,13 +135,18 @@ def lognormal_posteriors(
     prior_b : Prior beta from inverse gamma dist approximating variance of logarithms of original data.
         In theory b > 0, but as we always have at least one observation, we can start at 0.
     prior_w : Effective sample size.
+    seed : Random seed.
 
     Returns
     -------
     res : List of sim_count numbers drawn from lognormal distribution.
     """
+    if isinstance(seed, int):
+        rng = np.random.default_rng(seed)
+    else:
+        rng = np.random
     if totals <= 0:
-        return np.zeros(sim_count)
+        return list(np.zeros(sim_count))
     else:
         x_bar = sum_logs / totals
         a_post = prior_a + (totals / 2)
@@ -141,12 +157,12 @@ def lognormal_posteriors(
         )
 
         # here it has to be 1/b as it is a scale, and not a rate
-        sig_2 = 1 / np.random.gamma(a_post, 1 / b_post, sim_count)
+        sig_2 = 1 / rng.gamma(a_post, 1 / b_post, sim_count)
 
         m_post = (totals * x_bar + prior_w * prior_m) / (totals + prior_w)
         sig_2_post = sig_2 / (totals + prior_w)
 
-        normal_post = np.random.normal(m_post, np.sqrt(sig_2_post))
+        normal_post = rng.normal(m_post, np.sqrt(sig_2_post))
 
         # final simulated lognormal means using simulated normal means
         res = np.exp(normal_post + (sig_2 / 2))
@@ -166,6 +182,7 @@ def pbb_lognormal_agg(
     a_priors_ig: List[Number] = None,
     b_priors_ig: List[Number] = None,
     w_priors: List[Number] = None,
+    seed: int = None,
 ) -> List[float]:
     """
     Method estimating probabilities of being best for lognormal aggregated data per variant.
@@ -187,6 +204,7 @@ def pbb_lognormal_agg(
     a_priors_ig : List of prior alphas from inverse gamma dist approximating variance of logarithms.
     b_priors_ig : List of prior betas from inverse gamma dist approximating variance of logarithms.
     w_priors : List of effective sample sizes for each variant.
+    seed : Random seed.
 
     Returns
     -------
@@ -209,10 +227,10 @@ def pbb_lognormal_agg(
 
     if max(successes) <= 0:
         # if no success
-        return np.full(len(totals), 1 / len(totals))
+        return list(np.full(len(totals), round(1 / len(totals), 7)))
     else:
         beta_samples = beta_posteriors_all(
-            totals, successes, sim_count, a_priors_beta, b_priors_beta
+            totals, successes, sim_count, a_priors_beta, b_priors_beta, seed
         )
 
         lognormal_samples = np.array(
@@ -226,6 +244,7 @@ def pbb_lognormal_agg(
                     a_priors_ig[i],
                     b_priors_ig[i],
                     w_priors[i],
+                    seed,
                 )
                 for i in range(len(totals))
             ]

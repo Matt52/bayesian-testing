@@ -16,7 +16,7 @@ The package currently supports these data inputs:
 ```console
 pip install bayes-ab-test
 ```
-Alternatively you can clone the repository and use `poetry` manually:
+Alternatively, you can clone the repository and use `poetry` manually:
 ```console
 cd bayes-ab-test
 pip install poetry
@@ -35,6 +35,7 @@ To get the results of the test, simply call method `evaluate`, or `probabs_of_be
 Probabilities of being best are approximated using simulations. Hence `evaluate` can return slightly different
 values for different runs. To stabilize it, you can set `sim_count` parameter of `evaluate` to higher value
 (default value is 20K), or even use `seed` parameter to fix it completely.
+
 
 ### BinaryDataTest
 Class for Bayesian A/B test for binary-like data (e.g. conversions, successes, etc.).

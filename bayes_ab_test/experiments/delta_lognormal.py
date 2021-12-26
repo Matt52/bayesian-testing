@@ -137,7 +137,7 @@ class DeltaLognormalDataTest:
             self.variant_names,
             self.totals,
             self.positives,
-            self.sum_values,
+            [round(i, 5) for i in self.sum_values],
             avg_values,
             avg_pos_values,
             pbbs,

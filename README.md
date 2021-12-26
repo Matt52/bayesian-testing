@@ -7,8 +7,8 @@ The core evaluation metric of the approach is `Probability of Being Best` which 
 from posterior distribution (considering given data).
 
 The package currently supports these data inputs:
-- **binary data** (`[0, 1, 0, ...]`): convenient for conversion-like A/B testing
-- **delta-lognormal data** (`[0, 21.2, 0, ...]`):  convenient for revenue-like A/B testing
+- **binary data** (`[0, 1, 0, ...]`) - convenient for conversion-like A/B testing
+- **delta-lognormal data** (`[0, 21.2, 0, ...]`) - convenient for revenue-like A/B testing
 
 
 ## Installation
@@ -27,8 +27,8 @@ poetry install
 Library's primary features are `BinaryDataTest` and `DeltaLognormalDataTest` classes.
 
 In both cases, there are two methods to insert data:
-- `add_variant_data`: adding raw data for a variant as a list of numbers (or numpy 1-D array)
-- `add_variant_data_agg`: adding aggregated variant data (this can be practical for large data as the aggregation can be done on a database level)
+- `add_variant_data` - adding raw data for a variant as a list of numbers (or numpy 1-D array)
+- `add_variant_data_agg` - adding aggregated variant data (this can be practical for large data as the aggregation can be done on a database level)
 
 To get the results of the test, simply call method `evaluate`, or `probabs_of_being_best` for returning just the probabilities.
 
@@ -125,3 +125,21 @@ test.evaluate(seed=21)
       'avg_values': 3.085,
       'avg_positive_values': 10.28333,
       'prob_being_best': 0.8087}]
+
+## Development
+To set up development environment use [Poetry](https://python-poetry.org/) and [pre-commit](https://pre-commit.com):
+```console
+pip install poetry
+poetry install
+pre-commit install
+```
+
+## Roadmap
+
+Test classes to be added:
+- `PoissonDataTest` - for data like numbers of orders per session
+- `NormalDataTest`
+
+Metrics to be added:
+- `Expected Loss`
+- `Potential Value Remaining`

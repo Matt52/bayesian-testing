@@ -24,7 +24,7 @@ poetry install
 ```
 
 ## Basic Usage
-Library's primary features are `BinaryDataTest` and `DeltaLognormalDataTest` classes.
+The primary features are `BinaryDataTest` and `DeltaLognormalDataTest` classes.
 
 In both cases, there are two methods to insert data:
 - `add_variant_data` - adding raw data for a variant as a list of numbers (or numpy 1-D array)
@@ -85,6 +85,8 @@ test.evaluate()
 Class for Bayesian A/B test for delta-lognormal data (log-normal with zeros).
 Delta-lognormal data is typical case of revenue per session data where many sessions have 0 revenue
 but non-zero values are positive numbers with possible log-normal distribution.
+To handle this data, the calculation is combining binary bayes model for zero vs non-zero
+"conversions" and log-normal model for non-zero values.
 
 ```python
 import numpy as np
@@ -137,9 +139,15 @@ pre-commit install
 ## Roadmap
 
 Test classes to be added:
-- `PoissonDataTest` - for data like numbers of orders per session
+- `PoissonDataTest`
+- `ExponentialDataTest`
 - `NormalDataTest`
 
 Metrics to be added:
 - `Expected Loss`
 - `Potential Value Remaining`
+
+## References
+- `bayes-ab-test` package itself is dependent only on [numpy](https://numpy.org) package.
+- Work on this package (including default priors selection) was inspired mainly by Coursera
+course [Bayesian Statistics: From Concept to Data Analysis](https://www.coursera.org/learn/bayesian-statistics).

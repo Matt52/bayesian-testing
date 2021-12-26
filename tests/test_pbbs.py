@@ -66,6 +66,17 @@ PBB_LOGNORMAL_AGG_INPUTS = [
         },
         "expected_output": [0.25, 0.25, 0.25, 0.25],
     },
+    {
+        "input": {
+            "totals": [],
+            "successes": [],
+            "sum_logs": [],
+            "sum_logs_2": [],
+            "sim_count": 10000,
+            "seed": 52,
+        },
+        "expected_output": [],
+    },
 ]
 
 

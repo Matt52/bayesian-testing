@@ -134,10 +134,10 @@ def lognormal_posteriors(
     sum_logs_2 : Sum of logarithms squared of original data.
     sim_count : Number of simulations.
     prior_m : Prior mean of logarithms of original data.
-    prior_a : Prior alpha from inverse gamma dist approximating variance of logarithms
+    prior_a : Prior alpha from inverse gamma dist. for unknown variance of logarithms
         of original data. In theory a > 0, but as we always have at least one observation,
         we can start at 0.
-    prior_b : Prior beta from inverse gamma dist approximating variance of logarithms
+    prior_b : Prior beta from inverse gamma dist. for unknown variance of logarithms
         of original data. In theory b > 0, but as we always have at least one observation,
         we can start at 0.
     prior_w : Effective sample size.
@@ -206,17 +206,18 @@ def pbb_lognormal_agg(
     sim_count : Number of simulations.
     a_priors_beta : List of prior alpha parameters for Beta distributions for each variant.
     b_priors_beta : List of prior beta parameters for Beta distributions for each variant.
-    m_priors : List of prior means of logarithms of original data for each variant.
+    m_priors : List of prior means for logarithms of non-zero data for each variant.
     a_priors_ig : List of prior alphas from inverse gamma dist approximating variance of logarithms.
     b_priors_ig : List of prior betas from inverse gamma dist approximating variance of logarithms.
-    w_priors : List of effective sample sizes for each variant.
+    w_priors : List of prior effective sample sizes for each variant.
     seed : Random seed.
 
     Returns
     -------
     res : List of probabilities of being best for each variant.
     """
-
+    if len(totals) == 0:
+        return []
     # Same default priors for all variants if they are not provided.
     if not a_priors_beta:
         a_priors_beta = [0.5] * len(totals)

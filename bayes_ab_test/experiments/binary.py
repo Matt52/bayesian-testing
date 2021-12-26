@@ -9,6 +9,13 @@ logger = get_logger("bayes_ab_test")
 
 
 class BinaryDataTest:
+    """
+    Class for Bayesian A/B test for binary-like data (conversions, successes, ...).
+
+    After class initialization, use add_variant methods to insert variant data.
+    Then to get results of the test, use for instance `evaluate` method.
+    """
+
     def __init__(self) -> None:
         """
         Initialize ConversionTest class.
@@ -29,11 +36,11 @@ class BinaryDataTest:
 
     @property
     def a_priors(self):
-        return [self.data[k]["a_priors"] for k in self.data]
+        return [self.data[k]["a_prior"] for k in self.data]
 
     @property
     def b_priors(self):
-        return [self.data[k]["b_priors"] for k in self.data]
+        return [self.data[k]["b_prior"] for k in self.data]
 
     def probabs_of_being_best(self, sim_count: int = 20000, seed: int = None) -> dict:
         """
@@ -67,7 +74,7 @@ class BinaryDataTest:
         -------
         res : List of dictionaries with results per variant.
         """
-        keys = ["variant", "totals", "positives", "conv. rate", "prob. being best"]
+        keys = ["variant", "totals", "positives", "conv_rate", "prob_being_best"]
         conv_rates = [round(i[0] / i[1], 5) for i in zip(self.positives, self.totals)]
         pbbs = list(self.probabs_of_being_best(sim_count, seed).values())
         data = [
@@ -92,12 +99,15 @@ class BinaryDataTest:
     ) -> None:
         """
         Add variant data to test class using aggregated conversion data.
+        This can be convinient as aggregation can be done on database level.
+
+        Default prior setup is set for Beta(1/2, 1/2) which is non-information prior.
 
         Parameters
         ----------
         name : Variant name.
         totals : Total number of experiment observations (e.g. number of sessions).
-        positives : Total number of ones from given observations (e.g. number of conversions).
+        positives : Total number of ones for a given variant (e.g. number of conversions).
         a_prior : Prior alpha parameter for Beta distributions.
             Default value 0.5 is based on non-information prior Beta(0.5, 0.5).
         b_prior : Prior beta parameter for Beta distributions.
@@ -124,8 +134,8 @@ class BinaryDataTest:
             self.data[name] = {
                 "totals": totals,
                 "positives": positives,
-                "a_priors": a_prior,
-                "b_priors": b_prior,
+                "a_prior": a_prior,
+                "b_prior": b_prior,
             }
         elif name in self.variant_names and replace:
             msg = (
@@ -136,8 +146,8 @@ class BinaryDataTest:
             self.data[name] = {
                 "totals": totals,
                 "positives": positives,
-                "a_priors": a_prior,
-                "b_priors": b_prior,
+                "a_prior": a_prior,
+                "b_prior": b_prior,
             }
         elif name in self.variant_names and not replace:
             msg = (
@@ -160,6 +170,8 @@ class BinaryDataTest:
         """
         Add variant data to test class using raw conversion data.
 
+        Default prior setup is set for Beta(1/2, 1/2) which is non-information prior.
+
         Parameters
         ----------
         name : Variant name.
@@ -171,12 +183,8 @@ class BinaryDataTest:
         replace : Replace data if variant already exists.
             If set to False, data of existing variant will be appended to existing data.
         """
-        if not isinstance(name, str):
-            raise ValueError("Variant name has to be a string.")
-        if a_prior <= 0 or b_prior <= 0:
-            raise ValueError("Both [a_prior, b_prior] have to be positive numbers.")
         if len(data) == 0:
-            raise ValueError("Data of new variant needs to have some observations.")
+            raise ValueError("Data of added variant needs to have some observations.")
         if not min([i in [0, 1] for i in data]):
             raise ValueError("Input data needs to be a list of zeros and ones.")
 

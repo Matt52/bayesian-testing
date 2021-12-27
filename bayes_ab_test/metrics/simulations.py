@@ -163,15 +163,14 @@ def lognormal_posteriors(
         )
 
         # here it has to be 1/b as it is a scale, and not a rate
-        sig_2 = 1 / rng.gamma(a_post, 1 / b_post, sim_count)
+        sig_2_post = 1 / rng.gamma(a_post, 1 / b_post, sim_count)
 
         m_post = (totals * x_bar + prior_w * prior_m) / (totals + prior_w)
-        sig_2_post = sig_2 / (totals + prior_w)
 
-        normal_post = rng.normal(m_post, np.sqrt(sig_2_post))
+        normal_post = rng.normal(m_post, np.sqrt(sig_2_post / (totals + prior_w)))
 
         # final simulated lognormal means using simulated normal means
-        res = np.exp(normal_post + (sig_2 / 2))
+        res = np.exp(normal_post + (sig_2_post / 2))
 
         return res
 

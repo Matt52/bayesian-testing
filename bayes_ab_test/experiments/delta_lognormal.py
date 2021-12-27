@@ -4,7 +4,7 @@ from typing import List
 
 import numpy as np
 
-from bayes_ab_test.metrics import pbb_lognormal_agg
+from bayes_ab_test.metrics import pbb_delta_lognormal_agg
 from bayes_ab_test.utilities import get_logger
 
 logger = get_logger("bayes_ab_test")
@@ -89,7 +89,7 @@ class DeltaLognormalDataTest:
         -------
         res : Dictionary with probabilities of being best for all variants in experiment.
         """
-        pbbs = pbb_lognormal_agg(
+        pbbs = pbb_delta_lognormal_agg(
             self.totals,
             self.positives,
             self.sum_logs,

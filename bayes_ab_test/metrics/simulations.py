@@ -1,7 +1,8 @@
 from numbers import Number
-from typing import List
+from typing import List, Tuple, Union
 
 import numpy as np
+from numpy import ndarray
 
 from bayes_ab_test.utilities import get_logger
 
@@ -24,10 +25,10 @@ def beta_posteriors_all(
     totals: List[int],
     positives: List[int],
     sim_count: int,
-    a_priors_beta: List[Number],
-    b_priors_beta: List[Number],
+    a_priors_beta: List[Union[float, int]],
+    b_priors_beta: List[Union[float, int]],
     seed: int = None,
-) -> List[List[float]]:
+) -> ndarray:
     """
     Draw from beta posterior distributions for all variants at once.
 
@@ -111,15 +112,71 @@ def pbb_bernoulli_agg(
     return res
 
 
+def normal_posteriors(
+    total: int,
+    sums: float,
+    sums_2: float,
+    sim_count: int = 20000,
+    prior_m: Union[float, int] = 1,
+    prior_a: Union[float, int] = 0,
+    prior_b: Union[float, int] = 0,
+    prior_w: Union[float, int] = 0.01,
+    seed: int = None,
+) -> Tuple[List[Union[float, int]], List[Union[float, int]]]:
+    """
+    Drawing mus and sigmas from posterior normal distribution considering given aggregated data.
+
+    Parameters
+    ----------
+    total : Number of data observations from normal data.
+    sums : Sum of original data.
+    sums_2 : Sum of squares of original data.
+    sim_count : Number of simulations.
+    prior_m : Prior mean.
+    prior_a : Prior alpha from inverse gamma dist. for unknown variance of original data.
+        In theory a > 0, but as we always have at least one observation, we can start at 0.
+    prior_b : Prior beta from inverse gamma dist. for unknown variance of original data.
+        In theory b > 0, but as we always have at least one observation, we can start at 0.
+    prior_w : Prior effective sample size.
+    seed : Random seed.
+
+    Returns
+    -------
+    mu_post : List of size sim_count with mus drawn from normal distribution.
+    sig_2_post : List of size sim_count with mus drawn from normal distribution.
+    """
+    if isinstance(seed, int):
+        rng = np.random.default_rng(seed)
+    else:
+        rng = np.random
+
+    x_bar = sums / total
+    a_post = prior_a + (total / 2)
+    b_post = (
+        prior_b
+        + (1 / 2) * (sums_2 - 2 * sums * x_bar + total * (x_bar ** 2))
+        + ((total * prior_w) / (2 * (total + prior_w))) * ((x_bar - prior_m) ** 2)
+    )
+
+    # here it has to be 1/b as it is a scale, and not a rate
+    sig_2_post = 1 / rng.gamma(a_post, 1 / b_post, sim_count)
+
+    m_post = (total * x_bar + prior_w * prior_m) / (total + prior_w)
+
+    mu_post = rng.normal(m_post, np.sqrt(sig_2_post / (total + prior_w)))
+
+    return mu_post, sig_2_post
+
+
 def lognormal_posteriors(
-    totals: int,
+    total: int,
     sum_logs: float,
     sum_logs_2: float,
     sim_count: int = 20000,
-    prior_m: Number = 1,
-    prior_a: Number = 0,
-    prior_b: Number = 0,
-    prior_w: Number = 0.01,
+    prior_m: Union[float, int] = 1,
+    prior_a: Union[float, int] = 0,
+    prior_b: Union[float, int] = 0,
+    prior_w: Union[float, int] = 0.01,
     seed: int = None,
 ) -> List[float]:
     """
@@ -128,7 +185,7 @@ def lognormal_posteriors(
 
     Parameters
     ----------
-    totals : Number of lognormal data observations.
+    total : Number of lognormal data observations.
         Could be number of conversions in session data.
     sum_logs : Sum of logarithms of original data.
     sum_logs_2 : Sum of logarithms squared of original data.
@@ -147,35 +204,21 @@ def lognormal_posteriors(
     -------
     res : List of sim_count numbers drawn from lognormal distribution.
     """
-    if isinstance(seed, int):
-        rng = np.random.default_rng(seed)
-    else:
-        rng = np.random
-    if totals <= 0:
+    if total <= 0:
         return list(np.zeros(sim_count))
-    else:
-        x_bar = sum_logs / totals
-        a_post = prior_a + (totals / 2)
-        b_post = (
-            prior_b
-            + (1 / 2) * (sum_logs_2 - 2 * sum_logs * x_bar + totals * (x_bar ** 2))
-            + ((totals * prior_w) / (2 * (totals + prior_w))) * ((x_bar - prior_m) ** 2)
-        )
 
-        # here it has to be 1/b as it is a scale, and not a rate
-        sig_2_post = 1 / rng.gamma(a_post, 1 / b_post, sim_count)
+    # normal posterior for aggregated data of logarithms of original data
+    normal_mu_post, normal_sig_2_post = normal_posteriors(
+        total, sum_logs, sum_logs_2, sim_count, prior_m, prior_a, prior_b, prior_w, seed
+    )
 
-        m_post = (totals * x_bar + prior_w * prior_m) / (totals + prior_w)
+    # final simulated lognormal means using simulated normal means and sigmas
+    res = np.exp(normal_mu_post + (normal_sig_2_post / 2))
 
-        normal_post = rng.normal(m_post, np.sqrt(sig_2_post / (totals + prior_w)))
-
-        # final simulated lognormal means using simulated normal means
-        res = np.exp(normal_post + (sig_2_post / 2))
-
-        return res
+    return res
 
 
-def pbb_lognormal_agg(
+def pbb_delta_lognormal_agg(
     totals: List[int],
     non_zeros: List[int],
     sum_logs: List[float],
@@ -190,10 +233,7 @@ def pbb_lognormal_agg(
     seed: int = None,
 ) -> List[float]:
     """
-    Method estimating probabilities of being best for lognormal aggregated data per variant.
-    For convenience, this method allows working with underling data containing also zeros
-    which is more practical as revenue-like data can contain many cases with no-revenue
-    (e.g. revenue per online shop session where most of the sessions are without any order).
+    Method estimating probabilities of being best for delta-lognormal aggregated data per variant.
     For that reason the method works with both totals and non_zeros.
 
     Parameters

@@ -1,6 +1,6 @@
 import pytest
 
-from bayes_ab_test.metrics import pbb_bernoulli_agg, pbb_lognormal_agg
+from bayes_ab_test.metrics import pbb_bernoulli_agg, pbb_delta_lognormal_agg
 
 PBB_BERNOULLI_AGG_INPUTS = [
     {
@@ -20,6 +20,15 @@ PBB_BERNOULLI_AGG_INPUTS = [
             "seed": 52,
         },
         "expected_output": [0.4899, 0.5101],
+    },
+    {
+        "input": {
+            "totals": [100, 100],
+            "successes": [0, 0],
+            "sim_count": 20000,
+            "seed": 52,
+        },
+        "expected_output": [0.5008, 0.4992],
     },
     {
         "input": {
@@ -92,7 +101,7 @@ def test_pbb_bernoulli_agg(inp):
 @pytest.mark.parametrize("inp", PBB_LOGNORMAL_AGG_INPUTS)
 def test_pbb_lognormal_agg(inp):
     i = inp["input"]
-    res = pbb_lognormal_agg(
+    res = pbb_delta_lognormal_agg(
         i["totals"],
         i["successes"],
         i["sum_logs"],

@@ -3,8 +3,8 @@
 # bayes-ab-test: Bayesian A/B testing
 `bayes-ab-test` is a small package for a quick evaluation of A/B (or A/B/C/...) tests using Bayesian approach.
 
-The core evaluation metric of the approach is `Probability of Being Best` which is calculated using simulations
-from posterior distribution (considering given data).
+The core evaluation metric of the approach is `Probability of Being Best` (i.e. "being larger" from data point of view)
+which is calculated using simulations from posterior distribution (considering given data).
 
 The package currently supports these data inputs:
 - **binary data** (`[0, 1, 0, ...]`) - convenient for conversion-like A/B testing

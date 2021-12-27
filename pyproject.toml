@@ -17,6 +17,7 @@ packages = [
 [tool.poetry.dependencies]
 python = "^3.7.1"
 numpy = "^1.20.0"
+matplotlib = "^3.5.1"
 
 [tool.poetry.dev-dependencies]
 jupyter = "^1.0.0"

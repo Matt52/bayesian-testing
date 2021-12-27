@@ -144,7 +144,7 @@ def pbb_normal_agg(
                 a_priors_ig[i],
                 b_priors_ig[i],
                 w_priors[i],
-                seed,
+                seed if (seed is None) else seed + i,
             )[0]
             for i in range(len(totals))
         ]
@@ -227,7 +227,7 @@ def pbb_delta_lognormal_agg(
                     a_priors_ig[i],
                     b_priors_ig[i],
                     w_priors[i],
-                    seed,
+                    seed if (seed is None) else seed + 1 + i,
                 )
                 for i in range(len(totals))
             ]

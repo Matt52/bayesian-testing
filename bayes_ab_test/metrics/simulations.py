@@ -128,7 +128,7 @@ def lognormal_posteriors(
 
     Parameters
     ----------
-    totals : Number data observations from lognormal data.
+    totals : Number of data observations from lognormal data.
         Could be number of conversions in session data.
     sum_logs : Sum of logarithms of original data.
     sum_logs_2 : Sum of logarithms squared of original data.

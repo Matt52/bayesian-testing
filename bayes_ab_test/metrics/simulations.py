@@ -123,8 +123,8 @@ def lognormal_posteriors(
     seed: int = None,
 ) -> List[float]:
     """
-    Drawing from lognormal distribution using logarithms of original (lognormal) data
-    (logarithms of lognormal data are normal).
+    Drawing from posterior lognormal distribution using logarithms of original (lognormal) data
+    (logarithms of lognormal data are normal). Input data is in aggregated form.
 
     Parameters
     ----------

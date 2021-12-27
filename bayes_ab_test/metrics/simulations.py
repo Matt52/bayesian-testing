@@ -128,7 +128,7 @@ def lognormal_posteriors(
 
     Parameters
     ----------
-    totals : Number of data observations from lognormal data.
+    totals : Number of lognormal data observations.
         Could be number of conversions in session data.
     sum_logs : Sum of logarithms of original data.
     sum_logs_2 : Sum of logarithms squared of original data.
@@ -140,7 +140,7 @@ def lognormal_posteriors(
     prior_b : Prior beta from inverse gamma dist. for unknown variance of logarithms
         of original data. In theory b > 0, but as we always have at least one observation,
         we can start at 0.
-    prior_w : Effective sample size.
+    prior_w : Prior effective sample size.
     seed : Random seed.
 
     Returns

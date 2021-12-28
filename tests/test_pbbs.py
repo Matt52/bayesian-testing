@@ -97,8 +97,17 @@ PBB_NORMAL_AGG_INPUTS = [
     },
     {
         "input": {
+            "totals": [10000, 10000],
+            "sums": [11446.35, 11446.35],
+            "sums_2": [214614.36, 214614.36],
+            "sim_count": 20000,
+            "seed": 52,
+        },
+        "expected_output": [0.503, 0.497],
+    },
+    {
+        "input": {
             "totals": [],
-            "successes": [],
             "sums": [],
             "sums_2": [],
             "sim_count": 10000,

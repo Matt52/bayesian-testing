@@ -36,7 +36,7 @@ aggregation can be done on a database level)
 To get the results of the test, simply call method `evaluate`, or `probabs_of_being_best`
 for returning just the probabilities.
 
-Probabilities of being best are approximated using simulations. Hence `evaluate` can return slightly different
+Probabilities of being best are approximated using simulations, hence `evaluate` can return slightly different
 values for different runs. To stabilize it, you can set `sim_count` parameter of `evaluate` to higher value
 (default value is 20K), or even use `seed` parameter to fix it completely.
 

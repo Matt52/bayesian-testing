@@ -9,7 +9,7 @@ def beta_posteriors_all(
     sim_count: int,
     a_priors_beta: List[Union[float, int]],
     b_priors_beta: List[Union[float, int]],
-    seed: int = None,
+    seed: Union[int, np.random.bit_generator.SeedSequence] = None,
 ) -> np.ndarray:
     """
     Draw from beta posterior distributions for all variants at once.
@@ -51,7 +51,7 @@ def normal_posteriors(
     prior_a: Union[float, int] = 0,
     prior_b: Union[float, int] = 0,
     prior_w: Union[float, int] = 0.01,
-    seed: int = None,
+    seed: Union[int, np.random.bit_generator.SeedSequence] = None,
 ) -> Tuple[List[Union[float, int]], List[Union[float, int]]]:
     """
     Drawing mus and sigmas from posterior normal distribution considering given aggregated data.
@@ -104,7 +104,7 @@ def lognormal_posteriors(
     prior_a: Union[float, int] = 0,
     prior_b: Union[float, int] = 0,
     prior_w: Union[float, int] = 0.01,
-    seed: int = None,
+    seed: Union[int, np.random.bit_generator.SeedSequence] = None,
 ) -> List[float]:
     """
     Drawing from posterior lognormal distribution using logarithms of original (lognormal) data

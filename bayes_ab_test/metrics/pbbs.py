@@ -53,7 +53,7 @@ def pbb_bernoulli_agg(
     a_priors_beta: List[Number] = None,
     b_priors_beta: List[Number] = None,
     sim_count: int = 20000,
-    seed: Union[int, np.random.bit_generator.SeedSequence] = None,
+    seed: int = None,
 ) -> List[float]:
     """
     Method estimating probabilities of being best for beta-bernoulli aggregated data per variant.
@@ -100,7 +100,7 @@ def pbb_normal_agg(
     a_priors_ig: List[Number] = None,
     b_priors_ig: List[Number] = None,
     w_priors: List[Number] = None,
-    seed: Union[int, np.random.bit_generator.SeedSequence] = None,
+    seed: int = None,
 ) -> List[float]:
     """
     Method estimating probabilities of being best for normal aggregated data per variant.
@@ -172,7 +172,7 @@ def pbb_delta_lognormal_agg(
     a_priors_ig: List[Number] = None,
     b_priors_ig: List[Number] = None,
     w_priors: List[Number] = None,
-    seed: Union[int, np.random.bit_generator.SeedSequence] = None,
+    seed: int = None,
 ) -> List[float]:
     """
     Method estimating probabilities of being best for delta-lognormal aggregated data per variant.

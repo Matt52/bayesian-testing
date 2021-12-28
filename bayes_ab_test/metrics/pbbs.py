@@ -26,9 +26,11 @@ def validate_bernoulli_input(totals: List[int], positives: List[int]) -> None:
 def estimate_probabilities(data: Union[List[List[Number]], np.ndarray]) -> List[float]:
     """
     Estimate probabilities for variants considering simulated data from respective posteriors.
+
     Parameters
     ----------
     data : List of simulated data for each variant.
+
     Returns
     -------
     res : List of probabilities of being best for each variant.
@@ -53,6 +55,7 @@ def pbb_bernoulli_agg(
 ) -> List[float]:
     """
     Method estimating probabilities of being best for beta-bernoulli aggregated data per variant.
+
     Parameters
     ----------
     totals : List of numbers of experiment observations (e.g. number of sessions) for each variant.
@@ -61,6 +64,7 @@ def pbb_bernoulli_agg(
     a_priors_beta : List of prior alpha parameters for Beta distributions for each variant.
     b_priors_beta : List of prior beta parameters for Beta distributions for each variant.
     seed : Random seed.
+
     Returns
     -------
     res : List of probabilities of being best for each variant.
@@ -98,6 +102,7 @@ def pbb_normal_agg(
 ) -> List[float]:
     """
     Method estimating probabilities of being best for normal aggregated data per variant.
+
     Parameters
     ----------
     totals : List of numbers of experiment observations for each variant.
@@ -109,6 +114,7 @@ def pbb_normal_agg(
     b_priors_ig : List of prior betas from inverse gamma dist approximating variance.
     w_priors : List of prior effective sample sizes for each variant.
     seed : Random seed.
+
     Returns
     -------
     res : List of probabilities of being best for each variant.
@@ -169,6 +175,7 @@ def pbb_delta_lognormal_agg(
     """
     Method estimating probabilities of being best for delta-lognormal aggregated data per variant.
     For that reason the method works with both totals and non_zeros.
+
     Parameters
     ----------
     totals : List of numbers of experiment observations (e.g. number of sessions) for each variant.
@@ -183,6 +190,7 @@ def pbb_delta_lognormal_agg(
     b_priors_ig : List of prior betas from inverse gamma dist approximating variance of logarithms.
     w_priors : List of prior effective sample sizes for each variant.
     seed : Random seed.
+
     Returns
     -------
     res : List of probabilities of being best for each variant.

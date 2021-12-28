@@ -13,6 +13,7 @@ def beta_posteriors_all(
 ) -> np.ndarray:
     """
     Draw from beta posterior distributions for all variants at once.
+
     Parameters
     ----------
     totals : List of numbers of experiment observations (e.g. number of sessions) for each variant.
@@ -21,6 +22,7 @@ def beta_posteriors_all(
     a_priors_beta : List of prior alpha parameters for Beta distributions for each variant.
     b_priors_beta : List of prior beta parameters for Beta distributions for each variant.
     seed : Random seed.
+
     Returns
     -------
     beta_samples : List of lists of beta distribution samples for all variants.
@@ -53,6 +55,7 @@ def normal_posteriors(
 ) -> Tuple[List[Union[float, int]], List[Union[float, int]]]:
     """
     Drawing mus and sigmas from posterior normal distribution considering given aggregated data.
+
     Parameters
     ----------
     total : Number of data observations from normal data.
@@ -66,6 +69,7 @@ def normal_posteriors(
         In theory b > 0, but as we always have at least one observation, we can start at 0.
     prior_w : Prior effective sample size.
     seed : Random seed.
+
     Returns
     -------
     mu_post : List of size sim_count with mus drawn from normal distribution.
@@ -105,6 +109,7 @@ def lognormal_posteriors(
     """
     Drawing from posterior lognormal distribution using logarithms of original (lognormal) data
     (logarithms of lognormal data are normal). Input data is in aggregated form.
+
     Parameters
     ----------
     total : Number of lognormal data observations.
@@ -121,6 +126,7 @@ def lognormal_posteriors(
         we can start at 0.
     prior_w : Prior effective sample size.
     seed : Random seed.
+
     Returns
     -------
     res : List of sim_count numbers drawn from lognormal distribution.

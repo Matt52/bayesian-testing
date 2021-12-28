@@ -27,10 +27,8 @@ def beta_posteriors_all(
     -------
     beta_samples : List of lists of beta distribution samples for all variants.
     """
-    if isinstance(seed, int):
-        rng = np.random.default_rng(seed)
-    else:
-        rng = np.random
+    rng = np.random.default_rng(seed)
+
     beta_samples = np.array(
         [
             rng.beta(
@@ -77,10 +75,7 @@ def normal_posteriors(
     mu_post : List of size sim_count with mus drawn from normal distribution.
     sig_2_post : List of size sim_count with mus drawn from normal distribution.
     """
-    if isinstance(seed, int):
-        rng = np.random.default_rng(seed)
-    else:
-        rng = np.random
+    rng = np.random.default_rng(seed)
 
     x_bar = sums / total
     a_post = prior_a + (total / 2)

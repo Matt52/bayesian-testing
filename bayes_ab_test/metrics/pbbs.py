@@ -53,7 +53,7 @@ def pbb_bernoulli_agg(
     a_priors_beta: List[Number] = None,
     b_priors_beta: List[Number] = None,
     sim_count: int = 20000,
-    seed: int = None,
+    seed: Union[int, np.random.bit_generator.SeedSequence] = None,
 ) -> List[float]:
     """
     Method estimating probabilities of being best for beta-bernoulli aggregated data per variant.
@@ -100,7 +100,7 @@ def pbb_normal_agg(
     a_priors_ig: List[Number] = None,
     b_priors_ig: List[Number] = None,
     w_priors: List[Number] = None,
-    seed: int = None,
+    seed: Union[int, np.random.bit_generator.SeedSequence] = None,
 ) -> List[float]:
     """
     Method estimating probabilities of being best for normal aggregated data per variant.
@@ -133,6 +133,11 @@ def pbb_normal_agg(
     if not w_priors:
         w_priors = [0.01] * len(totals)
 
+    # we will need different generators for each call of normal_posteriors
+    # (so they are not perfectly correlated)
+    ss = np.random.SeedSequence(seed)
+    child_seeds = ss.spawn(len(totals))
+
     normal_samples = np.array(
         [
             normal_posteriors(
@@ -144,7 +149,7 @@ def pbb_normal_agg(
                 a_priors_ig[i],
                 b_priors_ig[i],
                 w_priors[i],
-                seed if (seed is None) else seed + i,
+                child_seeds[i],
             )[0]
             for i in range(len(totals))
         ]
@@ -167,7 +172,7 @@ def pbb_delta_lognormal_agg(
     a_priors_ig: List[Number] = None,
     b_priors_ig: List[Number] = None,
     w_priors: List[Number] = None,
-    seed: int = None,
+    seed: Union[int, np.random.bit_generator.SeedSequence] = None,
 ) -> List[float]:
     """
     Method estimating probabilities of being best for delta-lognormal aggregated data per variant.
@@ -212,8 +217,12 @@ def pbb_delta_lognormal_agg(
         # if only zeros in all variants
         return list(np.full(len(totals), round(1 / len(totals), 7)))
     else:
+        # we will need different generators for each call of lognormal_posteriors
+        ss = np.random.SeedSequence(seed)
+        child_seeds = ss.spawn(len(totals) + 1)
+
         beta_samples = beta_posteriors_all(
-            totals, non_zeros, sim_count, a_priors_beta, b_priors_beta, seed
+            totals, non_zeros, sim_count, a_priors_beta, b_priors_beta, child_seeds[0]
         )
 
         lognormal_samples = np.array(
@@ -227,7 +236,7 @@ def pbb_delta_lognormal_agg(
                     a_priors_ig[i],
                     b_priors_ig[i],
                     w_priors[i],
-                    seed if (seed is None) else seed + 1 + i,
+                    child_seeds[1 + i],
                 )
                 for i in range(len(totals))
             ]

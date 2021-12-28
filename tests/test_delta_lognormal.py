@@ -76,12 +76,12 @@ def test_w_priors(rev_test):
 
 
 def test_probabs_of_being_best(rev_test):
-    pbbs = rev_test.probabs_of_being_best(sim_count=20000, seed=21)
-    assert pbbs == {"A": 0.38345, "B": 0.13855, "C": 0.478}
+    pbbs = rev_test.probabs_of_being_best(sim_count=20000, seed=152)
+    assert pbbs == {"A": 0.3827, "B": 0.13765, "C": 0.47965}
 
 
 def test_evaluate(rev_test):
-    eval_report = rev_test.evaluate(sim_count=20000, seed=21)
+    eval_report = rev_test.evaluate(sim_count=20000, seed=152)
     print(eval_report)
     assert eval_report == [
         {
@@ -91,7 +91,7 @@ def test_evaluate(rev_test):
             "sum_values": 29.92,
             "avg_values": 2.992,
             "avg_positive_values": 9.97333,
-            "prob_being_best": 0.38345,
+            "prob_being_best": 0.3827,
         },
         {
             "variant": "B",
@@ -100,7 +100,7 @@ def test_evaluate(rev_test):
             "sum_values": 20.4,
             "avg_values": 2.04,
             "avg_positive_values": 10.2,
-            "prob_being_best": 0.13855,
+            "prob_being_best": 0.13765,
         },
         {
             "variant": "C",
@@ -109,6 +109,6 @@ def test_evaluate(rev_test):
             "sum_values": 23.1,
             "avg_values": 2.1,
             "avg_positive_values": 7.7,
-            "prob_being_best": 0.478,
+            "prob_being_best": 0.47965,
         },
     ]

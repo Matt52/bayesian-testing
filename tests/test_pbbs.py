@@ -63,7 +63,7 @@ PBB_NORMAL_AGG_INPUTS = [
             "sim_count": 20000,
             "seed": 52,
         },
-        "expected_output": [0.43935, 0.19595, 0.3647],
+        "expected_output": [0.43605, 0.19685, 0.3671],
     },
     {
         "input": {
@@ -73,17 +73,17 @@ PBB_NORMAL_AGG_INPUTS = [
             "sim_count": 20000,
             "seed": 52,
         },
-        "expected_output": [0.9433, 0.0567],
+        "expected_output": [0.94445, 0.05555],
     },
     {
         "input": {
             "totals": [10, 20, 30, 40],
             "sums": [0, 0, 0, 0],
             "sums_2": [0, 0, 0, 0],
-            "sim_count": 10000,
+            "sim_count": 20000,
             "seed": 52,
         },
-        "expected_output": [0.4074, 0.2526, 0.1851, 0.1549],
+        "expected_output": [0.40785, 0.25105, 0.1928, 0.1483],
     },
     {
         "input": {
@@ -103,7 +103,7 @@ PBB_NORMAL_AGG_INPUTS = [
             "sim_count": 20000,
             "seed": 52,
         },
-        "expected_output": [0.503, 0.497],
+        "expected_output": [0.5024, 0.4976],
     },
     {
         "input": {
@@ -117,7 +117,7 @@ PBB_NORMAL_AGG_INPUTS = [
     },
 ]
 
-PBB_LOGNORMAL_AGG_INPUTS = [
+PBB_DELTA_LOGNORMAL_AGG_INPUTS = [
     {
         "input": {
             "totals": [31500, 32000, 31000],
@@ -127,7 +127,7 @@ PBB_LOGNORMAL_AGG_INPUTS = [
             "sim_count": 20000,
             "seed": 52,
         },
-        "expected_output": [0.00025, 0.03305, 0.9667],
+        "expected_output": [0.00015, 0.03345, 0.9664],
     },
     {
         "input": {
@@ -138,7 +138,7 @@ PBB_LOGNORMAL_AGG_INPUTS = [
             "sim_count": 10000,
             "seed": 52,
         },
-        "expected_output": [0.495, 0.505],
+        "expected_output": [0.5013, 0.4987],
     },
     {
         "input": {
@@ -198,8 +198,15 @@ def test_pbb_normal_agg(inp):
     assert res == inp["expected_output"]
 
 
-@pytest.mark.parametrize("inp", PBB_LOGNORMAL_AGG_INPUTS)
-def test_pbb_lognormal_agg(inp):
+def test_pbb_normal_agg_different_runs():
+    # two different runs of same input without seed should be different
+    run1 = pbb_normal_agg([100, 100], [10, 10], [20, 20])
+    run2 = pbb_normal_agg([100, 100], [10, 10], [20, 20])
+    assert run1 != run2
+
+
+@pytest.mark.parametrize("inp", PBB_DELTA_LOGNORMAL_AGG_INPUTS)
+def test_pbb_delta_lognormal_agg(inp):
     i = inp["input"]
     res = pbb_delta_lognormal_agg(
         i["totals"],
@@ -210,3 +217,10 @@ def test_pbb_lognormal_agg(inp):
         seed=i["seed"],
     )
     assert res == inp["expected_output"]
+
+
+def test_pbb_delta_lognormal_agg_different_runs():
+    # two different runs of same input without seed should be different
+    run1 = pbb_delta_lognormal_agg([1000, 1000], [100, 100], [10, 10], [20, 20])
+    run2 = pbb_delta_lognormal_agg([1000, 1000], [100, 100], [10, 10], [20, 20])
+    assert run1 != run2

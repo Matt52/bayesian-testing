@@ -7,9 +7,7 @@ from bayes_ab_test.experiments import DeltaLognormalDataTest
 def rev_test():
     rev = DeltaLognormalDataTest()
     rev.add_variant_data("A", [0, 10.7, 0, 8, 0, 0, 0, 0, 0, 11.22], a_prior_beta=1)
-    rev.add_variant_data(
-        "B", [0, 0, 0, 11.3, 0, 0, 0, 0, 0, 9.1], m_prior=2, w_prior=0.02
-    )
+    rev.add_variant_data("B", [0, 0, 0, 11.3, 0, 0, 0, 0, 0, 9.1], m_prior=2, w_prior=0.02)
     rev.add_variant_data_agg(
         "C",
         11,
@@ -82,7 +80,6 @@ def test_probabs_of_being_best(rev_test):
 
 def test_evaluate(rev_test):
     eval_report = rev_test.evaluate(sim_count=20000, seed=152)
-    print(eval_report)
     assert eval_report == [
         {
             "variant": "A",

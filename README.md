@@ -3,12 +3,14 @@
 # bayes-ab-test: Bayesian A/B testing
 `bayes-ab-test` is a small package for a quick evaluation of A/B (or A/B/C/...) tests using Bayesian approach.
 
-The core evaluation metric of the approach is `Probability of Being Best` (i.e. "being larger" from data point of view)
-which is calculated using simulations from posterior distribution (considering given data).
-
 The package currently supports these data inputs:
 - **binary data** (`[0, 1, 0, ...]`) - convenient for conversion-like A/B testing
-- **delta-lognormal data** (`[0, 21.2, 0, ...]`) - convenient for revenue-like A/B testing
+- **normal data** with unknown variance
+- **delta-lognormal data** (lognormal data with zeros) - convenient for revenue-like A/B testing
+
+The core evaluation metric of the approach is `Probability of Being Best` for the mean
+(i.e. "being larger" from data point of view)
+which is calculated using simulations from posterior distributions (considering given data).
 
 
 ## Installation
@@ -24,13 +26,15 @@ poetry install
 ```
 
 ## Basic Usage
-The primary features are `BinaryDataTest` and `DeltaLognormalDataTest` classes.
+The primary features are `BinaryDataTest`, `NormalDataTest` and `DeltaLognormalDataTest` classes.
 
-In both cases, there are two methods to insert data:
+In all cases, there are two methods to insert data:
 - `add_variant_data` - adding raw data for a variant as a list of numbers (or numpy 1-D array)
-- `add_variant_data_agg` - adding aggregated variant data (this can be practical for large data as the aggregation can be done on a database level)
+- `add_variant_data_agg` - adding aggregated variant data (this can be practical for large data, as the
+aggregation can be done on a database level)
 
-To get the results of the test, simply call method `evaluate`, or `probabs_of_being_best` for returning just the probabilities.
+To get the results of the test, simply call method `evaluate`, or `probabs_of_being_best`
+for returning just the probabilities.
 
 Probabilities of being best are approximated using simulations. Hence `evaluate` can return slightly different
 values for different runs. To stabilize it, you can set `sim_count` parameter of `evaluate` to higher value
@@ -44,21 +48,21 @@ Class for Bayesian A/B test for binary-like data (e.g. conversions, successes, e
 import numpy as np
 from bayes_ab_test.experiments import BinaryDataTest
 
-
+# generating some random data
+rng = np.random.default_rng(52)
 # random 1x1500 array of 0/1 data with 5.2% probability for 1:
-data_a = np.random.default_rng(21).binomial(n=1, p=0.052, size=1500)
-
+data_a = rng.binomial(n=1, p=0.052, size=1500)
 # random 1x1200 array of 0/1 data with 6.7% probability for 1:
-data_b = np.random.default_rng(21).binomial(n=1, p=0.067, size=1200)
+data_b = rng.binomial(n=1, p=0.067, size=1200)
 
-# initialize test
+# initialize a test
 test = BinaryDataTest()
 
-# adding variant using raw data (arrays of zeros and ones):
+# add variant using raw data (arrays of zeros and ones):
 test.add_variant_data("A", data_a)
 test.add_variant_data("B", data_b)
 
-# adding variant using aggregated data (same as raw data with 950 zeros and 50 ones):
+# add variant using aggregated data (same as raw data with 950 zeros and 50 ones):
 test.add_variant_data_agg("C", totals=1000, positives=50)
 
 # evaluate test
@@ -69,17 +73,61 @@ test.evaluate()
       'totals': 1500,
       'positives': 80,
       'conv_rate': 0.05333,
-      'prob_being_best': 0.1198},
+      'prob_being_best': 0.06625},
      {'variant': 'B',
       'totals': 1200,
-      'positives': 76,
-      'conv_rate': 0.06333,
-      'prob_being_best': 0.8058},
+      'positives': 80,
+      'conv_rate': 0.06667,
+      'prob_being_best': 0.89005},
      {'variant': 'C',
       'totals': 1000,
       'positives': 50,
       'conv_rate': 0.05,
-      'prob_being_best': 0.0744}]
+      'prob_being_best': 0.0437}]
+
+### NormalDataTest
+Class for Bayesian A/B test for normal data.
+
+```python
+import numpy as np
+from bayes_ab_test.experiments import NormalDataTest
+
+# generating some random data
+rng = np.random.default_rng(21)
+data_a = rng.normal(7.2, 2, 1000)
+data_b = rng.normal(7.1, 2, 800)
+data_c = rng.normal(7.0, 4, 500)
+
+# initialize a test
+test = NormalDataTest()
+
+# add variant using raw data:
+test.add_variant_data("A", data_a)
+test.add_variant_data("B", data_b)
+# test.add_variant_data("C", data_c)
+
+# add variant using aggregated data:
+test.add_variant_data_agg("C", len(data_c), sum(data_c), sum(np.square(data_c)))
+
+# evaluate test
+test.evaluate(sim_count=20000, seed=52)
+```
+
+    [{'variant': 'A',
+      'totals': 1000,
+      'sum_values': 7294.67901,
+      'avg_values': 7.29468,
+      'prob_being_best': 0.1707},
+     {'variant': 'B',
+      'totals': 800,
+      'sum_values': 5685.86168,
+      'avg_values': 7.10733,
+      'prob_being_best': 0.00125},
+     {'variant': 'C',
+      'totals': 500,
+      'sum_values': 3736.91581,
+      'avg_values': 7.47383,
+      'prob_being_best': 0.82805}]
 
 ### DeltaLognormalDataTest
 Class for Bayesian A/B test for delta-lognormal data (log-normal with zeros).
@@ -97,7 +145,7 @@ test = DeltaLognormalDataTest()
 data_a = [7.1, 0.3, 5.9, 0, 1.3, 0.3, 0, 0, 0, 0, 0, 1.5, 2.2, 0, 4.9, 0, 0, 0, 0, 0]
 data_b = [4.0, 0, 3.3, 19.3, 18.5, 0, 0, 0, 12.9, 0, 0, 0, 0, 0, 0, 0, 0, 3.7, 0, 0]
 
-# adding variant using raw data 
+# adding variant using raw data
 test.add_variant_data("A", data_a)
 
 # alternatively, variant can be also added using aggregated data:
@@ -119,14 +167,14 @@ test.evaluate(seed=21)
       'sum_values': 23.5,
       'avg_values': 1.175,
       'avg_positive_values': 2.9375,
-      'prob_being_best': 0.1913},
+      'prob_being_best': 0.18915},
      {'variant': 'B',
       'totals': 20,
       'positives': 6,
       'sum_values': 61.7,
       'avg_values': 3.085,
       'avg_positive_values': 10.28333,
-      'prob_being_best': 0.8087}]
+      'prob_being_best': 0.81085}]
 
 ## Development
 To set up development environment use [Poetry](https://python-poetry.org/) and [pre-commit](https://pre-commit.com):
@@ -141,7 +189,6 @@ pre-commit install
 Test classes to be added:
 - `PoissonDataTest`
 - `ExponentialDataTest`
-- `NormalDataTest`
 
 Metrics to be added:
 - `Expected Loss`

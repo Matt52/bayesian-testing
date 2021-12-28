@@ -43,7 +43,6 @@ def test_probabs_of_being_best(conv_test):
 
 def test_evaluate(conv_test):
     eval_report = conv_test.evaluate(sim_count=20000, seed=52)
-    print(eval_report)
     assert eval_report == [
         {
             "variant": "A",

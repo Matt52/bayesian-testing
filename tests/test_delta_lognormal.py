@@ -7,9 +7,7 @@ from bayes_ab_test.experiments import DeltaLognormalDataTest
 def rev_test():
     rev = DeltaLognormalDataTest()
     rev.add_variant_data("A", [0, 10.7, 0, 8, 0, 0, 0, 0, 0, 11.22], a_prior_beta=1)
-    rev.add_variant_data(
-        "B", [0, 0, 0, 11.3, 0, 0, 0, 0, 0, 9.1], m_prior=2, w_prior=0.02
-    )
+    rev.add_variant_data("B", [0, 0, 0, 11.3, 0, 0, 0, 0, 0, 9.1], m_prior=2, w_prior=0.02)
     rev.add_variant_data_agg(
         "C",
         11,
@@ -76,13 +74,12 @@ def test_w_priors(rev_test):
 
 
 def test_probabs_of_being_best(rev_test):
-    pbbs = rev_test.probabs_of_being_best(sim_count=20000, seed=52)
-    assert pbbs == {"A": 0.38525, "B": 0.13575, "C": 0.479}
+    pbbs = rev_test.probabs_of_being_best(sim_count=20000, seed=152)
+    assert pbbs == {"A": 0.3827, "B": 0.13765, "C": 0.47965}
 
 
 def test_evaluate(rev_test):
-    eval_report = rev_test.evaluate(sim_count=20000, seed=52)
-    print(eval_report)
+    eval_report = rev_test.evaluate(sim_count=20000, seed=152)
     assert eval_report == [
         {
             "variant": "A",
@@ -91,7 +88,7 @@ def test_evaluate(rev_test):
             "sum_values": 29.92,
             "avg_values": 2.992,
             "avg_positive_values": 9.97333,
-            "prob_being_best": 0.38525,
+            "prob_being_best": 0.3827,
         },
         {
             "variant": "B",
@@ -100,7 +97,7 @@ def test_evaluate(rev_test):
             "sum_values": 20.4,
             "avg_values": 2.04,
             "avg_positive_values": 10.2,
-            "prob_being_best": 0.13575,
+            "prob_being_best": 0.13765,
         },
         {
             "variant": "C",
@@ -109,6 +106,6 @@ def test_evaluate(rev_test):
             "sum_values": 23.1,
             "avg_values": 2.1,
             "avg_positive_values": 7.7,
-            "prob_being_best": 0.479,
+            "prob_being_best": 0.47965,
         },
     ]

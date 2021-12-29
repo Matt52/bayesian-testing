@@ -219,6 +219,6 @@ def test_pbb_delta_lognormal_agg(inp):
 
 def test_pbb_delta_lognormal_agg_different_runs():
     # two different runs of same input without seed should be different
-    run1 = pbb_delta_lognormal_agg([1000, 1000], [100, 100], [10, 10], [20, 20])
-    run2 = pbb_delta_lognormal_agg([1000, 1000], [100, 100], [10, 10], [20, 20])
+    run1 = pbb_delta_lognormal_agg([1000, 1000], [100, 100], [10, 10], [20, 20], sim_count=100000)
+    run2 = pbb_delta_lognormal_agg([1000, 1000], [100, 100], [10, 10], [20, 20], sim_count=100000)
     assert run1 != run2

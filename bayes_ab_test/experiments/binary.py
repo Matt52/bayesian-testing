@@ -18,7 +18,7 @@ class BinaryDataTest:
 
     def __init__(self) -> None:
         """
-        Initialize ConversionTest class.
+        Initialize BinaryDataTest class.
         """
         self.data = {}
 
@@ -74,14 +74,14 @@ class BinaryDataTest:
         -------
         res : List of dictionaries with results per variant.
         """
-        keys = ["variant", "totals", "positives", "conv_rate", "prob_being_best"]
-        conv_rates = [round(i[0] / i[1], 5) for i in zip(self.positives, self.totals)]
+        keys = ["variant", "totals", "positives", "positive_rate", "prob_being_best"]
+        positive_rate = [round(i[0] / i[1], 5) for i in zip(self.positives, self.totals)]
         pbbs = list(self.probabs_of_being_best(sim_count, seed).values())
         data = [
             self.variant_names,
             self.totals,
             self.positives,
-            conv_rates,
+            positive_rate,
             pbbs,
         ]
         res = [dict(zip(keys, item)) for item in zip(*data)]
@@ -98,7 +98,7 @@ class BinaryDataTest:
         replace: bool = True,
     ) -> None:
         """
-        Add variant data to test class using aggregated conversion data.
+        Add variant data to test class using aggregated binary data.
         This can be convenient as aggregation can be done on database level.
 
         Default prior setup is set for Beta(1/2, 1/2) which is non-information prior.
@@ -164,14 +164,14 @@ class BinaryDataTest:
         replace: bool = True,
     ) -> None:
         """
-        Add variant data to test class using raw conversion data.
+        Add variant data to test class using raw binary data.
 
         Default prior setup is set for Beta(1/2, 1/2) which is non-information prior.
 
         Parameters
         ----------
         name : Variant name.
-        data : List of conversion data containing zeros (non-conversion) and ones (conversions).
+        data : List of binary data containing zeros (non-conversion) and ones (conversions).
         a_prior : Prior alpha parameter for Beta distributions.
             Default value 0.5 is based on non-information prior Beta(0.5, 0.5).
         b_prior : Prior beta parameter for Beta distributions.

@@ -5,10 +5,10 @@
 
 The package currently supports these data inputs:
 - **binary data** (`[0, 1, 0, ...]`) - convenient for conversion-like A/B testing
-- **normal data** with unknown variance
+- **normal data** with unknown variance - convenient for normal data A/B testing
 - **delta-lognormal data** (lognormal data with zeros) - convenient for revenue-like A/B testing
 
-The core evaluation metric of the approach is `Probability of Being Best` for the mean
+The core evaluation metric of the approach is `Probability of Being Best`
 (i.e. "being larger" from data point of view)
 which is calculated using simulations from posterior distributions (considering given data).
 
@@ -23,6 +23,7 @@ Alternatively, you can clone the repository and use `poetry` manually:
 cd bayes-ab-test
 pip install poetry
 poetry install
+poetry shell
 ```
 
 ## Basic Usage

@@ -1,16 +1,16 @@
-import warnings
 from numbers import Number
 from typing import List
 
 import numpy as np
 
+from bayes_ab_test.experiments.base import BaseDataTest
 from bayes_ab_test.metrics import pbb_normal_agg
 from bayes_ab_test.utilities import get_logger
 
 logger = get_logger("bayes_ab_test")
 
 
-class NormalDataTest:
+class NormalDataTest(BaseDataTest):
     """
     Class for Bayesian A/B test for normal data.
 
@@ -22,11 +22,7 @@ class NormalDataTest:
         """
         Initialize NormalDataTest class.
         """
-        self.data = {}
-
-    @property
-    def variant_names(self):
-        return [k for k in self.data]
+        super().__init__()
 
     @property
     def totals(self):
@@ -239,18 +235,3 @@ class NormalDataTest:
             w_prior,
             replace,
         )
-
-    def delete_variant(self, name: str) -> None:
-        """
-        Delete variant and all its data from experiment.
-
-        Parameters
-        ----------
-        name : Variant name.
-        """
-        if not isinstance(name, str):
-            raise ValueError("Variant name has to be a string.")
-        if name not in self.variant_names:
-            warnings.warn(f"Nothing to be deleted. Variant {name} is not in experiment.")
-        else:
-            del self.data[name]

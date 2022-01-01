@@ -1,11 +1,13 @@
 [tool.poetry]
 name = "bayesian-testing"
-version = "0.1.0"
+version = "0.1.1"
 description = "Bayesian A/B testing with simple probabilities."
 authors = ["Matus Baniar"]
 license = "MIT"
+readme = "README.md"
 homepage = "https://github.com/Matt52/bayesian-testing"
 repository = "https://github.com/Matt52/bayesian-testing"
+keywords = ["ab testing", "bayes", "bayesian statistics"]
 include = [
     "LICENSE",
 ]

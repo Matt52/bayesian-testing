@@ -1,5 +1,5 @@
 [![Tests](https://github.com/Matt52/bayes-ab-test/workflows/Tests/badge.svg)](https://github.com/Matt52/bayes-ab-test/actions?workflow=Tests)
-[![Codecov](https://codecov.io/gh/Matt52/bayes-ab-test/branch/main/graph/badge.svg)](https://codecov.io/gh/Matt52/bayes-ab-test)
+[![Codecov](https://codecov.io/gh/Matt52/bayes-ab-test/branch/main/graph/badge.svg?token=667K54UO8K)](https://codecov.io/gh/Matt52/bayes-ab-test)
 # bayes-ab-test: Bayesian A/B testing
 `bayes-ab-test` is a small package for a quick evaluation of A/B (or A/B/C/...) tests using Bayesian approach.
 

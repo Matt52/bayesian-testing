@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "bayesian-testing"
-version = "0.1.1"
+version = "0.1.2"
 description = "Bayesian A/B testing with simple probabilities."
 authors = ["Matus Baniar"]
 license = "MIT"
@@ -18,7 +18,7 @@ packages = [
 
 [tool.poetry.dependencies]
 python = "^3.7.1"
-numpy = "^1.20.0"
+numpy = "^1.19.0"
 
 [tool.poetry.dev-dependencies]
 jupyter = "^1.0.0"

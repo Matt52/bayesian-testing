@@ -1,6 +1,6 @@
 [![Tests](https://github.com/Matt52/bayesian-testing/workflows/Tests/badge.svg)](https://github.com/Matt52/bayesian-testing/actions?workflow=Tests)
 [![Codecov](https://codecov.io/gh/Matt52/bayesian-testing/branch/main/graph/badge.svg)](https://codecov.io/gh/Matt52/bayesian-testing)
-# bayes-ab-test: Bayesian A/B testing
+# bayesian_testing: Bayesian A/B testing
 `bayesian_testing` is a small package for a quick evaluation of A/B (or A/B/C/...) tests using Bayesian approach.
 
 The package currently supports these data inputs:
@@ -134,7 +134,7 @@ test.evaluate(sim_count=20000, seed=52)
 Class for Bayesian A/B test for delta-lognormal data (log-normal with zeros).
 Delta-lognormal data is typical case of revenue per session data where many sessions have 0 revenue
 but non-zero values are positive numbers with possible log-normal distribution.
-To handle this data, the calculation is combining binary bayes model for zero vs non-zero
+To handle this data, the calculation is combining binary Bayes model for zero vs non-zero
 "conversions" and log-normal model for non-zero values.
 
 ```python

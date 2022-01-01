@@ -1,7 +1,7 @@
-[![Tests](https://github.com/Matt52/bayes-ab-test/workflows/Tests/badge.svg)](https://github.com/Matt52/bayes-ab-test/actions?workflow=Tests)
-[![Codecov](https://codecov.io/gh/Matt52/bayes-ab-test/branch/main/graph/badge.svg?token=667K54UO8K)](https://codecov.io/gh/Matt52/bayes-ab-test)
+[![Tests](https://github.com/Matt52/bayesian_testing/workflows/Tests/badge.svg)](https://github.com/Matt52/bayesian_testing/actions?workflow=Tests)
+[![Codecov](https://codecov.io/gh/Matt52/bayesian_testing/branch/main/graph/badge.svg?token=667K54UO8K)](https://codecov.io/gh/Matt52/bayesian_testing)
 # bayes-ab-test: Bayesian A/B testing
-`bayes-ab-test` is a small package for a quick evaluation of A/B (or A/B/C/...) tests using Bayesian approach.
+`bayesian_testing` is a small package for a quick evaluation of A/B (or A/B/C/...) tests using Bayesian approach.
 
 The package currently supports these data inputs:
 - **binary data** (`[0, 1, 0, ...]`) - convenient for conversion-like A/B testing
@@ -14,13 +14,13 @@ which is calculated using simulations from posterior distributions (considering 
 
 
 ## Installation
-`bayes-ab-test` can be installed using pip:
+`bayesian_testing` can be installed using pip:
 ```console
-pip install bayes-ab-test
+pip install bayesian_testing
 ```
 Alternatively, you can clone the repository and use `poetry` manually:
 ```console
-cd bayes-ab-test
+cd bayesian_testing
 pip install poetry
 poetry install
 poetry shell
@@ -47,7 +47,7 @@ Class for Bayesian A/B test for binary-like data (e.g. conversions, successes, e
 
 ```python
 import numpy as np
-from bayes_ab_test.experiments import BinaryDataTest
+from bayesian_testing.experiments import BinaryDataTest
 
 # generating some random data
 rng = np.random.default_rng(52)
@@ -91,7 +91,7 @@ Class for Bayesian A/B test for normal data.
 
 ```python
 import numpy as np
-from bayes_ab_test.experiments import NormalDataTest
+from bayesian_testing.experiments import NormalDataTest
 
 # generating some random data
 rng = np.random.default_rng(21)
@@ -139,7 +139,7 @@ To handle this data, the calculation is combining binary bayes model for zero vs
 
 ```python
 import numpy as np
-from bayes_ab_test.experiments import DeltaLognormalDataTest
+from bayesian_testing.experiments import DeltaLognormalDataTest
 
 test = DeltaLognormalDataTest()
 
@@ -182,7 +182,7 @@ To set up development environment use [Poetry](https://python-poetry.org/) and [
 ```console
 pip install poetry
 poetry install
-pre-commit install
+poetry run pre-commit install
 ```
 
 ## Roadmap
@@ -196,6 +196,6 @@ Metrics to be added:
 - `Potential Value Remaining`
 
 ## References
-- `bayes-ab-test` package itself is dependent only on [numpy](https://numpy.org) package.
+- `bayesian_testing` package itself is dependent only on [numpy](https://numpy.org) package.
 - Work on this package (including default priors selection) was inspired mainly by Coursera
 course [Bayesian Statistics: From Concept to Data Analysis](https://www.coursera.org/learn/bayesian-statistics).

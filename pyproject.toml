@@ -1,17 +1,17 @@
 [tool.poetry]
-name = "bayes-ab-test"
+name = "bayesian-testing"
 version = "0.1.0"
 description = "Bayesian A/B testing with simple probabilities."
 authors = ["Matus Baniar"]
 license = "MIT"
-homepage = "https://github.com/Matt52/bayes-ab-test"
-repository = "https://github.com/Matt52/bayes-ab-test"
+homepage = "https://github.com/Matt52/bayesian-testing"
+repository = "https://github.com/Matt52/bayesian-testing"
 include = [
     "LICENSE",
 ]
 
 packages = [
-    {include = "bayes_ab_test"}
+    {include = "bayesian_testing"}
 ]
 
 [tool.poetry.dependencies]

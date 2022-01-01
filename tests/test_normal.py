@@ -1,6 +1,6 @@
 import pytest
 
-from bayes_ab_test.experiments import NormalDataTest
+from bayesian_testing.experiments import NormalDataTest
 
 
 @pytest.fixture

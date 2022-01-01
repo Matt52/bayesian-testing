@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from bayes_ab_test.metrics.posteriors import beta_posteriors_all, lognormal_posteriors
+from bayesian_testing.metrics.posteriors import beta_posteriors_all, lognormal_posteriors
 
 BETA_POSTERIORS_ALL_INPUTS = [
     {

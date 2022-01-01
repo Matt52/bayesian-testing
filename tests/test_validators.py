@@ -1,7 +1,7 @@
 import pytest
 
-from bayes_ab_test.metrics.pbbs import validate_bernoulli_input
-from bayes_ab_test.utilities.common import check_list_lengths
+from bayesian_testing.metrics.pbbs import validate_bernoulli_input
+from bayesian_testing.utilities.common import check_list_lengths
 
 
 def test_validate_bernoulli_input():

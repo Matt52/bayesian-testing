@@ -1,6 +1,6 @@
 import pytest
 
-from bayes_ab_test.metrics import (
+from bayesian_testing.metrics import (
     pbb_bernoulli_agg,
     pbb_normal_agg,
     pbb_delta_lognormal_agg,

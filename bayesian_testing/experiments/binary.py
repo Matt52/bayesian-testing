@@ -1,11 +1,11 @@
 from numbers import Number
 from typing import List
 
-from bayes_ab_test.experiments.base import BaseDataTest
-from bayes_ab_test.metrics import pbb_bernoulli_agg
-from bayes_ab_test.utilities import get_logger
+from bayesian_testing.experiments.base import BaseDataTest
+from bayesian_testing.metrics import pbb_bernoulli_agg
+from bayesian_testing.utilities import get_logger
 
-logger = get_logger("bayes_ab_test")
+logger = get_logger("bayesian_testing")
 
 
 class BinaryDataTest(BaseDataTest):

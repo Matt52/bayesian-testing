@@ -3,14 +3,14 @@ from typing import List, Union
 
 import numpy as np
 
-from bayes_ab_test.metrics.posteriors import (
+from bayesian_testing.metrics.posteriors import (
     beta_posteriors_all,
     lognormal_posteriors,
     normal_posteriors,
 )
-from bayes_ab_test.utilities import get_logger
+from bayesian_testing.utilities import get_logger
 
-logger = get_logger("bayes_ab_test")
+logger = get_logger("bayesian_testing")
 
 
 def validate_bernoulli_input(totals: List[int], positives: List[int]) -> None:

@@ -3,11 +3,11 @@ from typing import List
 
 import numpy as np
 
-from bayes_ab_test.experiments.base import BaseDataTest
-from bayes_ab_test.metrics import pbb_delta_lognormal_agg
-from bayes_ab_test.utilities import get_logger
+from bayesian_testing.experiments.base import BaseDataTest
+from bayesian_testing.metrics import pbb_delta_lognormal_agg
+from bayesian_testing.utilities import get_logger
 
-logger = get_logger("bayes_ab_test")
+logger = get_logger("bayesian_testing")
 
 
 class DeltaLognormalDataTest(BaseDataTest):

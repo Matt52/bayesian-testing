@@ -35,6 +35,10 @@ In all cases, there are two methods to insert data:
 - `add_variant_data_agg` - adding aggregated variant data (this can be practical for large data, as the
 aggregation can be done on a database level)
 
+Both methods for adding data are allowing specification of prior distribution using default parameters
+(see details in respective docstrings). Default prior setup should be sufficient for most of the cases
+(e.g. in cases with unknown priors or large amounts of data).
+
 To get the results of the test, simply call method `evaluate`, or `probabs_of_being_best`
 for returning just the probabilities.
 
@@ -56,6 +60,8 @@ rng = np.random.default_rng(52)
 data_a = rng.binomial(n=1, p=0.052, size=1500)
 # random 1x1200 array of 0/1 data with 6.7% probability for 1:
 data_b = rng.binomial(n=1, p=0.067, size=1200)
+# priors can be specified like this (default for this test is a=b=1/2):
+# test.add_variant_data("B", data_b, a_prior=1, b_prior=20)
 
 # initialize a test
 test = BinaryDataTest()

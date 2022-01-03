@@ -60,8 +60,6 @@ rng = np.random.default_rng(52)
 data_a = rng.binomial(n=1, p=0.052, size=1500)
 # random 1x1200 array of 0/1 data with 6.7% probability for 1:
 data_b = rng.binomial(n=1, p=0.067, size=1200)
-# priors can be specified like this (default for this test is a=b=1/2):
-# test.add_variant_data("B", data_b, a_prior=1, b_prior=20)
 
 # initialize a test
 test = BinaryDataTest()
@@ -69,6 +67,8 @@ test = BinaryDataTest()
 # add variant using raw data (arrays of zeros and ones):
 test.add_variant_data("A", data_a)
 test.add_variant_data("B", data_b)
+# priors can be specified like this (default for this test is a=b=1/2):
+# test.add_variant_data("B", data_b, a_prior=1, b_prior=20)
 
 # add variant using aggregated data (same as raw data with 950 zeros and 50 ones):
 test.add_variant_data_agg("C", totals=1000, positives=50)

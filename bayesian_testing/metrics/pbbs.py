@@ -7,6 +7,7 @@ from bayesian_testing.metrics.posteriors import (
     beta_posteriors_all,
     lognormal_posteriors,
     normal_posteriors,
+    dirichlet_posteriors,
 )
 from bayesian_testing.utilities import get_logger
 
@@ -245,3 +246,50 @@ def pbb_delta_lognormal_agg(
         res = estimate_probabilities(combined_samples)
 
         return res
+
+
+def pbb_numerical_dirichlet_agg(
+    categories: List[Union[float, int]],
+    concentrations: List[List[int]],
+    prior_alphas: List[List[Union[float, int]]] = None,
+    sim_count: int = 20000,
+    seed: int = None,
+):
+    """
+    Method estimating probabilities of being best for dirichlet-multinomial aggregated data
+    per variant. Categories in this case are expected to be a numerical values (e.g. dice numbers,
+    number of stars in a rating, etc.), where higher value is considered to be better.
+
+    Parameters
+    ----------
+    categories : All possible outcomes in given multinomial distribution.
+    concentrations : Concentration of observations for each category for all variants.
+    prior_alphas : Prior values for each category for all variants.
+    sim_count : Number of simulations.
+    seed : Random seed.
+
+    Returns
+    -------
+    res : List of probabilities of being best for each variant.
+    """
+    if len(concentrations) == 0:
+        return []
+
+    if not prior_alphas:
+        prior_alphas = [[1] * len(categories) for i in range(len(concentrations))]
+
+    # we will need different generators for each call of dirichlet_posteriors
+    ss = np.random.SeedSequence(seed)
+    child_seeds = ss.spawn(len(concentrations))
+
+    means_samples = []
+    for i in range(len(concentrations)):
+        dir_post = dirichlet_posteriors(
+            concentrations[i], prior_alphas[i], sim_count, child_seeds[i]
+        )
+        means = np.sum(np.multiply(dir_post, np.array(categories)), axis=1)
+        means_samples.append(list(means))
+
+    res = estimate_probabilities(means_samples)
+
+    return res

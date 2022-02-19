@@ -275,6 +275,7 @@ def pbb_numerical_dirichlet_agg(
     if len(concentrations) == 0:
         return []
 
+    # default prior will be expecting 1 observation in all categories for all variants
     if not prior_alphas:
         prior_alphas = [[1] * len(categories) for i in range(len(concentrations))]
 

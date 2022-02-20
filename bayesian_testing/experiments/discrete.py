@@ -21,7 +21,7 @@ class DiscreteDataTest(BaseDataTest):
 
     def __init__(self, categories: List[Union[float, int]]) -> None:
         """
-        Initialize NumericalDirichletDataTest class.
+        Initialize DiscreteDataTest class.
         """
         super().__init__()
         if not self.check_if_numerical(categories):

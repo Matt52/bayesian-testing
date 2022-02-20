@@ -99,7 +99,7 @@ class DiscreteDataTest(BaseDataTest):
         replace: bool = True,
     ) -> None:
         """
-        Add variant data to test class using aggregated dirichlet-multinomial data.
+        Add variant data to test class using aggregated discrete data.
         This can be convenient as aggregation can be done on database level.
 
         Default prior setup is Dirichlet(1,...,1) which is low information prior
@@ -156,7 +156,7 @@ class DiscreteDataTest(BaseDataTest):
         replace: bool = True,
     ) -> None:
         """
-        Add variant data to test class using raw dirichlet-multinomial data.
+        Add variant data to test class using raw discrete data.
 
         Default prior setup is Dirichlet(1,...,1) which is low information prior
         (we can interpret it as prior 1 observation of each category).

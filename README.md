@@ -8,6 +8,8 @@ The package currently supports these data inputs:
 - **binary data** (`[0, 1, 0, ...]`) - convenient for conversion-like A/B testing
 - **normal data** with unknown variance - convenient for normal data A/B testing
 - **delta-lognormal data** (lognormal data with zeros) - convenient for revenue-like A/B testing
+- **discrete data** (categorical data with numerical categories) - convenient for discrete data A/B testing
+(e.g. dice rolls, star ratings, 1-10 ratings)
 
 The core evaluation metric of the approach is `Probability of Being Best`
 (i.e. "being larger" from data point of view)
@@ -28,7 +30,11 @@ poetry shell
 ```
 
 ## Basic Usage
-The primary features are `BinaryDataTest`, `NormalDataTest` and `DeltaLognormalDataTest` classes.
+The primary features are classes:
+- `BinaryDataTest`
+- `NormalDataTest`
+- `DeltaLognormalDataTest`
+- `DiscreteDataTest`
 
 In all cases, there are two methods to insert data:
 - `add_variant_data` - adding raw data for a variant as a list of numbers (or numpy 1-D array)
@@ -183,6 +189,50 @@ test.evaluate(seed=21)
       'avg_values': 3.085,
       'avg_positive_values': 10.28333,
       'prob_being_best': 0.81085}]
+
+### DiscreteDataTest
+Class for Bayesian A/B test for discrete data with finite number of numerical categories,
+where these numbers represent some value.
+This test can be used for instance for dice rolls data (when looking for the "best" of multiple dice) or rating data
+(e.g. 1-5 stars or 1-10 scale).
+
+```python
+import numpy as np
+from bayesian_testing.experiments import DiscreteDataTest
+
+# dice rolls data for 3 dice - A, B, C
+rng = np.random.default_rng(21)
+data_a = [2, 5, 1, 4, 6, 2, 2, 6, 3, 2, 6, 3, 4, 6, 3, 1, 6, 3, 5, 6]
+data_b = [1, 2, 2, 2, 2, 3, 2, 3, 4, 2]
+data_c = [1, 3, 6, 5, 4]
+
+# initialize a test with all possible numerical categories
+test = DiscreteDataTest(categories=[1, 2, 3, 4, 5, 6])
+
+# add variant using raw data:
+test.add_variant_data("A", data_a)
+test.add_variant_data("B", data_b)
+test.add_variant_data("C", data_c)
+
+# add variant using aggregated data:
+# test.add_variant_data_agg("C", [1, 0, 1, 1, 1, 1]) # equivalent to rolls data_c
+
+# evaluate test
+test.evaluate(sim_count=20000, seed=52)
+```
+
+    [{'variant': 'A',
+      'concentration': {1: 2.0, 2: 4.0, 3: 4.0, 4: 2.0, 5: 2.0, 6: 6.0},
+      'average_value': 3.8,
+      'prob_being_best': 0.54685},
+     {'variant': 'B',
+      'concentration': {1: 1.0, 2: 6.0, 3: 2.0, 4: 1.0, 5: 0.0, 6: 0.0},
+      'average_value': 2.3,
+      'prob_being_best': 0.008},
+     {'variant': 'C',
+      'concentration': {1: 1.0, 2: 0.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0},
+      'average_value': 3.8,
+      'prob_being_best': 0.44515}]
 
 ## Development
 To set up development environment use [Poetry](https://python-poetry.org/) and [pre-commit](https://pre-commit.com):

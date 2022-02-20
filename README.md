@@ -201,7 +201,6 @@ import numpy as np
 from bayesian_testing.experiments import DiscreteDataTest
 
 # dice rolls data for 3 dice - A, B, C
-rng = np.random.default_rng(21)
 data_a = [2, 5, 1, 4, 6, 2, 2, 6, 3, 2, 6, 3, 4, 6, 3, 1, 6, 3, 5, 6]
 data_b = [1, 2, 2, 2, 2, 3, 2, 3, 4, 2]
 data_c = [1, 3, 6, 5, 4]

@@ -4,6 +4,7 @@ from bayesian_testing.metrics import (
     pbb_bernoulli_agg,
     pbb_normal_agg,
     pbb_delta_lognormal_agg,
+    pbb_numerical_dirichlet_agg,
 )
 
 PBB_BERNOULLI_AGG_INPUTS = [
@@ -175,6 +176,40 @@ PBB_DELTA_LOGNORMAL_AGG_INPUTS = [
     },
 ]
 
+PBB_NUMERICAL_DIRICHLET_AGG_INPUTS = [
+    {
+        "input": {
+            "categories": [1, 2, 3, 4, 5, 6],
+            "concentrations": [
+                [10, 10, 10, 10, 20, 10],
+                [10, 10, 10, 10, 10, 20],
+                [10, 10, 10, 20, 10, 10],
+            ],
+            "sim_count": 20000,
+            "seed": 52,
+        },
+        "expected_output": [0.28205, 0.62335, 0.0946],
+    },
+    {
+        "input": {
+            "categories": [1, 2, 3],
+            "concentrations": [[100, 100, 100]],
+            "sim_count": 20000,
+            "seed": 52,
+        },
+        "expected_output": [1],
+    },
+    {
+        "input": {
+            "categories": [],
+            "concentrations": [],
+            "sim_count": 20000,
+            "seed": 52,
+        },
+        "expected_output": [],
+    },
+]
+
 
 @pytest.mark.parametrize("inp", PBB_BERNOULLI_AGG_INPUTS)
 def test_pbb_bernoulli_agg(inp):
@@ -221,4 +256,20 @@ def test_pbb_delta_lognormal_agg_different_runs():
     # two different runs of same input without seed should be different
     run1 = pbb_delta_lognormal_agg([1000, 1000], [100, 100], [10, 10], [20, 20], sim_count=100000)
     run2 = pbb_delta_lognormal_agg([1000, 1000], [100, 100], [10, 10], [20, 20], sim_count=100000)
+    assert run1 != run2
+
+
+@pytest.mark.parametrize("inp", PBB_NUMERICAL_DIRICHLET_AGG_INPUTS)
+def test_pbb_numerical_dirichlet_agg(inp):
+    i = inp["input"]
+    res = pbb_numerical_dirichlet_agg(
+        i["categories"], i["concentrations"], sim_count=i["sim_count"], seed=i["seed"]
+    )
+    assert res == inp["expected_output"]
+
+
+def test_pbb_numerical_dirichlet_agg_different_runs():
+    # two different runs of same input without seed should be different
+    run1 = pbb_numerical_dirichlet_agg([1, 20], [[10, 10], [20, 20]])
+    run2 = pbb_numerical_dirichlet_agg([1, 20], [[10, 10], [20, 20]])
     assert run1 != run2

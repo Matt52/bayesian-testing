@@ -143,3 +143,32 @@ def lognormal_posteriors(
     res = np.exp(normal_mu_post + (normal_sig_2_post / 2))
 
     return res
+
+
+def dirichlet_posteriors(
+    concentration: List[int],
+    prior: List[Union[float, int]],
+    sim_count: int = 20000,
+    seed: Union[int, np.random.bit_generator.SeedSequence] = None,
+) -> np.ndarray:
+    """
+    Drawing from dirichlet posterior for a single variant.
+
+    Parameters
+    ----------
+    concentration : List of numbers of observation for each possible category.
+        In dice example it would be numbers of observations for each possible face.
+    prior : List of prior values for each category in dirichlet distribution.
+    sim_count : Number of simulations.
+    seed : Random seed.
+
+    Returns
+    -------
+    res : List of lists of dirichlet samples.
+    """
+    rng = np.random.default_rng(seed)
+
+    posterior_concentration = [sum(x) for x in zip(prior, concentration)]
+    res = rng.dirichlet(posterior_concentration, sim_count)
+
+    return res

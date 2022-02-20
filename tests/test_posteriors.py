@@ -1,7 +1,11 @@
 import numpy as np
 import pytest
 
-from bayesian_testing.metrics.posteriors import beta_posteriors_all, lognormal_posteriors
+from bayesian_testing.metrics.posteriors import (
+    beta_posteriors_all,
+    lognormal_posteriors,
+    dirichlet_posteriors,
+)
 
 BETA_POSTERIORS_ALL_INPUTS = [
     {
@@ -41,6 +45,19 @@ LOGNORMAL_POSTERIORS_INPUTS = [
     },
 ]
 
+DIRICHLET_POSTERIORS_INPUTS = [
+    {
+        "concentration": [1, 2, 3],
+        "prior": [1, 1, 1],
+        "sim_count": 10000,
+    },
+    {
+        "concentration": [100, 200],
+        "prior": [1 / 2, 1 / 2],
+        "sim_count": 100,
+    },
+]
+
 
 @pytest.mark.parametrize("inp", BETA_POSTERIORS_ALL_INPUTS)
 def test_beta_posteriors_all(inp):
@@ -64,3 +81,13 @@ def test_lognormal_posteriors(inp):
         inp["sim_count"],
     )
     assert len(all_pos) == inp["sim_count"]
+
+
+@pytest.mark.parametrize("inp", DIRICHLET_POSTERIORS_INPUTS)
+def test_dirichlet_posteriors(inp):
+    all_pos = dirichlet_posteriors(
+        inp["concentration"],
+        inp["prior"],
+        inp["sim_count"],
+    )
+    assert all_pos.shape == (inp["sim_count"], len(inp["concentration"]))

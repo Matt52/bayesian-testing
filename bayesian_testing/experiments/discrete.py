@@ -9,10 +9,11 @@ from bayesian_testing.utilities import get_logger
 logger = get_logger("bayesian_testing")
 
 
-class NumericalDirichletDataTest(BaseDataTest):
+class DiscreteDataTest(BaseDataTest):
     """
-    Class for Bayesian A/B test for dirichlet-multinomial data with numerical values
-    (dice rolls, star ratings, 1-10 ratings, ...).
+    Class for Bayesian A/B test for finite discrete data (i.e. categorical data
+    with numerical categories). As a real world examples we can think of dice rolls,
+    1-5 star ratings, 1-10 ratings, etc.
 
     After class initialization, use add_variant methods to insert variant data.
     Then to get results of the test, use for instance `evaluate` method.

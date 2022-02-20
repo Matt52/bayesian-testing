@@ -5,8 +5,8 @@ from bayesian_testing.experiments import NormalDataTest
 
 @pytest.fixture
 def norm_test():
-    rev = NormalDataTest()
-    rev.add_variant_data(
+    norm = NormalDataTest()
+    norm.add_variant_data(
         "A",
         [
             11.8,
@@ -32,7 +32,7 @@ def norm_test():
         ],
         m_prior=9,
     )
-    rev.add_variant_data(
+    norm.add_variant_data(
         "B",
         [
             10.6,
@@ -56,7 +56,7 @@ def norm_test():
         ],
         w_prior=0.03,
     )
-    rev.add_variant_data(
+    norm.add_variant_data(
         "C",
         [
             25.3,
@@ -84,12 +84,12 @@ def norm_test():
         ],
         b_prior_ig=2,
     )
-    rev.add_variant_data_agg("A", 20, 193.3, 2127.71, replace=False)
-    rev.add_variant_data("D", [0, 10.7, 0, 8, 0, 0, 0, 0, 0, 11.22])
-    rev.add_variant_data("D", [0, 10.7, 0, 8, 0, 0, 0, 0, 0, 11.22], replace=False)
-    rev.add_variant_data("D", [0, 10.7, 0, 8, 0, 0, 0, 0, 0, 11.22], replace=True)
-    rev.delete_variant("D")
-    return rev
+    norm.add_variant_data_agg("A", 20, 193.3, 2127.71, replace=False)
+    norm.add_variant_data("D", [0, 10.7, 0, 8, 0, 0, 0, 0, 0, 11.22])
+    norm.add_variant_data("D", [0, 10.7, 0, 8, 0, 0, 0, 0, 0, 11.22], replace=False)
+    norm.add_variant_data("D", [0, 10.7, 0, 8, 0, 0, 0, 0, 0, 11.22], replace=True)
+    norm.delete_variant("D")
+    return norm
 
 
 def test_variants(norm_test):

@@ -179,7 +179,7 @@ PBB_DELTA_LOGNORMAL_AGG_INPUTS = [
 PBB_NUMERICAL_DIRICHLET_AGG_INPUTS = [
     {
         "input": {
-            "categories": [1, 2, 3, 4, 5, 6],
+            "states": [1, 2, 3, 4, 5, 6],
             "concentrations": [
                 [10, 10, 10, 10, 20, 10],
                 [10, 10, 10, 10, 10, 20],
@@ -192,7 +192,7 @@ PBB_NUMERICAL_DIRICHLET_AGG_INPUTS = [
     },
     {
         "input": {
-            "categories": [1, 2, 3],
+            "states": [1, 2, 3],
             "concentrations": [[100, 100, 100]],
             "sim_count": 20000,
             "seed": 52,
@@ -201,7 +201,7 @@ PBB_NUMERICAL_DIRICHLET_AGG_INPUTS = [
     },
     {
         "input": {
-            "categories": [],
+            "states": [],
             "concentrations": [],
             "sim_count": 20000,
             "seed": 52,
@@ -263,7 +263,7 @@ def test_pbb_delta_lognormal_agg_different_runs():
 def test_pbb_numerical_dirichlet_agg(inp):
     i = inp["input"]
     res = pbb_numerical_dirichlet_agg(
-        i["categories"], i["concentrations"], sim_count=i["sim_count"], seed=i["seed"]
+        i["states"], i["concentrations"], sim_count=i["sim_count"], seed=i["seed"]
     )
     assert res == inp["expected_output"]
 

@@ -249,7 +249,7 @@ def pbb_delta_lognormal_agg(
 
 
 def pbb_numerical_dirichlet_agg(
-    categories: List[Union[float, int]],
+    states: List[Union[float, int]],
     concentrations: List[List[int]],
     prior_alphas: List[List[Union[float, int]]] = None,
     sim_count: int = 20000,
@@ -257,14 +257,14 @@ def pbb_numerical_dirichlet_agg(
 ):
     """
     Method estimating probabilities of being best for dirichlet-multinomial aggregated data
-    per variant. Categories in this case are expected to be a numerical values (e.g. dice numbers,
-    number of stars in a rating, etc.), where higher value is considered to be better.
+    per variant. States in this case are expected to be a numerical values (e.g. dice numbers,
+    number of stars in a rating, etc.).
 
     Parameters
     ----------
-    categories : All possible outcomes in given multinomial distribution.
-    concentrations : Concentration of observations for each category for all variants.
-    prior_alphas : Prior values for each category for all variants.
+    states : All possible outcomes in given multinomial distribution.
+    concentrations : Concentration of observations for each state for all variants.
+    prior_alphas : Prior alpha values for each state for all variants.
     sim_count : Number of simulations.
     seed : Random seed.
 
@@ -275,9 +275,9 @@ def pbb_numerical_dirichlet_agg(
     if len(concentrations) == 0:
         return []
 
-    # default prior will be expecting 1 observation in all categories for all variants
+    # default prior will be expecting 1 observation in all states for all variants
     if not prior_alphas:
-        prior_alphas = [[1] * len(categories) for i in range(len(concentrations))]
+        prior_alphas = [[1] * len(states) for i in range(len(concentrations))]
 
     # we will need different generators for each call of dirichlet_posteriors
     ss = np.random.SeedSequence(seed)
@@ -288,7 +288,7 @@ def pbb_numerical_dirichlet_agg(
         dir_post = dirichlet_posteriors(
             concentrations[i], prior_alphas[i], sim_count, child_seeds[i]
         )
-        means = np.sum(np.multiply(dir_post, np.array(categories)), axis=1)
+        means = np.sum(np.multiply(dir_post, np.array(states)), axis=1)
         means_samples.append(list(means))
 
     res = estimate_probabilities(means_samples)

@@ -191,8 +191,8 @@ test.evaluate(seed=21)
       'prob_being_best': 0.81085}]
 
 ### DiscreteDataTest
-Class for Bayesian A/B test for discrete data with finite number of numerical categories,
-where these numbers represent some value.
+Class for Bayesian A/B test for discrete data with finite number of numerical categories (states),
+representing some value.
 This test can be used for instance for dice rolls data (when looking for the "best" of multiple dice) or rating data
 (e.g. 1-5 stars or 1-10 scale).
 
@@ -205,8 +205,8 @@ data_a = [2, 5, 1, 4, 6, 2, 2, 6, 3, 2, 6, 3, 4, 6, 3, 1, 6, 3, 5, 6]
 data_b = [1, 2, 2, 2, 2, 3, 2, 3, 4, 2]
 data_c = [1, 3, 6, 5, 4]
 
-# initialize a test with all possible numerical categories
-test = DiscreteDataTest(categories=[1, 2, 3, 4, 5, 6])
+# initialize a test with all possible states (i.e. numerical categories):
+test = DiscreteDataTest(states=[1, 2, 3, 4, 5, 6])
 
 # add variant using raw data:
 test.add_variant_data("A", data_a)

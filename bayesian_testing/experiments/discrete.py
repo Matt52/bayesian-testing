@@ -11,7 +11,7 @@ logger = get_logger("bayesian_testing")
 
 class DiscreteDataTest(BaseDataTest):
     """
-    Class for Bayesian A/B test for finite discrete data (i.e. categorical data
+    Class for Bayesian A/B test for data with finite discrete states (i.e. categorical data
     with numerical categories). As a real world examples we can think of dice rolls,
     1-5 star ratings, 1-10 ratings, etc.
 
@@ -19,14 +19,18 @@ class DiscreteDataTest(BaseDataTest):
     Then to get results of the test, use for instance `evaluate` method.
     """
 
-    def __init__(self, categories: List[Union[float, int]]) -> None:
+    def __init__(self, states: List[Union[float, int]]) -> None:
         """
         Initialize DiscreteDataTest class.
+
+        Parameters
+        ----------
+        states : List of all possible states for a given discrete variable.
         """
         super().__init__()
-        if not self.check_if_numerical(categories):
-            raise ValueError("Categories in this test has to be all numbers (int or float).")
-        self.categories = categories
+        if not self.check_if_numerical(states):
+            raise ValueError("States in the test have to be numbers (int or float).")
+        self.states = states
 
     @property
     def concentrations(self):
@@ -58,7 +62,7 @@ class DiscreteDataTest(BaseDataTest):
         res : Dictionary with probabilities of being best for all variants in experiment.
         """
         pbbs = pbb_numerical_dirichlet_agg(
-            self.categories, self.concentrations, self.prior_alphas, sim_count, seed
+            self.states, self.concentrations, self.prior_alphas, sim_count, seed
         )
         res = dict(zip(self.variant_names, pbbs))
         return res
@@ -79,11 +83,11 @@ class DiscreteDataTest(BaseDataTest):
         keys = ["variant", "concentration", "average_value", "prob_being_best"]
         pbbs = list(self.probabs_of_being_best(sim_count, seed).values())
         average_values = [
-            np.sum(np.multiply(i, self.categories)) / np.sum(i) for i in self.concentrations
+            np.sum(np.multiply(i, self.states)) / np.sum(i) for i in self.concentrations
         ]
         data = [
             self.variant_names,
-            [dict(zip(self.categories, i)) for i in self.concentrations],
+            [dict(zip(self.states, i)) for i in self.concentrations],
             average_values,
             pbbs,
         ]
@@ -103,12 +107,12 @@ class DiscreteDataTest(BaseDataTest):
         This can be convenient as aggregation can be done on database level.
 
         Default prior setup is Dirichlet(1,...,1) which is low information prior
-        (we can interpret it as prior 1 observation of each category).
+        (we can interpret it as prior 1 observation of each state).
 
         Parameters
         ----------
         name : Variant name.
-        concentration : Total number of experiment observations for each category
+        concentration : Total number of experiment observations for each state
             (e.g. number of rolls for each side in a die roll data).
         prior : Prior alpha parameters of Dirichlet distribution.
         replace : Replace data if variant already exists.
@@ -116,17 +120,17 @@ class DiscreteDataTest(BaseDataTest):
         """
         if not isinstance(name, str):
             raise ValueError("Variant name has to be a string.")
-        if not len(self.categories) == len(concentration):
+        if not len(self.states) == len(concentration):
             msg = (
-                f"Concentration list has to have same size as number of categories in a test "
-                f"{len(concentration)} != {len(self.categories)}."
+                f"Concentration list has to have same size as number of states in a test "
+                f"{len(concentration)} != {len(self.states)}."
             )
             raise ValueError(msg)
         if not self.check_if_numerical(concentration):
             raise ValueError("Concentration parameter has to be a list of integer values.")
 
         if not prior:
-            prior = [1] * len(self.categories)
+            prior = [1] * len(self.states)
 
         if name not in self.variant_names:
             self.data[name] = {"concentration": concentration, "prior": prior}
@@ -159,28 +163,27 @@ class DiscreteDataTest(BaseDataTest):
         Add variant data to test class using raw discrete data.
 
         Default prior setup is Dirichlet(1,...,1) which is low information prior
-        (we can interpret it as prior 1 observation of each category).
+        (we can interpret it as prior 1 observation of each state).
 
         Parameters
         ----------
         name : Variant name.
-        data : List of numerical data observations from possible categories.
+        data : List of numerical data observations from possible states.
         prior : Prior alpha parameters of Dirichlet distribution.
         replace : Replace data if variant already exists.
             If set to False, data of existing variant will be appended to existing data.
         """
         if len(data) == 0:
             raise ValueError("Data of added variant needs to have some observations.")
-        if not min([i in self.categories for i in data]):
+        if not min([i in self.states for i in data]):
             msg = (
-                "Input data needs to be a list of numbers from possible categories: "
-                f"{self.categories}."
+                "Input data needs to be a list of numbers from possible states: " f"{self.states}."
             )
             raise ValueError(msg)
 
-        counter_dict = dict(zip(self.categories, np.zeros(len(self.categories))))
+        counter_dict = dict(zip(self.states, np.zeros(len(self.states))))
         for i in data:
             counter_dict[i] += 1
-        concentration = [counter_dict[i] for i in self.categories]
+        concentration = [counter_dict[i] for i in self.states]
 
         self.add_variant_data_agg(name, concentration, prior, replace)

@@ -5,7 +5,7 @@ from bayesian_testing.experiments import DiscreteDataTest
 
 @pytest.fixture
 def discrete_test():
-    disc = DiscreteDataTest(categories=[1, 2, 3, 4, 5, 6])
+    disc = DiscreteDataTest(states=[1, 2, 3, 4, 5, 6])
     disc.add_variant_data("A", [6, 5, 4, 4, 4, 2, 5, 4, 2, 1, 2, 5, 4, 6, 2, 3, 6, 2, 3, 6])
     disc.add_variant_data("B", [4, 6, 3, 6, 4, 6, 6, 1, 4, 1])
     disc.add_variant_data_agg("C", [10, 10, 10, 10, 10, 10], prior=[100, 100, 100, 100, 100, 100])
@@ -20,8 +20,8 @@ def test_variants(discrete_test):
     assert discrete_test.variant_names == ["A", "B", "C"]
 
 
-def test_categories(discrete_test):
-    assert discrete_test.categories == [1, 2, 3, 4, 5, 6]
+def test_states(discrete_test):
+    assert discrete_test.states == [1, 2, 3, 4, 5, 6]
 
 
 def test_concentrations(discrete_test):
@@ -61,9 +61,9 @@ def test_evaluate(discrete_test):
     ]
 
 
-def test_non_numerical_categories_error():
+def test_non_numerical_states_error():
     with pytest.raises(ValueError):
-        DiscreteDataTest(categories=[1, 2.0, "3"])
+        DiscreteDataTest(states=[1, 2.0, "3"])
 
 
 def test_non_string_variant_error(discrete_test):
@@ -81,6 +81,6 @@ def test_empty_data_error(discrete_test):
         discrete_test.add_variant_data("D", [])
 
 
-def test_non_existing_category_error(discrete_test):
+def test_non_existing_state_error(discrete_test):
     with pytest.raises(ValueError):
         discrete_test.add_variant_data("D", [1, 2, 3, 5, 21])

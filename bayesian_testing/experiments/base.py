@@ -51,7 +51,7 @@ class BaseDataTest:
 
         Returns
         -------
-        pbbs : Dictionary with expected loss for all variants in experiment.
+        loss : Dictionary with expected loss for all variants in experiment.
         """
         pbbs, loss = self.eval_simulation(sim_count, seed)
 

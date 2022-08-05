@@ -1,10 +1,11 @@
+import numpy as np
 import pytest
 
 from bayesian_testing.metrics import (
-    pbb_bernoulli_agg,
-    pbb_normal_agg,
-    pbb_delta_lognormal_agg,
-    pbb_numerical_dirichlet_agg,
+    eval_bernoulli_agg,
+    eval_normal_agg,
+    eval_delta_lognormal_agg,
+    eval_numerical_dirichlet_agg,
 )
 
 PBB_BERNOULLI_AGG_INPUTS = [
@@ -15,7 +16,7 @@ PBB_BERNOULLI_AGG_INPUTS = [
             "sim_count": 20000,
             "seed": 52,
         },
-        "expected_output": [0.04185, 0.92235, 0.0358],
+        "expected_output": ([0.04185, 0.92235, 0.0358], [0.0030138, 6.06e-05, 0.0031649]),
     },
     {
         "input": {
@@ -24,7 +25,7 @@ PBB_BERNOULLI_AGG_INPUTS = [
             "sim_count": 10000,
             "seed": 52,
         },
-        "expected_output": [0.4899, 0.5101],
+        "expected_output": ([0.4899, 0.5101], [0.0204051, 0.0182965]),
     },
     {
         "input": {
@@ -33,7 +34,7 @@ PBB_BERNOULLI_AGG_INPUTS = [
             "sim_count": 20000,
             "seed": 52,
         },
-        "expected_output": [0.5008, 0.4992],
+        "expected_output": ([0.5008, 0.4992], [0.0030829, 0.0031614]),
     },
     {
         "input": {
@@ -42,7 +43,7 @@ PBB_BERNOULLI_AGG_INPUTS = [
             "sim_count": 20000,
             "seed": 52,
         },
-        "expected_output": [1],
+        "expected_output": ([1], [0]),
     },
     {
         "input": {
@@ -51,7 +52,7 @@ PBB_BERNOULLI_AGG_INPUTS = [
             "sim_count": 20000,
             "seed": 52,
         },
-        "expected_output": [],
+        "expected_output": ([], []),
     },
 ]
 
@@ -64,7 +65,7 @@ PBB_NORMAL_AGG_INPUTS = [
             "sim_count": 20000,
             "seed": 52,
         },
-        "expected_output": [0.43605, 0.19685, 0.3671],
+        "expected_output": ([0.43605, 0.19685, 0.3671], [0.0133512, 0.0179947, 0.0137618]),
     },
     {
         "input": {
@@ -74,7 +75,7 @@ PBB_NORMAL_AGG_INPUTS = [
             "sim_count": 20000,
             "seed": 52,
         },
-        "expected_output": [0.94445, 0.05555],
+        "expected_output": ([0.94445, 0.05555], [0.0011338, 0.0753121]),
     },
     {
         "input": {
@@ -84,7 +85,10 @@ PBB_NORMAL_AGG_INPUTS = [
             "sim_count": 20000,
             "seed": 52,
         },
-        "expected_output": [0.40785, 0.25105, 0.1928, 0.1483],
+        "expected_output": (
+            [0.40785, 0.25105, 0.1928, 0.1483],
+            [0.0058965, 0.0065083, 0.0066249, 0.0067183],
+        ),
     },
     {
         "input": {
@@ -94,7 +98,7 @@ PBB_NORMAL_AGG_INPUTS = [
             "sim_count": 10000,
             "seed": 52,
         },
-        "expected_output": [1],
+        "expected_output": ([1], [0]),
     },
     {
         "input": {
@@ -104,7 +108,7 @@ PBB_NORMAL_AGG_INPUTS = [
             "sim_count": 20000,
             "seed": 52,
         },
-        "expected_output": [0.5024, 0.4976],
+        "expected_output": ([0.5024, 0.4976], [0.0250157, 0.0256253]),
     },
     {
         "input": {
@@ -114,7 +118,7 @@ PBB_NORMAL_AGG_INPUTS = [
             "sim_count": 10000,
             "seed": 52,
         },
-        "expected_output": [],
+        "expected_output": ([], []),
     },
 ]
 
@@ -128,7 +132,7 @@ PBB_DELTA_LOGNORMAL_AGG_INPUTS = [
             "sim_count": 20000,
             "seed": 52,
         },
-        "expected_output": [0.00015, 0.03345, 0.9664],
+        "expected_output": ([0.00015, 0.03345, 0.9664], [0.2209593, 0.1205541, 0.0008458]),
     },
     {
         "input": {
@@ -139,7 +143,7 @@ PBB_DELTA_LOGNORMAL_AGG_INPUTS = [
             "sim_count": 10000,
             "seed": 52,
         },
-        "expected_output": [0.5013, 0.4987],
+        "expected_output": ([0.5013, 0.4987], [0.028189, 0.0287233]),
     },
     {
         "input": {
@@ -150,7 +154,7 @@ PBB_DELTA_LOGNORMAL_AGG_INPUTS = [
             "sim_count": 10000,
             "seed": 52,
         },
-        "expected_output": [0.25, 0.25, 0.25, 0.25],
+        "expected_output": ([0.25, 0.25, 0.25, 0.25], [np.nan, np.nan, np.nan, np.nan]),
     },
     {
         "input": {
@@ -161,7 +165,7 @@ PBB_DELTA_LOGNORMAL_AGG_INPUTS = [
             "sim_count": 10000,
             "seed": 52,
         },
-        "expected_output": [1],
+        "expected_output": ([1], [0]),
     },
     {
         "input": {
@@ -172,7 +176,7 @@ PBB_DELTA_LOGNORMAL_AGG_INPUTS = [
             "sim_count": 10000,
             "seed": 52,
         },
-        "expected_output": [],
+        "expected_output": ([], []),
     },
 ]
 
@@ -188,7 +192,7 @@ PBB_NUMERICAL_DIRICHLET_AGG_INPUTS = [
             "sim_count": 20000,
             "seed": 52,
         },
-        "expected_output": [0.28205, 0.62335, 0.0946],
+        "expected_output": ([0.28205, 0.62335, 0.0946], [0.1999528, 0.0698306, 0.334045]),
     },
     {
         "input": {
@@ -197,7 +201,7 @@ PBB_NUMERICAL_DIRICHLET_AGG_INPUTS = [
             "sim_count": 20000,
             "seed": 52,
         },
-        "expected_output": [1],
+        "expected_output": ([1], [0]),
     },
     {
         "input": {
@@ -206,22 +210,22 @@ PBB_NUMERICAL_DIRICHLET_AGG_INPUTS = [
             "sim_count": 20000,
             "seed": 52,
         },
-        "expected_output": [],
+        "expected_output": ([], []),
     },
 ]
 
 
 @pytest.mark.parametrize("inp", PBB_BERNOULLI_AGG_INPUTS)
-def test_pbb_bernoulli_agg(inp):
+def test_eval_bernoulli_agg(inp):
     i = inp["input"]
-    res = pbb_bernoulli_agg(i["totals"], i["successes"], sim_count=i["sim_count"], seed=i["seed"])
+    res = eval_bernoulli_agg(i["totals"], i["successes"], sim_count=i["sim_count"], seed=i["seed"])
     assert res == inp["expected_output"]
 
 
 @pytest.mark.parametrize("inp", PBB_NORMAL_AGG_INPUTS)
-def test_pbb_normal_agg(inp):
+def test_eval_normal_agg(inp):
     i = inp["input"]
-    res = pbb_normal_agg(
+    res = eval_normal_agg(
         i["totals"],
         i["sums"],
         i["sums_2"],
@@ -231,17 +235,17 @@ def test_pbb_normal_agg(inp):
     assert res == inp["expected_output"]
 
 
-def test_pbb_normal_agg_different_runs():
+def test_eval_normal_agg_different_runs():
     # two different runs of same input without seed should be different
-    run1 = pbb_normal_agg([100, 100], [10, 10], [20, 20])
-    run2 = pbb_normal_agg([100, 100], [10, 10], [20, 20])
+    run1 = eval_normal_agg([100, 100], [10, 10], [20, 20])
+    run2 = eval_normal_agg([100, 100], [10, 10], [20, 20])
     assert run1 != run2
 
 
 @pytest.mark.parametrize("inp", PBB_DELTA_LOGNORMAL_AGG_INPUTS)
-def test_pbb_delta_lognormal_agg(inp):
+def test_eval_delta_lognormal_agg(inp):
     i = inp["input"]
-    res = pbb_delta_lognormal_agg(
+    res = eval_delta_lognormal_agg(
         i["totals"],
         i["successes"],
         i["sum_logs"],
@@ -252,24 +256,24 @@ def test_pbb_delta_lognormal_agg(inp):
     assert res == inp["expected_output"]
 
 
-def test_pbb_delta_lognormal_agg_different_runs():
+def test_eval_delta_lognormal_agg_different_runs():
     # two different runs of same input without seed should be different
-    run1 = pbb_delta_lognormal_agg([1000, 1000], [100, 100], [10, 10], [20, 20], sim_count=100000)
-    run2 = pbb_delta_lognormal_agg([1000, 1000], [100, 100], [10, 10], [20, 20], sim_count=100000)
+    run1 = eval_delta_lognormal_agg([1000, 1000], [100, 100], [10, 10], [20, 20], sim_count=100000)
+    run2 = eval_delta_lognormal_agg([1000, 1000], [100, 100], [10, 10], [20, 20], sim_count=100000)
     assert run1 != run2
 
 
 @pytest.mark.parametrize("inp", PBB_NUMERICAL_DIRICHLET_AGG_INPUTS)
-def test_pbb_numerical_dirichlet_agg(inp):
+def test_eval_numerical_dirichlet_agg(inp):
     i = inp["input"]
-    res = pbb_numerical_dirichlet_agg(
+    res = eval_numerical_dirichlet_agg(
         i["states"], i["concentrations"], sim_count=i["sim_count"], seed=i["seed"]
     )
     assert res == inp["expected_output"]
 
 
-def test_pbb_numerical_dirichlet_agg_different_runs():
+def test_eval_numerical_dirichlet_agg_different_runs():
     # two different runs of same input without seed should be different
-    run1 = pbb_numerical_dirichlet_agg([1, 20], [[10, 10], [20, 20]])
-    run2 = pbb_numerical_dirichlet_agg([1, 20], [[10, 10], [20, 20]])
+    run1 = eval_numerical_dirichlet_agg([1, 20], [[10, 10], [20, 20]])
+    run2 = eval_numerical_dirichlet_agg([1, 20], [[10, 10], [20, 20]])
     assert run1 != run2

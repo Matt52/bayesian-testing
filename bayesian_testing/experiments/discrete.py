@@ -1,9 +1,9 @@
 from numbers import Number
-from typing import List, Union
+from typing import List, Tuple, Union
 import numpy as np
 
 from bayesian_testing.experiments.base import BaseDataTest
-from bayesian_testing.metrics import pbb_numerical_dirichlet_agg
+from bayesian_testing.metrics import eval_numerical_dirichlet_agg
 from bayesian_testing.utilities import get_logger
 
 logger = get_logger("bayesian_testing")
@@ -48,9 +48,9 @@ class DiscreteDataTest(BaseDataTest):
                 res = False
         return res
 
-    def probabs_of_being_best(self, sim_count: int = 20000, seed: int = None) -> dict:
+    def eval_simulation(self, sim_count: int = 20000, seed: int = None) -> Tuple[dict, dict]:
         """
-        Calculate probabilities of being best for a current class state.
+        Calculate probabilities of being best and expected loss for a current class state.
 
         Parameters
         ----------
@@ -59,13 +59,16 @@ class DiscreteDataTest(BaseDataTest):
 
         Returns
         -------
-        res : Dictionary with probabilities of being best for all variants in experiment.
+        res_pbbs : Dictionary with probabilities of being best for all variants in experiment.
+        res_loss : Dictionary with expected loss for all variants in experiment.
         """
-        pbbs = pbb_numerical_dirichlet_agg(
+        pbbs, loss = eval_numerical_dirichlet_agg(
             self.states, self.concentrations, self.prior_alphas, sim_count, seed
         )
-        res = dict(zip(self.variant_names, pbbs))
-        return res
+        res_pbbs = dict(zip(self.variant_names, pbbs))
+        res_loss = dict(zip(self.variant_names, loss))
+
+        return res_pbbs, res_loss
 
     def evaluate(self, sim_count: int = 20000, seed: int = None) -> List[dict]:
         """
@@ -80,8 +83,10 @@ class DiscreteDataTest(BaseDataTest):
         -------
         res : List of dictionaries with results per variant.
         """
-        keys = ["variant", "concentration", "average_value", "prob_being_best"]
-        pbbs = list(self.probabs_of_being_best(sim_count, seed).values())
+        keys = ["variant", "concentration", "average_value", "prob_being_best", "expected_loss"]
+        eval_pbbs, eval_loss = self.eval_simulation(sim_count, seed)
+        pbbs = list(eval_pbbs.values())
+        loss = list(eval_loss.values())
         average_values = [
             np.sum(np.multiply(i, self.states)) / np.sum(i) for i in self.concentrations
         ]
@@ -90,6 +95,7 @@ class DiscreteDataTest(BaseDataTest):
             [dict(zip(self.states, i)) for i in self.concentrations],
             average_values,
             pbbs,
+            loss,
         ]
         res = [dict(zip(keys, item)) for item in zip(*data)]
 

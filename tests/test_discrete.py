@@ -37,6 +37,11 @@ def test_probabs_of_being_best(discrete_test):
     assert pbbs == {"A": 0.35595, "B": 0.59325, "C": 0.0508}
 
 
+def test_expected_loss(discrete_test):
+    loss = discrete_test.expected_loss(sim_count=20000, seed=52)
+    assert loss == {"A": 0.3053921, "B": 0.1560257, "C": 0.5328904}
+
+
 def test_evaluate(discrete_test):
     eval_report = discrete_test.evaluate(sim_count=20000, seed=52)
     assert eval_report == [
@@ -45,18 +50,21 @@ def test_evaluate(discrete_test):
             "concentration": {1: 1.0, 2: 5.0, 3: 2.0, 4: 5.0, 5: 3.0, 6: 4.0},
             "average_value": 3.8,
             "prob_being_best": 0.35595,
+            "expected_loss": 0.3053921,
         },
         {
             "variant": "B",
             "concentration": {1: 2.0, 2: 0.0, 3: 1.0, 4: 3.0, 5: 0.0, 6: 4.0},
             "average_value": 4.1,
             "prob_being_best": 0.59325,
+            "expected_loss": 0.1560257,
         },
         {
             "variant": "C",
             "concentration": {1: 10, 2: 10, 3: 10, 4: 10, 5: 10, 6: 10},
             "average_value": 3.5,
             "prob_being_best": 0.0508,
+            "expected_loss": 0.5328904,
         },
     ]
 

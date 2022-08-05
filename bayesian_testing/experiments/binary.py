@@ -1,8 +1,8 @@
 from numbers import Number
-from typing import List
+from typing import List, Tuple
 
 from bayesian_testing.experiments.base import BaseDataTest
-from bayesian_testing.metrics import pbb_bernoulli_agg
+from bayesian_testing.metrics import eval_bernoulli_agg
 from bayesian_testing.utilities import get_logger
 
 logger = get_logger("bayesian_testing")
@@ -38,9 +38,9 @@ class BinaryDataTest(BaseDataTest):
     def b_priors(self):
         return [self.data[k]["b_prior"] for k in self.data]
 
-    def probabs_of_being_best(self, sim_count: int = 20000, seed: int = None) -> dict:
+    def eval_simulation(self, sim_count: int = 20000, seed: int = None) -> Tuple[dict, dict]:
         """
-        Calculate probabilities of being best for a current class state.
+        Calculate probabilities of being best and expected loss for a current class state.
 
         Parameters
         ----------
@@ -49,13 +49,16 @@ class BinaryDataTest(BaseDataTest):
 
         Returns
         -------
-        res : Dictionary with probabilities of being best for all variants in experiment.
+        res_pbbs : Dictionary with probabilities of being best for all variants in experiment.
+        res_loss : Dictionary with expected loss for all variants in experiment.
         """
-        pbbs = pbb_bernoulli_agg(
+        pbbs, loss = eval_bernoulli_agg(
             self.totals, self.positives, self.a_priors, self.b_priors, sim_count, seed
         )
-        res = dict(zip(self.variant_names, pbbs))
-        return res
+        res_pbbs = dict(zip(self.variant_names, pbbs))
+        res_loss = dict(zip(self.variant_names, loss))
+
+        return res_pbbs, res_loss
 
     def evaluate(self, sim_count: int = 20000, seed: int = None) -> List[dict]:
         """
@@ -70,16 +73,19 @@ class BinaryDataTest(BaseDataTest):
         -------
         res : List of dictionaries with results per variant.
         """
-        keys = ["variant", "totals", "positives", "positive_rate", "prob_being_best"]
-        positive_rate = [round(i[0] / i[1], 5) for i in zip(self.positives, self.totals)]
-        pbbs = list(self.probabs_of_being_best(sim_count, seed).values())
-        data = [
-            self.variant_names,
-            self.totals,
-            self.positives,
-            positive_rate,
-            pbbs,
+        keys = [
+            "variant",
+            "totals",
+            "positives",
+            "positive_rate",
+            "prob_being_best",
+            "expected_loss",
         ]
+        positive_rate = [round(i[0] / i[1], 5) for i in zip(self.positives, self.totals)]
+        eval_pbbs, eval_loss = self.eval_simulation(sim_count, seed)
+        pbbs = list(eval_pbbs.values())
+        loss = list(eval_loss.values())
+        data = [self.variant_names, self.totals, self.positives, positive_rate, pbbs, loss]
         res = [dict(zip(keys, item)) for item in zip(*data)]
 
         return res

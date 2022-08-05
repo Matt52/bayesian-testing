@@ -1,5 +1,5 @@
 from numbers import Number
-from typing import List, Union
+from typing import List, Tuple, Union
 
 import numpy as np
 
@@ -46,16 +46,34 @@ def estimate_probabilities(data: Union[List[List[Number]], np.ndarray]) -> List[
     return res
 
 
-def pbb_bernoulli_agg(
+def estimate_expected_loss(data: Union[List[List[Number]], np.ndarray]) -> List[float]:
+    """
+    Estimate expected losses for variants considering simulated data from respective posteriors.
+
+    Parameters
+    ----------
+    data : List of simulated data for each variant.
+
+    Returns
+    -------
+    res : List of expected loss for each variant.
+    """
+    max_values = np.max(data, axis=0)
+    res = list(np.mean(max_values - data, axis=1).round(7))
+    return res
+
+
+def eval_bernoulli_agg(
     totals: List[int],
     positives: List[int],
     a_priors_beta: List[Number] = None,
     b_priors_beta: List[Number] = None,
     sim_count: int = 20000,
     seed: int = None,
-) -> List[float]:
+) -> Tuple[List[float], List[float]]:
     """
-    Method estimating probabilities of being best for beta-bernoulli aggregated data per variant.
+    Method estimating probabilities of being best and expected loss for beta-bernoulli
+    aggregated data per variant.
 
     Parameters
     ----------
@@ -68,12 +86,13 @@ def pbb_bernoulli_agg(
 
     Returns
     -------
-    res : List of probabilities of being best for each variant.
+    res_pbbs : List of probabilities of being best for each variant.
+    res_loss : List of expected loss for each variant.
     """
     validate_bernoulli_input(totals, positives)
 
     if len(totals) == 0:
-        return []
+        return [], []
 
     # Default prior for all variants is Beta(0.5, 0.5) which is non-information prior.
     if not a_priors_beta:
@@ -85,12 +104,13 @@ def pbb_bernoulli_agg(
         totals, positives, sim_count, a_priors_beta, b_priors_beta, seed
     )
 
-    res = estimate_probabilities(beta_samples)
+    res_pbbs = estimate_probabilities(beta_samples)
+    res_loss = estimate_expected_loss(beta_samples)
 
-    return res
+    return res_pbbs, res_loss
 
 
-def pbb_normal_agg(
+def eval_normal_agg(
     totals: List[int],
     sums: List[float],
     sums_2: List[float],
@@ -100,9 +120,10 @@ def pbb_normal_agg(
     b_priors_ig: List[Number] = None,
     w_priors: List[Number] = None,
     seed: int = None,
-) -> List[float]:
+) -> Tuple[List[float], List[float]]:
     """
-    Method estimating probabilities of being best for normal aggregated data per variant.
+    Method estimating probabilities of being best and expected loss for normal
+    aggregated data per variant.
 
     Parameters
     ----------
@@ -118,10 +139,11 @@ def pbb_normal_agg(
 
     Returns
     -------
-    res : List of probabilities of being best for each variant.
+    res_pbbs : List of probabilities of being best for each variant.
+    res_loss : List of expected loss for each variant.
     """
     if len(totals) == 0:
-        return []
+        return [], []
     # Same default priors for all variants if they are not provided.
     if not m_priors:
         m_priors = [1] * len(totals)
@@ -154,12 +176,13 @@ def pbb_normal_agg(
         ]
     )
 
-    res = estimate_probabilities(normal_samples)
+    res_pbbs = estimate_probabilities(normal_samples)
+    res_loss = estimate_expected_loss(normal_samples)
 
-    return res
+    return res_pbbs, res_loss
 
 
-def pbb_delta_lognormal_agg(
+def eval_delta_lognormal_agg(
     totals: List[int],
     non_zeros: List[int],
     sum_logs: List[float],
@@ -172,10 +195,10 @@ def pbb_delta_lognormal_agg(
     b_priors_ig: List[Number] = None,
     w_priors: List[Number] = None,
     seed: int = None,
-) -> List[float]:
+) -> Tuple[List[float], List[float]]:
     """
-    Method estimating probabilities of being best for delta-lognormal aggregated data per variant.
-    For that reason the method works with both totals and non_zeros.
+    Method estimating probabilities of being best and expected loss for delta-lognormal
+    aggregated data per variant. For that reason the method works with both totals and non_zeros.
 
     Parameters
     ----------
@@ -194,10 +217,11 @@ def pbb_delta_lognormal_agg(
 
     Returns
     -------
-    res : List of probabilities of being best for each variant.
+    res_pbbs : List of probabilities of being best for each variant.
+    res_loss : List of expected loss for each variant.
     """
     if len(totals) == 0:
-        return []
+        return [], []
     # Same default priors for all variants if they are not provided.
     if not a_priors_beta:
         a_priors_beta = [0.5] * len(totals)
@@ -214,7 +238,9 @@ def pbb_delta_lognormal_agg(
 
     if max(non_zeros) <= 0:
         # if only zeros in all variants
-        return list(np.full(len(totals), round(1 / len(totals), 7)))
+        res_pbbs = list(np.full(len(totals), round(1 / len(totals), 7)))
+        res_loss = [np.nan] * len(totals)
+        return res_pbbs, res_loss
     else:
         # we will need different generators for each call of lognormal_posteriors
         ss = np.random.SeedSequence(seed)
@@ -243,12 +269,13 @@ def pbb_delta_lognormal_agg(
 
         combined_samples = beta_samples * lognormal_samples
 
-        res = estimate_probabilities(combined_samples)
+        res_pbbs = estimate_probabilities(combined_samples)
+        res_loss = estimate_expected_loss(combined_samples)
 
-        return res
+        return res_pbbs, res_loss
 
 
-def pbb_numerical_dirichlet_agg(
+def eval_numerical_dirichlet_agg(
     states: List[Union[float, int]],
     concentrations: List[List[int]],
     prior_alphas: List[List[Union[float, int]]] = None,
@@ -256,9 +283,9 @@ def pbb_numerical_dirichlet_agg(
     seed: int = None,
 ):
     """
-    Method estimating probabilities of being best for dirichlet-multinomial aggregated data
-    per variant. States in this case are expected to be a numerical values (e.g. dice numbers,
-    number of stars in a rating, etc.).
+    Method estimating probabilities of being best and expected loss for dirichlet-multinomial
+    aggregated data per variant. States in this case are expected to be a numerical values
+    (e.g. dice numbers, number of stars in a rating, etc.).
 
     Parameters
     ----------
@@ -270,10 +297,11 @@ def pbb_numerical_dirichlet_agg(
 
     Returns
     -------
-    res : List of probabilities of being best for each variant.
+    res_pbbs : List of probabilities of being best for each variant.
+    res_loss : List of expected loss for each variant.
     """
     if len(concentrations) == 0:
-        return []
+        return [], []
 
     # default prior will be expecting 1 observation in all states for all variants
     if not prior_alphas:
@@ -291,6 +319,7 @@ def pbb_numerical_dirichlet_agg(
         means = np.sum(np.multiply(dir_post, np.array(states)), axis=1)
         means_samples.append(list(means))
 
-    res = estimate_probabilities(means_samples)
+    res_pbbs = estimate_probabilities(means_samples)
+    res_loss = estimate_expected_loss(means_samples)
 
-    return res
+    return res_pbbs, res_loss

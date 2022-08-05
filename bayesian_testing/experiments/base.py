@@ -1,3 +1,4 @@
+from typing import Tuple
 import warnings
 
 
@@ -15,6 +16,46 @@ class BaseDataTest:
     @property
     def variant_names(self):
         return [k for k in self.data]
+
+    def eval_simulation(self, sim_count: int = 20000, seed: int = None) -> Tuple[dict, dict]:
+        """
+        Should be implemented in each individual experiment.
+        """
+        raise NotImplementedError
+
+    def probabs_of_being_best(self, sim_count: int = 20000, seed: int = None) -> dict:
+        """
+        Calculate probabilities of being best for a current class state.
+
+        Parameters
+        ----------
+        sim_count : Number of simulations to be used for probability estimation.
+        seed : Random seed.
+
+        Returns
+        -------
+        pbbs : Dictionary with probabilities of being best for all variants in experiment.
+        """
+        pbbs, loss = self.eval_simulation(sim_count, seed)
+
+        return pbbs
+
+    def expected_loss(self, sim_count: int = 20000, seed: int = None) -> dict:
+        """
+        Calculate expected loss for a current class state.
+
+        Parameters
+        ----------
+        sim_count : Number of simulations to be used for probability estimation.
+        seed : Random seed.
+
+        Returns
+        -------
+        pbbs : Dictionary with expected loss for all variants in experiment.
+        """
+        pbbs, loss = self.eval_simulation(sim_count, seed)
+
+        return loss
 
     def delete_variant(self, name: str) -> None:
         """

@@ -129,6 +129,11 @@ def test_probabs_of_being_best(norm_test):
     assert pbbs == {"A": 0.05105, "B": 0.27935, "C": 0.6696}
 
 
+def test_expected_loss(norm_test):
+    loss = norm_test.expected_loss(sim_count=20000, seed=52)
+    assert loss == {"A": 2.2696341, "B": 1.4580033, "C": 0.4464154}
+
+
 def test_evaluate(norm_test):
     eval_report = norm_test.evaluate(sim_count=20000, seed=52)
     assert eval_report == [
@@ -138,6 +143,7 @@ def test_evaluate(norm_test):
             "sum_values": 386.6,
             "avg_values": 9.665,
             "prob_being_best": 0.05105,
+            "expected_loss": 2.2696341,
         },
         {
             "variant": "B",
@@ -145,6 +151,7 @@ def test_evaluate(norm_test):
             "sum_values": 189.0,
             "avg_values": 10.5,
             "prob_being_best": 0.27935,
+            "expected_loss": 1.4580033,
         },
         {
             "variant": "C",
@@ -152,5 +159,6 @@ def test_evaluate(norm_test):
             "sum_values": 252.7,
             "avg_values": 11.48636,
             "prob_being_best": 0.6696,
+            "expected_loss": 0.4464154,
         },
     ]

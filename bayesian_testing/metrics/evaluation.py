@@ -198,7 +198,7 @@ def eval_delta_lognormal_agg(
 ) -> Tuple[List[float], List[float]]:
     """
     Method estimating probabilities of being best and expected loss for delta-lognormal
-    aggregated data per variant. For that reason the method works with both totals and non_zeros.
+    aggregated data per variant. For that reason, the method works with both totals and non_zeros.
 
     Parameters
     ----------

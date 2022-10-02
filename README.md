@@ -279,6 +279,9 @@ Test classes to be added:
 Metrics to be added:
 - `Potential Value Remaining`
 
+Other functionality:
+- `Reversed testing` (case when "being best" = "being smaller")
+
 ## References
 - `bayesian_testing` package itself depends only on [numpy](https://numpy.org) package.
 - Work on this package (including default priors selection) was inspired mainly by a Coursera

@@ -20,7 +20,8 @@
 
 **Implemented evaluation metrics:**
 - `Probability of Being Best`
-  - probability of "being larger" from a data point of view
+  - probability of being "greatest" from a data point of view
+  - it is possible to reverse the setup to "being best" = "being smallest" using `min_is_best` in evaluation
 - `Expected Loss`
   - "risk" of choosing particular variant over other variants in the test
   - measured in the same units as a tested measure (e.g. positive rate or average value)
@@ -140,7 +141,7 @@ test.add_variant_data("B", data_b)
 test.add_variant_data_agg("C", len(data_c), sum(data_c), sum(np.square(data_c)))
 
 # evaluate test:
-test.evaluate(sim_count=20000, seed=52)
+test.evaluate(sim_count=20000, seed=52, min_is_best=False)
 ```
 
     [{'variant': 'A',
@@ -243,7 +244,7 @@ test.add_variant_data("C", data_c)
 # test.add_variant_data_agg("C", [1, 0, 1, 1, 1, 1]) # equivalent to rolls in data_c
 
 # evaluate test:
-test.evaluate(sim_count=20000, seed=52)
+test.evaluate(sim_count=20000, seed=52, min_is_best=False)
 ```
 
     [{'variant': 'A',
@@ -278,9 +279,6 @@ Test classes to be added:
 
 Metrics to be added:
 - `Potential Value Remaining`
-
-Other functionality:
-- `Reversed testing` (case when "being best" = "being smaller")
 
 ## References
 - `bayesian_testing` package itself depends only on [numpy](https://numpy.org) package.

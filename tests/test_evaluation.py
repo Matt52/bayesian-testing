@@ -15,8 +15,19 @@ PBB_BERNOULLI_AGG_INPUTS = [
             "successes": [1580, 1700, 1550],
             "sim_count": 20000,
             "seed": 52,
+            "min_is_best": False,
         },
         "expected_output": ([0.04185, 0.92235, 0.0358], [0.0030138, 6.06e-05, 0.0031649]),
+    },
+    {
+        "input": {
+            "totals": [31500, 32000, 31000],
+            "successes": [1580, 1700, 1550],
+            "sim_count": 20000,
+            "seed": 52,
+            "min_is_best": True,
+        },
+        "expected_output": ([0.4594, 0.00925, 0.53135], [0.000781, 0.0037342, 0.0006299]),
     },
     {
         "input": {
@@ -24,6 +35,7 @@ PBB_BERNOULLI_AGG_INPUTS = [
             "successes": [80, 160],
             "sim_count": 10000,
             "seed": 52,
+            "min_is_best": False,
         },
         "expected_output": ([0.4899, 0.5101], [0.0204051, 0.0182965]),
     },
@@ -33,6 +45,7 @@ PBB_BERNOULLI_AGG_INPUTS = [
             "successes": [0, 0],
             "sim_count": 20000,
             "seed": 52,
+            "min_is_best": False,
         },
         "expected_output": ([0.5008, 0.4992], [0.0030829, 0.0031614]),
     },
@@ -42,6 +55,7 @@ PBB_BERNOULLI_AGG_INPUTS = [
             "successes": [77],
             "sim_count": 20000,
             "seed": 52,
+            "min_is_best": False,
         },
         "expected_output": ([1], [0]),
     },
@@ -51,6 +65,7 @@ PBB_BERNOULLI_AGG_INPUTS = [
             "successes": [],
             "sim_count": 20000,
             "seed": 52,
+            "min_is_best": False,
         },
         "expected_output": ([], []),
     },
@@ -218,7 +233,13 @@ PBB_NUMERICAL_DIRICHLET_AGG_INPUTS = [
 @pytest.mark.parametrize("inp", PBB_BERNOULLI_AGG_INPUTS)
 def test_eval_bernoulli_agg(inp):
     i = inp["input"]
-    res = eval_bernoulli_agg(i["totals"], i["successes"], sim_count=i["sim_count"], seed=i["seed"])
+    res = eval_bernoulli_agg(
+        i["totals"],
+        i["successes"],
+        sim_count=i["sim_count"],
+        seed=i["seed"],
+        min_is_best=i["min_is_best"],
+    )
     assert res == inp["expected_output"]
 
 

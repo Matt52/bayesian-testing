@@ -24,20 +24,27 @@ def validate_bernoulli_input(totals: List[int], positives: List[int]) -> None:
         raise ValueError(msg)
 
 
-def estimate_probabilities(data: Union[List[List[Number]], np.ndarray]) -> List[float]:
+def estimate_probabilities(
+    data: Union[List[List[Number]], np.ndarray], min_is_best: bool = False
+) -> List[float]:
     """
-    Estimate probabilities for variants considering simulated data from respective posteriors.
+    Estimate probabilities of being best for variants
+    considering simulated data from respective posteriors.
 
     Parameters
     ----------
     data : List of simulated data for each variant.
+    min_is_best : Option to change "being best" to a minimum. Default is maximum.
 
     Returns
     -------
     res : List of probabilities of being best for each variant.
     """
-    max_values = np.argmax(data, axis=0)
-    unique, counts = np.unique(max_values, return_counts=True)
+    if min_is_best:
+        best_values = np.argmin(data, axis=0)
+    else:
+        best_values = np.argmax(data, axis=0)
+    unique, counts = np.unique(best_values, return_counts=True)
     occurrences = dict(zip(unique, counts))
     sim_count = len(data[0])
     res = []
@@ -46,20 +53,26 @@ def estimate_probabilities(data: Union[List[List[Number]], np.ndarray]) -> List[
     return res
 
 
-def estimate_expected_loss(data: Union[List[List[Number]], np.ndarray]) -> List[float]:
+def estimate_expected_loss(
+    data: Union[List[List[Number]], np.ndarray], min_is_best: bool = False
+) -> List[float]:
     """
     Estimate expected losses for variants considering simulated data from respective posteriors.
 
     Parameters
     ----------
     data : List of simulated data for each variant.
+    min_is_best : Option to change "being best" to a minimum. Default is maximum.
 
     Returns
     -------
     res : List of expected loss for each variant.
     """
-    max_values = np.max(data, axis=0)
-    res = list(np.mean(max_values - data, axis=1).round(7))
+    if min_is_best:
+        best_values = np.min(data, axis=0)
+    else:
+        best_values = np.max(data, axis=0)
+    res = list(abs(np.mean(best_values - data, axis=1)).round(7))
     return res
 
 
@@ -70,6 +83,7 @@ def eval_bernoulli_agg(
     b_priors_beta: List[Number] = None,
     sim_count: int = 20000,
     seed: int = None,
+    min_is_best: bool = False,
 ) -> Tuple[List[float], List[float]]:
     """
     Method estimating probabilities of being best and expected loss for beta-bernoulli
@@ -83,6 +97,7 @@ def eval_bernoulli_agg(
     a_priors_beta : List of prior alpha parameters for Beta distributions for each variant.
     b_priors_beta : List of prior beta parameters for Beta distributions for each variant.
     seed : Random seed.
+    min_is_best : Option to change "being best" to a minimum. Default is maximum.
 
     Returns
     -------
@@ -104,8 +119,8 @@ def eval_bernoulli_agg(
         totals, positives, sim_count, a_priors_beta, b_priors_beta, seed
     )
 
-    res_pbbs = estimate_probabilities(beta_samples)
-    res_loss = estimate_expected_loss(beta_samples)
+    res_pbbs = estimate_probabilities(beta_samples, min_is_best)
+    res_loss = estimate_expected_loss(beta_samples, min_is_best)
 
     return res_pbbs, res_loss
 
@@ -120,6 +135,7 @@ def eval_normal_agg(
     b_priors_ig: List[Number] = None,
     w_priors: List[Number] = None,
     seed: int = None,
+    min_is_best: bool = False,
 ) -> Tuple[List[float], List[float]]:
     """
     Method estimating probabilities of being best and expected loss for normal
@@ -136,6 +152,7 @@ def eval_normal_agg(
     b_priors_ig : List of prior betas from inverse gamma dist approximating variance.
     w_priors : List of prior effective sample sizes for each variant.
     seed : Random seed.
+    min_is_best : Option to change "being best" to a minimum. Default is maximum.
 
     Returns
     -------
@@ -176,8 +193,8 @@ def eval_normal_agg(
         ]
     )
 
-    res_pbbs = estimate_probabilities(normal_samples)
-    res_loss = estimate_expected_loss(normal_samples)
+    res_pbbs = estimate_probabilities(normal_samples, min_is_best)
+    res_loss = estimate_expected_loss(normal_samples, min_is_best)
 
     return res_pbbs, res_loss
 
@@ -195,6 +212,7 @@ def eval_delta_lognormal_agg(
     b_priors_ig: List[Number] = None,
     w_priors: List[Number] = None,
     seed: int = None,
+    min_is_best: bool = False,
 ) -> Tuple[List[float], List[float]]:
     """
     Method estimating probabilities of being best and expected loss for delta-lognormal
@@ -214,6 +232,7 @@ def eval_delta_lognormal_agg(
     b_priors_ig : List of prior betas from inverse gamma dist approximating variance of logarithms.
     w_priors : List of prior effective sample sizes for each variant.
     seed : Random seed.
+    min_is_best : Option to change "being best" to a minimum. Default is maximum.
 
     Returns
     -------
@@ -269,8 +288,8 @@ def eval_delta_lognormal_agg(
 
         combined_samples = beta_samples * lognormal_samples
 
-        res_pbbs = estimate_probabilities(combined_samples)
-        res_loss = estimate_expected_loss(combined_samples)
+        res_pbbs = estimate_probabilities(combined_samples, min_is_best)
+        res_loss = estimate_expected_loss(combined_samples, min_is_best)
 
         return res_pbbs, res_loss
 
@@ -281,6 +300,7 @@ def eval_numerical_dirichlet_agg(
     prior_alphas: List[List[Union[float, int]]] = None,
     sim_count: int = 20000,
     seed: int = None,
+    min_is_best: bool = False,
 ):
     """
     Method estimating probabilities of being best and expected loss for dirichlet-multinomial
@@ -294,6 +314,7 @@ def eval_numerical_dirichlet_agg(
     prior_alphas : Prior alpha values for each state for all variants.
     sim_count : Number of simulations.
     seed : Random seed.
+    min_is_best : Option to change "being best" to a minimum. Default is maximum.
 
     Returns
     -------
@@ -319,7 +340,7 @@ def eval_numerical_dirichlet_agg(
         means = np.sum(np.multiply(dir_post, np.array(states)), axis=1)
         means_samples.append(list(means))
 
-    res_pbbs = estimate_probabilities(means_samples)
-    res_loss = estimate_expected_loss(means_samples)
+    res_pbbs = estimate_probabilities(means_samples, min_is_best)
+    res_loss = estimate_expected_loss(means_samples, min_is_best)
 
     return res_pbbs, res_loss

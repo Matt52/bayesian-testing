@@ -72,7 +72,9 @@ class DeltaLognormalDataTest(BaseDataTest):
     def w_priors(self):
         return [self.data[k]["w_prior"] for k in self.data]
 
-    def eval_simulation(self, sim_count: int = 20000, seed: int = None) -> Tuple[dict, dict]:
+    def eval_simulation(
+        self, sim_count: int = 20000, seed: int = None, min_is_best: bool = False
+    ) -> Tuple[dict, dict]:
         """
         Calculate probabilities of being best and expected loss for a current class state.
 
@@ -80,6 +82,7 @@ class DeltaLognormalDataTest(BaseDataTest):
         ----------
         sim_count : Number of simulations to be used for probability estimation.
         seed : Random seed.
+        min_is_best : Option to change "being best" to a minimum. Default is maximum.
 
         Returns
         -------
@@ -99,13 +102,16 @@ class DeltaLognormalDataTest(BaseDataTest):
             b_priors_ig=self.b_priors_ig,
             w_priors=self.w_priors,
             seed=seed,
+            min_is_best=min_is_best,
         )
         res_pbbs = dict(zip(self.variant_names, pbbs))
         res_loss = dict(zip(self.variant_names, loss))
 
         return res_pbbs, res_loss
 
-    def evaluate(self, sim_count: int = 20000, seed: int = None) -> List[dict]:
+    def evaluate(
+        self, sim_count: int = 20000, seed: int = None, min_is_best: bool = False
+    ) -> List[dict]:
         """
         Evaluation of experiment.
 
@@ -113,6 +119,7 @@ class DeltaLognormalDataTest(BaseDataTest):
         ----------
         sim_count : Number of simulations to be used for probability estimation.
         seed : Random seed.
+        min_is_best : Option to change "being best" to a minimum. Default is maximum.
 
         Returns
         -------
@@ -130,7 +137,7 @@ class DeltaLognormalDataTest(BaseDataTest):
         ]
         avg_values = [round(i[0] / i[1], 5) for i in zip(self.sum_values, self.totals)]
         avg_pos_values = [round(i[0] / i[1], 5) for i in zip(self.sum_values, self.positives)]
-        eval_pbbs, eval_loss = self.eval_simulation(sim_count, seed)
+        eval_pbbs, eval_loss = self.eval_simulation(sim_count, seed, min_is_best)
         pbbs = list(eval_pbbs.values())
         loss = list(eval_loss.values())
         data = [

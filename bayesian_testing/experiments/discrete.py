@@ -48,7 +48,9 @@ class DiscreteDataTest(BaseDataTest):
                 res = False
         return res
 
-    def eval_simulation(self, sim_count: int = 20000, seed: int = None) -> Tuple[dict, dict]:
+    def eval_simulation(
+        self, sim_count: int = 20000, seed: int = None, min_is_best: bool = False
+    ) -> Tuple[dict, dict]:
         """
         Calculate probabilities of being best and expected loss for a current class state.
 
@@ -56,6 +58,7 @@ class DiscreteDataTest(BaseDataTest):
         ----------
         sim_count : Number of simulations to be used for probability estimation.
         seed : Random seed.
+        min_is_best : Option to change "being best" to a minimum. Default is maximum.
 
         Returns
         -------
@@ -63,14 +66,16 @@ class DiscreteDataTest(BaseDataTest):
         res_loss : Dictionary with expected loss for all variants in experiment.
         """
         pbbs, loss = eval_numerical_dirichlet_agg(
-            self.states, self.concentrations, self.prior_alphas, sim_count, seed
+            self.states, self.concentrations, self.prior_alphas, sim_count, seed, min_is_best
         )
         res_pbbs = dict(zip(self.variant_names, pbbs))
         res_loss = dict(zip(self.variant_names, loss))
 
         return res_pbbs, res_loss
 
-    def evaluate(self, sim_count: int = 20000, seed: int = None) -> List[dict]:
+    def evaluate(
+        self, sim_count: int = 20000, seed: int = None, min_is_best: bool = False
+    ) -> List[dict]:
         """
         Evaluation of experiment.
 
@@ -78,13 +83,14 @@ class DiscreteDataTest(BaseDataTest):
         ----------
         sim_count : Number of simulations to be used for probability estimation.
         seed : Random seed.
+        min_is_best : Option to change "being best" to a minimum. Default is maximum.
 
         Returns
         -------
         res : List of dictionaries with results per variant.
         """
         keys = ["variant", "concentration", "average_value", "prob_being_best", "expected_loss"]
-        eval_pbbs, eval_loss = self.eval_simulation(sim_count, seed)
+        eval_pbbs, eval_loss = self.eval_simulation(sim_count, seed, min_is_best)
         pbbs = list(eval_pbbs.values())
         loss = list(eval_loss.values())
         average_values = [

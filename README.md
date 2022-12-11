@@ -99,27 +99,19 @@ test.add_variant_data("B", data_b)
 test.add_variant_data_agg("C", totals=1000, positives=50)
 
 # evaluate test:
-test.evaluate()
+results = test.evaluate()
+results # print(pd.DataFrame(results).to_markdown(tablefmt="grid", index=False))
 ```
 
-    [{'variant': 'A',
-      'totals': 1500,
-      'positives': 80,
-      'positive_rate': 0.05333,
-      'prob_being_best': 0.0669,
-      'expected_loss': 0.0138774},
-     {'variant': 'B',
-      'totals': 1200,
-      'positives': 80,
-      'positive_rate': 0.06667,
-      'prob_being_best': 0.8926,
-      'expected_loss': 0.0004599},
-     {'variant': 'C',
-      'totals': 1000,
-      'positives': 50,
-      'positive_rate': 0.05,
-      'prob_being_best': 0.0405,
-      'expected_loss': 0.0170356}]
+    +-----------+----------+-------------+-----------------+-------------------+-----------------+
+    | variant   |   totals |   positives |   positive_rate |   prob_being_best |   expected_loss |
+    +===========+==========+=============+=================+===================+=================+
+    | A         |     1500 |          80 |         0.05333 |            0.0646 |       0.0138213 |
+    +-----------+----------+-------------+-----------------+-------------------+-----------------+
+    | B         |     1200 |          80 |         0.06667 |            0.8941 |       0.0004529 |
+    +-----------+----------+-------------+-----------------+-------------------+-----------------+
+    | C         |     1000 |          50 |         0.05    |            0.0413 |       0.0170256 |
+    +-----------+----------+-------------+-----------------+-------------------+-----------------+
 
 ### NormalDataTest
 Class for Bayesian A/B test for normal data.
@@ -147,27 +139,19 @@ test.add_variant_data("B", data_b)
 test.add_variant_data_agg("C", len(data_c), sum(data_c), sum(np.square(data_c)))
 
 # evaluate test:
-test.evaluate(sim_count=20000, seed=52, min_is_best=False)
+results = test.evaluate(sim_count=20000, seed=52, min_is_best=False)
+results # print(pd.DataFrame(results).to_markdown(tablefmt="grid", index=False))
 ```
 
-    [{'variant': 'A',
-      'totals': 1000,
-      'sum_values': 7294.67901,
-      'avg_values': 7.29468,
-      'prob_being_best': 0.1707,
-      'expected_loss': 0.1968735},
-     {'variant': 'B',
-      'totals': 800,
-      'sum_values': 5685.86168,
-      'avg_values': 7.10733,
-      'prob_being_best': 0.00125,
-      'expected_loss': 0.385112},
-     {'variant': 'C',
-      'totals': 500,
-      'sum_values': 3736.91581,
-      'avg_values': 7.47383,
-      'prob_being_best': 0.82805,
-      'expected_loss': 0.0169998}]
+    +-----------+----------+--------------+--------------+-------------------+-----------------+
+    | variant   |   totals |   sum_values |   avg_values |   prob_being_best |   expected_loss |
+    +===========+==========+==============+==============+===================+=================+
+    | A         |     1000 |      7294.68 |      7.29468 |           0.1707  |       0.196874  |
+    +-----------+----------+--------------+--------------+-------------------+-----------------+
+    | B         |      800 |      5685.86 |      7.10733 |           0.00125 |       0.385112  |
+    +-----------+----------+--------------+--------------+-------------------+-----------------+
+    | C         |      500 |      3736.92 |      7.47383 |           0.82805 |       0.0169998 |
+    +-----------+----------+--------------+--------------+-------------------+-----------------+
 
 ### DeltaLognormalDataTest
 Class for Bayesian A/B test for delta-lognormal data (log-normal with zeros).
@@ -202,25 +186,17 @@ test.add_variant_data_agg(
 )
 
 # evaluate test:
-test.evaluate(seed=21)
+results = test.evaluate(seed=21)
+results # print(pd.DataFrame(results).to_markdown(tablefmt="grid", index=False))
 ```
 
-    [{'variant': 'A',
-      'totals': 24,
-      'positives': 13,
-      'sum_values': 43.4,
-      'avg_values': 1.80833,
-      'avg_positive_values': 3.33846,
-      'prob_being_best': 0.04815,
-      'expected_loss': 4.0941101},
-     {'variant': 'B',
-      'totals': 25,
-      'positives': 12,
-      'sum_values': 146.7,
-      'avg_values': 5.868,
-      'avg_positive_values': 12.225,
-      'prob_being_best': 0.95185,
-      'expected_loss': 0.1588627}]
+    +-----------+----------+-------------+--------------+--------------+-----------------------+-------------------+-----------------+
+    | variant   |   totals |   positives |   sum_values |   avg_values |   avg_positive_values |   prob_being_best |   expected_loss |
+    +===========+==========+=============+==============+==============+=======================+===================+=================+
+    | A         |       24 |          13 |         43.4 |      1.80833 |               3.33846 |           0.04815 |        4.09411  |
+    +-----------+----------+-------------+--------------+--------------+-----------------------+-------------------+-----------------+
+    | B         |       25 |          12 |        146.7 |      5.868   |              12.225   |           0.95185 |        0.158863 |
+    +-----------+----------+-------------+--------------+--------------+-----------------------+-------------------+-----------------+
 
 ### DiscreteDataTest
 Class for Bayesian A/B test for discrete data with finite number of numerical categories (states),
@@ -230,7 +206,6 @@ This test can be used for instance for dice rolls data (when looking for the "be
 
 **Example:**
 ```python
-import numpy as np
 from bayesian_testing.experiments import DiscreteDataTest
 
 # dice rolls data for 3 dice - A, B, C
@@ -250,24 +225,19 @@ test.add_variant_data("C", data_c)
 # test.add_variant_data_agg("C", [1, 0, 1, 1, 1, 1]) # equivalent to rolls in data_c
 
 # evaluate test:
-test.evaluate(sim_count=20000, seed=52, min_is_best=False)
+results = test.evaluate(sim_count=20000, seed=52, min_is_best=False)
+results # print(pd.DataFrame(results).to_markdown(tablefmt="grid", index=False))
 ```
 
-    [{'variant': 'A',
-      'concentration': {1: 2.0, 2: 4.0, 3: 4.0, 4: 2.0, 5: 2.0, 6: 6.0},
-      'average_value': 3.8,
-      'prob_being_best': 0.54685,
-      'expected_loss': 0.199953},
-     {'variant': 'B',
-      'concentration': {1: 1.0, 2: 6.0, 3: 2.0, 4: 1.0, 5: 0.0, 6: 0.0},
-      'average_value': 2.3,
-      'prob_being_best': 0.008,
-      'expected_loss': 1.1826766},
-     {'variant': 'C',
-      'concentration': {1: 1.0, 2: 0.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0},
-      'average_value': 3.8,
-      'prob_being_best': 0.44515,
-      'expected_loss': 0.2870247}]
+    +-----------+--------------------------------------------------+-----------------+-------------------+-----------------+
+    | variant   | concentration                                    |   average_value |   prob_being_best |   expected_loss |
+    +===========+==================================================+=================+===================+=================+
+    | A         | {1: 2.0, 2: 4.0, 3: 4.0, 4: 2.0, 5: 2.0, 6: 6.0} |             3.8 |           0.54685 |        0.199953 |
+    +-----------+--------------------------------------------------+-----------------+-------------------+-----------------+
+    | B         | {1: 1.0, 2: 6.0, 3: 2.0, 4: 1.0, 5: 0.0, 6: 0.0} |             2.3 |           0.008   |        1.18268  |
+    +-----------+--------------------------------------------------+-----------------+-------------------+-----------------+
+    | C         | {1: 1.0, 2: 0.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0} |             3.8 |           0.44515 |        0.287025 |
+    +-----------+--------------------------------------------------+-----------------+-------------------+-----------------+
 
 ### PoissonDataTest
 Class for Bayesian A/B test for poisson data.
@@ -294,27 +264,21 @@ test.add_variant_data('city', city_goals_against, a_prior=3, b_prior=1)
 test.add_variant_data_agg("bayern", len(bayern_goals_against), sum(bayern_goals_against))
 
 # evaluate test (since fewer goals is better, we explicitly set min_is_best to True)
-test.evaluate(sim_count=20000, seed=52, min_is_best=True)
+results = test.evaluate(sim_count=20000, seed=52, min_is_best=True)
+results # print(pd.DataFrame(results).to_markdown(tablefmt="grid", index=False))
 ```
 
-    [{'variant': 'psg',
-      'totals': 15,
-      'observed_average': 0.6,
-      'posterior_mean': 0.60265,
-      'prob_being_best': 0.78175,
-      'expected_loss': 0.0369998},
-     {'variant': 'city',
-      'totals': 14,
-      'observed_average': 1.0,
-      'posterior_mean': 1.13333,
-      'prob_being_best': 0.0344,
-      'expected_loss': 0.5620553},
-     {'variant': 'bayern',
-      'totals': 15,
-      'observed_average': 0.86667,
-      'posterior_mean': 0.86755,
-      'prob_being_best': 0.18385,
-      'expected_loss': 0.3003345}]
+    +-----------+----------+--------------+--------------------+------------------+-------------------+-----------------+
+    | variant   |   totals |   sum_values |   observed_average |   posterior_mean |   prob_being_best |   expected_loss |
+    +===========+==========+==============+====================+==================+===================+=================+
+    | psg       |       15 |            9 |            0.6     |          0.60265 |           0.78175 |       0.0369998 |
+    +-----------+----------+--------------+--------------------+------------------+-------------------+-----------------+
+    | city      |       14 |           14 |            1       |          1.13333 |           0.0344  |       0.562055  |
+    +-----------+----------+--------------+--------------------+------------------+-------------------+-----------------+
+    | bayern    |       15 |           13 |            0.86667 |          0.86755 |           0.18385 |       0.300335  |
+    +-----------+----------+--------------+--------------------+------------------+-------------------+-----------------+
+
+_note: Since we set `min_is_best=True` (because received goals are "bad"), probability and loss are in a favor of variants with lower posterior means._
 
 ## Development
 To set up a development environment, use [Poetry](https://python-poetry.org/) and [pre-commit](https://pre-commit.com):

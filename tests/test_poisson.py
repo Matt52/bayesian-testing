@@ -52,6 +52,7 @@ def test_evaluate(poisson_test):
         {
             "variant": "A",
             "totals": 15,
+            "sum_values": 43,
             "observed_average": 2.86667,
             "posterior_mean": 2.8543,
             "prob_being_best": 0.30945,
@@ -60,6 +61,7 @@ def test_evaluate(poisson_test):
         {
             "variant": "B",
             "totals": 14,
+            "sum_values": 40,
             "observed_average": 2.85714,
             "posterior_mean": 2.84397,
             "prob_being_best": 0.29665,
@@ -68,6 +70,7 @@ def test_evaluate(poisson_test):
         {
             "variant": "C",
             "totals": 15,
+            "sum_values": 49,
             "observed_average": 3.26667,
             "posterior_mean": 2.94118,
             "prob_being_best": 0.3939,

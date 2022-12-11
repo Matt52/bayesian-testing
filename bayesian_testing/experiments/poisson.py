@@ -1,18 +1,16 @@
 from numbers import Number
-from typing import List, Tuple
-
-import numpy as np
+from typing import List, Tuple, Union
 
 from bayesian_testing.experiments.base import BaseDataTest
-from bayesian_testing.metrics import eval_normal_agg
+from bayesian_testing.metrics import eval_poisson_agg
 from bayesian_testing.utilities import get_logger
 
 logger = get_logger("bayesian_testing")
 
 
-class NormalDataTest(BaseDataTest):
+class PoissonDataTest(BaseDataTest):
     """
-    Class for Bayesian A/B test for Normal data.
+    Class for Bayesian A/B test for Poisson data (i.e. numbers of events, e.g. goals scored).
 
     After class initialization, use add_variant methods to insert variant data.
     Then to get results of the test, use for instance `evaluate` method.
@@ -20,7 +18,7 @@ class NormalDataTest(BaseDataTest):
 
     def __init__(self) -> None:
         """
-        Initialize NormalDataTest class.
+        Initialize BinaryDataTest class.
         """
         super().__init__()
 
@@ -33,24 +31,12 @@ class NormalDataTest(BaseDataTest):
         return [self.data[k]["sum_values"] for k in self.data]
 
     @property
-    def sum_values_2(self):
-        return [self.data[k]["sum_values_2"] for k in self.data]
+    def a_priors(self):
+        return [self.data[k]["a_prior"] for k in self.data]
 
     @property
-    def m_priors(self):
-        return [self.data[k]["m_prior"] for k in self.data]
-
-    @property
-    def a_priors_ig(self):
-        return [self.data[k]["a_prior_ig"] for k in self.data]
-
-    @property
-    def b_priors_ig(self):
-        return [self.data[k]["b_prior_ig"] for k in self.data]
-
-    @property
-    def w_priors(self):
-        return [self.data[k]["w_prior"] for k in self.data]
+    def b_priors(self):
+        return [self.data[k]["b_prior"] for k in self.data]
 
     def eval_simulation(
         self, sim_count: int = 20000, seed: int = None, min_is_best: bool = False
@@ -69,17 +55,8 @@ class NormalDataTest(BaseDataTest):
         res_pbbs : Dictionary with probabilities of being best for all variants in experiment.
         res_loss : Dictionary with expected loss for all variants in experiment.
         """
-        pbbs, loss = eval_normal_agg(
-            self.totals,
-            self.sum_values,
-            self.sum_values_2,
-            sim_count=sim_count,
-            m_priors=self.m_priors,
-            a_priors_ig=self.a_priors_ig,
-            b_priors_ig=self.b_priors_ig,
-            w_priors=self.w_priors,
-            seed=seed,
-            min_is_best=min_is_best,
+        pbbs, loss = eval_poisson_agg(
+            self.totals, self.sum_values, self.a_priors, self.b_priors, sim_count, seed, min_is_best
         )
         res_pbbs = dict(zip(self.variant_names, pbbs))
         res_loss = dict(zip(self.variant_names, loss))
@@ -105,20 +82,24 @@ class NormalDataTest(BaseDataTest):
         keys = [
             "variant",
             "totals",
-            "sum_values",
-            "avg_values",
+            "observed_average",
+            "posterior_mean",
             "prob_being_best",
             "expected_loss",
         ]
-        avg_values = [round(i[0] / i[1], 5) for i in zip(self.sum_values, self.totals)]
+        observed_average = [round(i[0] / i[1], 5) for i in zip(self.sum_values, self.totals)]
+        posterior_mean = [
+            round((i[2] + i[0]) / (i[3] + i[1]), 5)
+            for i in zip(self.sum_values, self.totals, self.a_priors, self.b_priors)
+        ]
         eval_pbbs, eval_loss = self.eval_simulation(sim_count, seed, min_is_best)
         pbbs = list(eval_pbbs.values())
         loss = list(eval_loss.values())
         data = [
             self.variant_names,
             self.totals,
-            [round(i, 5) for i in self.sum_values],
-            avg_values,
+            observed_average,
+            posterior_mean,
             pbbs,
             loss,
         ]
@@ -130,52 +111,44 @@ class NormalDataTest(BaseDataTest):
         self,
         name: str,
         totals: int,
-        sum_values: float,
-        sum_values_2: float,
-        m_prior: Number = 1,
-        a_prior_ig: Number = 0,
-        b_prior_ig: Number = 0,
-        w_prior: Number = 0.01,
+        sum_values: Union[float, int],
+        a_prior: Number = 0.1,
+        b_prior: Number = 0.1,
         replace: bool = True,
     ) -> None:
         """
-        Add variant data to test class using aggregated Normal data.
+        Add variant data to test class using aggregated Poisson data.
         This can be convenient as aggregation can be done on database level.
 
-        The goal of default prior setup is to be low information.
-        It should be tuned with caution.
+        Default prior setup is set for Gamma(0.1, 0.1) which is on purpose very vague prior.
 
         Parameters
         ----------
         name : Variant name.
-        totals : Total number of experiment observations (e.g. number of sessions).
-        sum_values : Sum of values for a given variant.
-        sum_values_2 : Sum of values squared for a given variant.
-        m_prior : Prior normal mean.
-        a_prior_ig : Prior alpha from inverse gamma dist. for unknown variance.
-            In theory a > 0, but as we always have at least one observation, we can start at 0.
-        b_prior_ig : Prior beta from inverse gamma dist. for unknown variance.
-            In theory b > 0, but as we always have at least one observation, we can start at 0.
-        w_prior : Prior effective sample sizes.
+        totals : Total number of experiment observations (e.g. number of matches).
+        sum_values : Sum of values for a given variant (e.g. total number of goals).
+        a_prior : Prior alpha parameter for Gamma distributions.
+            Default value 0.1 is on purpose to be vague (lower information).
+        b_prior : Prior beta parameter for Gamma distributions.
+            Default value 0.1 is on purpose to be vague (lower information).
         replace : Replace data if variant already exists.
             If set to False, data of existing variant will be appended to existing data.
         """
         if not isinstance(name, str):
             raise ValueError("Variant name has to be a string.")
-        if m_prior < 0 or a_prior_ig < 0 or b_prior_ig < 0 or w_prior < 0:
-            raise ValueError("All priors of [m, a_ig, b_ig, w] have to be non-negative numbers.")
+        if a_prior <= 0 or b_prior <= 0:
+            raise ValueError("Both [a_prior, b_prior] have to be positive numbers.")
         if totals <= 0:
             raise ValueError("Input variable 'totals' is expected to be positive integer.")
+        if sum_values < 0:
+            raise ValueError("Input variable 'sum_values' is expected to be non-negative number.")
 
         if name not in self.variant_names:
             self.data[name] = {
                 "totals": totals,
                 "sum_values": sum_values,
-                "sum_values_2": sum_values_2,
-                "m_prior": m_prior,
-                "a_prior_ig": a_prior_ig,
-                "b_prior_ig": b_prior_ig,
-                "w_prior": w_prior,
+                "a_prior": a_prior,
+                "b_prior": b_prior,
             }
         elif name in self.variant_names and replace:
             msg = (
@@ -186,11 +159,8 @@ class NormalDataTest(BaseDataTest):
             self.data[name] = {
                 "totals": totals,
                 "sum_values": sum_values,
-                "sum_values_2": sum_values_2,
-                "m_prior": m_prior,
-                "a_prior_ig": a_prior_ig,
-                "b_prior_ig": b_prior_ig,
-                "w_prior": w_prior,
+                "a_prior": a_prior,
+                "b_prior": b_prior,
             }
         elif name in self.variant_names and not replace:
             msg = (
@@ -201,51 +171,37 @@ class NormalDataTest(BaseDataTest):
             logger.info(msg)
             self.data[name]["totals"] += totals
             self.data[name]["sum_values"] += sum_values
-            self.data[name]["sum_values_2"] += sum_values_2
 
     def add_variant_data(
         self,
         name: str,
-        data: List[Number],
-        m_prior: Number = 1,
-        a_prior_ig: Number = 0,
-        b_prior_ig: Number = 0,
-        w_prior: Number = 0.01,
+        data: List[int],
+        a_prior: Number = 0.1,
+        b_prior: Number = 0.1,
         replace: bool = True,
     ) -> None:
         """
-        Add variant data to test class using raw Normal data.
+        Add variant data to test class using raw Poisson data.
 
-        The goal of default prior setup is to be low information. It should be tuned with caution.
+        Default prior setup is set for Gamma(0.1, 0.1) which is non-information prior.
 
         Parameters
         ----------
         name : Variant name.
-        data : List of normal data.
-        m_prior : Prior mean.
-        a_prior_ig : Prior alpha from inverse gamma dist. for unknown variance.
-            In theory a > 0, but as we always have at least one observation, we can start at 0.
-        b_prior_ig : Prior beta from inverse gamma dist. for unknown variance.
-            In theory b > 0, but as we always have at least one observation, we can start at 0.
-        w_prior : Prior effective sample sizes.
+        data : List of Poisson data.
+        a_prior : Prior alpha parameter for Gamma distributions.
+            Default value 0.1 is on purpose to be vague (lower information).
+        b_prior : Prior beta parameter for Gamma distributions.
+            Default value 0.1 is on purpose to be vague (lower information).
         replace : Replace data if variant already exists.
             If set to False, data of existing variant will be appended to existing data.
         """
         if len(data) == 0:
             raise ValueError("Data of added variant needs to have some observations.")
+        if not min([i >= 0 for i in data]):
+            raise ValueError("Input data needs to be a list of non-negative integers.")
 
         totals = len(data)
         sum_values = sum(data)
-        sum_values_2 = sum(np.square(data))
 
-        self.add_variant_data_agg(
-            name,
-            totals,
-            sum_values,
-            sum_values_2,
-            m_prior,
-            a_prior_ig,
-            b_prior_ig,
-            w_prior,
-            replace,
-        )
+        self.add_variant_data_agg(name, totals, sum_values, a_prior, b_prior, replace)

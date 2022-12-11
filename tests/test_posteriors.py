@@ -5,6 +5,7 @@ from bayesian_testing.metrics.posteriors import (
     beta_posteriors_all,
     lognormal_posteriors,
     dirichlet_posteriors,
+    gamma_posteriors_all,
 )
 
 BETA_POSTERIORS_ALL_INPUTS = [
@@ -58,6 +59,23 @@ DIRICHLET_POSTERIORS_INPUTS = [
     },
 ]
 
+GAMMA_POSTERIORS_ALL_INPUTS = [
+    {
+        "totals": [10, 20, 30],
+        "sums": [80, 161, 260],
+        "sim_count": 10,
+        "a_priors_gamma": [0.5, 0.5, 0.5],
+        "b_priors_gamma": [0.5, 0.5, 0.5],
+    },
+    {
+        "totals": [20, 30],
+        "sums": [160, 240],
+        "sim_count": 20,
+        "a_priors_gamma": [0.5, 0.5],
+        "b_priors_gamma": [0.5, 0.5],
+    },
+]
+
 
 @pytest.mark.parametrize("inp", BETA_POSTERIORS_ALL_INPUTS)
 def test_beta_posteriors_all(inp):
@@ -91,3 +109,16 @@ def test_dirichlet_posteriors(inp):
         inp["sim_count"],
     )
     assert all_pos.shape == (inp["sim_count"], len(inp["concentration"]))
+
+
+@pytest.mark.parametrize("inp", GAMMA_POSTERIORS_ALL_INPUTS)
+def test_gamma_posteriors_all(inp):
+    all_pos = gamma_posteriors_all(
+        inp["totals"],
+        inp["sums"],
+        inp["sim_count"],
+        inp["a_priors_gamma"],
+        inp["b_priors_gamma"],
+    )
+    all_pos_shape = np.array(all_pos).shape
+    assert all_pos_shape == (len(inp["totals"]), inp["sim_count"])

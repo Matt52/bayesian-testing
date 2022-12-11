@@ -6,6 +6,7 @@ from bayesian_testing.metrics import (
     eval_normal_agg,
     eval_delta_lognormal_agg,
     eval_numerical_dirichlet_agg,
+    eval_poisson_agg,
 )
 
 PBB_BERNOULLI_AGG_INPUTS = [
@@ -229,6 +230,49 @@ PBB_NUMERICAL_DIRICHLET_AGG_INPUTS = [
     },
 ]
 
+PBB_POISSON_AGG_INPUTS = [
+    {
+        "input": {
+            "totals": [3150, 3200, 3100],
+            "sums": [10000, 10000, 10000],
+            "sim_count": 20000,
+            "seed": 52,
+            "min_is_best": False,
+        },
+        "expected_output": ([0.127, 0.00695, 0.86605], [0.0539495, 0.1042691, 0.0030418]),
+    },
+    {
+        "input": {
+            "totals": [3150, 3200, 3100],
+            "sums": [10000, 10000, 10000],
+            "sim_count": 20000,
+            "seed": 52,
+            "min_is_best": True,
+        },
+        "expected_output": ([0.12775, 0.8656, 0.00665], [0.0532581, 0.0029385, 0.1041658]),
+    },
+    {
+        "input": {
+            "totals": [100],
+            "sums": [77],
+            "sim_count": 20000,
+            "seed": 52,
+            "min_is_best": False,
+        },
+        "expected_output": ([1], [0]),
+    },
+    {
+        "input": {
+            "totals": [],
+            "sums": [],
+            "sim_count": 20000,
+            "seed": 52,
+            "min_is_best": False,
+        },
+        "expected_output": ([], []),
+    },
+]
+
 
 @pytest.mark.parametrize("inp", PBB_BERNOULLI_AGG_INPUTS)
 def test_eval_bernoulli_agg(inp):
@@ -298,3 +342,16 @@ def test_eval_numerical_dirichlet_agg_different_runs():
     run1 = eval_numerical_dirichlet_agg([1, 20], [[10, 10], [20, 20]])
     run2 = eval_numerical_dirichlet_agg([1, 20], [[10, 10], [20, 20]])
     assert run1 != run2
+
+
+@pytest.mark.parametrize("inp", PBB_POISSON_AGG_INPUTS)
+def test_eval_poisson_agg(inp):
+    i = inp["input"]
+    res = eval_poisson_agg(
+        i["totals"],
+        i["sums"],
+        sim_count=i["sim_count"],
+        seed=i["seed"],
+        min_is_best=i["min_is_best"],
+    )
+    assert res == inp["expected_output"]

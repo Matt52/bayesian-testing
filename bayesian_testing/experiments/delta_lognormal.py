@@ -12,7 +12,7 @@ logger = get_logger("bayesian_testing")
 
 class DeltaLognormalDataTest(BaseDataTest):
     """
-    Class for Bayesian A/B test for delta-lognormal data (log-normal with possible zeros).
+    Class for Bayesian A/B test for Delta-LogNormal data (Log-Normal with possible zeros).
     Delta-lognormal data is typical case of revenue/session data where many
     sessions are with 0 revenue.
     To handle this data, the evaluation methods are combining binary bayes model for
@@ -171,7 +171,7 @@ class DeltaLognormalDataTest(BaseDataTest):
         replace: bool = True,
     ) -> None:
         """
-        Add variant data to test class using aggregated delta-lognormal data.
+        Add variant data to test class using aggregated Delta-LogNormal data.
         This can be convenient as aggregation can be done on database level.
 
         The goal of default prior setup is to be low information.
@@ -266,7 +266,7 @@ class DeltaLognormalDataTest(BaseDataTest):
         replace: bool = True,
     ) -> None:
         """
-        Add variant data to test class using raw delta-lognormal data.
+        Add variant data to test class using raw Delta-LogNormal data.
 
         The goal of default prior setup is to be low information. It should be tuned with caution.
 

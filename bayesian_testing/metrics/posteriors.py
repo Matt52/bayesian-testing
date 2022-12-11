@@ -12,15 +12,15 @@ def beta_posteriors_all(
     seed: Union[int, np.random.bit_generator.SeedSequence] = None,
 ) -> np.ndarray:
     """
-    Draw from beta posterior distributions for all variants at once.
+    Draw from Beta posterior distributions for all variants at once.
 
     Parameters
     ----------
-    totals : List of numbers of experiment observations (e.g. number of sessions) for each variant.
-    positives : List of numbers of ones (e.g. number of conversions) for each variant.
+    totals : List of total experiment observations (e.g. number of sessions) for each variant.
+    positives : List of total number of ones (e.g. number of conversions) for each variant.
     sim_count : Number of simulations to be used for probability estimation.
-    a_priors_beta : List of prior alpha parameters for Beta distributions for each variant.
-    b_priors_beta : List of prior beta parameters for Beta distributions for each variant.
+    a_priors_beta : List of prior alpha parameters of Beta distributions for each variant.
+    b_priors_beta : List of prior beta parameters of Beta distributions for each variant.
     seed : Random seed.
 
     Returns
@@ -54,7 +54,7 @@ def normal_posteriors(
     seed: Union[int, np.random.bit_generator.SeedSequence] = None,
 ) -> Tuple[List[Union[float, int]], List[Union[float, int]]]:
     """
-    Drawing mus and sigmas from posterior normal distribution considering given aggregated data.
+    Drawing mus and sigmas from posterior Normal distribution considering given aggregated data.
 
     Parameters
     ----------
@@ -81,7 +81,7 @@ def normal_posteriors(
     a_post = prior_a + (total / 2)
     b_post = (
         prior_b
-        + (1 / 2) * (sums_2 - 2 * sums * x_bar + total * (x_bar ** 2))
+        + (1 / 2) * (sums_2 - 2 * sums * x_bar + total * (x_bar**2))
         + ((total * prior_w) / (2 * (total + prior_w))) * ((x_bar - prior_m) ** 2)
     )
 
@@ -107,7 +107,7 @@ def lognormal_posteriors(
     seed: Union[int, np.random.bit_generator.SeedSequence] = None,
 ) -> List[float]:
     """
-    Drawing from posterior lognormal distribution using logarithms of original (lognormal) data
+    Drawing from posterior LogNormal distribution using logarithms of original (lognormal) data
     (logarithms of lognormal data are normal). Input data is in aggregated form.
 
     Parameters
@@ -152,7 +152,7 @@ def dirichlet_posteriors(
     seed: Union[int, np.random.bit_generator.SeedSequence] = None,
 ) -> np.ndarray:
     """
-    Drawing from dirichlet posterior for a single variant.
+    Drawing from Dirichlet posterior for a single variant.
 
     Parameters
     ----------
@@ -172,3 +172,43 @@ def dirichlet_posteriors(
     res = rng.dirichlet(posterior_concentration, sim_count)
 
     return res
+
+
+def gamma_posteriors_all(
+    totals: List[int],
+    sums: List[Union[float, int]],
+    sim_count: int,
+    a_priors_gamma: List[Union[float, int]],
+    b_priors_gamma: List[Union[float, int]],
+    seed: Union[int, np.random.bit_generator.SeedSequence] = None,
+) -> np.ndarray:
+    """
+    Draw from Gamma posterior distributions for all variants at once.
+
+    Parameters
+    ----------
+    totals : List of total experiment observations (e.g. number of matches) for each variant.
+    sums : List of sums of observations (e.g. number of goals) for each variant.
+    sim_count : Number of simulations to be used for probability estimation.
+    a_priors_gamma : List of prior alpha parameters of Gamma distributions for each variant.
+    b_priors_gamma : List of prior beta parameters of Gamma distributions for each variant.
+    seed : Random seed.
+
+    Returns
+    -------
+    gamma_samples : List of lists of Gamma distribution samples for all variants.
+    """
+    rng = np.random.default_rng(seed)
+
+    gamma_samples = np.array(
+        [
+            rng.gamma(
+                sums[i] + a_priors_gamma[i],
+                # here it has to be 1/(...) as it is a scale, and not a rate
+                1 / (totals[i] + b_priors_gamma[i]),
+                sim_count,
+            )
+            for i in range(len(totals))
+        ]
+    )
+    return gamma_samples

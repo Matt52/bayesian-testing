@@ -6,22 +6,27 @@
 
 **Implemented tests:**
 - [BinaryDataTest](bayesian_testing/experiments/binary.py)
-  - **_input data_** - binary (`[0, 1, 0, ...]`)
-  - convenient for conversion-like A/B testing
+  - **_input data_** - binary data (`[0, 1, 0, ...]`)
+  - designed for conversion-like A/B testing
 - [NormalDataTest](bayesian_testing/experiments/normal.py)
   - **_input data_** - normal data with unknown variance
-  - convenient for normal data A/B testing
+  - designed for normal data A/B testing
 - [DeltaLognormalDataTest](bayesian_testing/experiments/delta_lognormal.py)
   - **_input data_** - lognormal data with zeros
-  - convenient for revenue-like A/B testing
+  - designed for revenue-like A/B testing
 - [DiscreteDataTest](bayesian_testing/experiments/discrete.py)
   - **_input data_** - categorical data with numerical categories
-  - convenient for discrete data A/B testing (e.g. dice rolls, star ratings, 1-10 ratings)
+  - designed for discrete data A/B testing (e.g. dice rolls, star ratings, 1-10 ratings)
+- [PoissonDataTest](bayesian_testing/experiments/poisson.py)
+  - **_input data_** - observations of non-negative integers (`[1, 0, 3, ...]`)
+  - designed for poisson data A/B testing
 
 **Implemented evaluation metrics:**
 - `Probability of Being Best`
-  - probability of being "greatest" from a data point of view
-  - it is possible to reverse the setup to "being best" = "being smallest" using `min_is_best` in evaluation
+  - probability that a given variant is best among all variants
+  - by default, `best` is equivalent to `greatest` (from a data/metric point of view),
+however it is possible to change it using `min_is_best=True` in the evaluation method
+(this can be useful if we try to find the variant while minimizing tested measure)
 - `Expected Loss`
   - "risk" of choosing particular variant over other variants in the test
   - measured in the same units as a tested measure (e.g. positive rate or average value)
@@ -48,13 +53,14 @@ The primary features are classes:
 - `NormalDataTest`
 - `DeltaLognormalDataTest`
 - `DiscreteDataTest`
+- `PoissonDataTest`
 
-In all cases, there are two methods to insert data:
+All test classes support two methods to insert the data:
 - `add_variant_data` - adding raw data for a variant as a list of observations (or numpy 1-D array)
 - `add_variant_data_agg` - adding aggregated variant data (this can be practical for a large data, as the
-aggregation can be done on a database level)
+aggregation can be done already on a database level)
 
-Both methods for adding data are allowing specification of prior distributions
+Both methods for adding data allow specification of prior distributions
 (see details in respective docstrings). Default prior setup should be sufficient for most of the cases
 (e.g. cases with unknown priors or large amounts of data).
 
@@ -263,6 +269,53 @@ test.evaluate(sim_count=20000, seed=52, min_is_best=False)
       'prob_being_best': 0.44515,
       'expected_loss': 0.2870247}]
 
+### PoissonDataTest
+Class for Bayesian A/B test for poisson data.
+
+**Example:**
+```python
+from bayesian_testing.experiments import PoissonDataTest
+
+# goals received - so less is better (duh...)
+psg_goals_against = [0, 2, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 3, 1, 0]
+city_goals_against = [0, 0, 3, 2, 0, 1, 0, 3, 0, 1, 1, 0, 1, 2]
+bayern_goals_against = [1, 0, 0, 1, 1, 2, 1, 0, 2, 0, 0, 2, 2, 1, 0]
+
+# initialize a test:
+test = PoissonDataTest()
+
+# add variant using raw data:
+test.add_variant_data('psg', psg_goals_against)
+# example with specific priors ("b_prior" as an effective sample size, and "a_prior/b_prior" as a prior mean)
+test.add_variant_data('city', city_goals_against, a_prior=3, b_prior=1)
+# test.add_variant_data('bayern', bayern_goals_against)
+
+# add variant using aggregated data:
+test.add_variant_data_agg("bayern", len(bayern_goals_against), sum(bayern_goals_against))
+
+# evaluate test (since fewer goals is better, we explicitly set min_is_best to True)
+test.evaluate(sim_count=20000, seed=52, min_is_best=True)
+```
+
+    [{'variant': 'psg',
+      'totals': 15,
+      'observed_average': 0.6,
+      'posterior_mean': 0.60265,
+      'prob_being_best': 0.78175,
+      'expected_loss': 0.0369998},
+     {'variant': 'city',
+      'totals': 14,
+      'observed_average': 1.0,
+      'posterior_mean': 1.13333,
+      'prob_being_best': 0.0344,
+      'expected_loss': 0.5620553},
+     {'variant': 'bayern',
+      'totals': 15,
+      'observed_average': 0.86667,
+      'posterior_mean': 0.86755,
+      'prob_being_best': 0.18385,
+      'expected_loss': 0.3003345}]
+
 ## Development
 To set up a development environment, use [Poetry](https://python-poetry.org/) and [pre-commit](https://pre-commit.com):
 ```console
@@ -274,7 +327,6 @@ poetry run pre-commit install
 ## Roadmap
 
 Test classes to be added:
-- `PoissonDataTest`
 - `ExponentialDataTest`
 
 Metrics to be added:

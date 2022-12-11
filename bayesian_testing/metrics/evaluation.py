@@ -8,6 +8,7 @@ from bayesian_testing.metrics.posteriors import (
     lognormal_posteriors,
     normal_posteriors,
     dirichlet_posteriors,
+    gamma_posteriors_all,
 )
 from bayesian_testing.utilities import get_logger
 
@@ -86,16 +87,16 @@ def eval_bernoulli_agg(
     min_is_best: bool = False,
 ) -> Tuple[List[float], List[float]]:
     """
-    Method estimating probabilities of being best and expected loss for beta-bernoulli
+    Method estimating probabilities of being best and expected loss for Beta-Bernoulli
     aggregated data per variant.
 
     Parameters
     ----------
-    totals : List of numbers of experiment observations (e.g. number of sessions) for each variant.
-    positives : List of numbers of ones (e.g. number of conversions) for each variant.
+    totals : List of total experiment observations (e.g. number of sessions) for each variant.
+    positives : List of total number of ones (e.g. number of conversions) for each variant.
     sim_count : Number of simulations to be used for probability estimation.
-    a_priors_beta : List of prior alpha parameters for Beta distributions for each variant.
-    b_priors_beta : List of prior beta parameters for Beta distributions for each variant.
+    a_priors_beta : List of prior alpha parameters of Beta distributions for each variant.
+    b_priors_beta : List of prior beta parameters of Beta distributions for each variant.
     seed : Random seed.
     min_is_best : Option to change "being best" to a minimum. Default is maximum.
 
@@ -138,7 +139,7 @@ def eval_normal_agg(
     min_is_best: bool = False,
 ) -> Tuple[List[float], List[float]]:
     """
-    Method estimating probabilities of being best and expected loss for normal
+    Method estimating probabilities of being best and expected loss for Normal
     aggregated data per variant.
 
     Parameters
@@ -215,7 +216,7 @@ def eval_delta_lognormal_agg(
     min_is_best: bool = False,
 ) -> Tuple[List[float], List[float]]:
     """
-    Method estimating probabilities of being best and expected loss for delta-lognormal
+    Method estimating probabilities of being best and expected loss for Delta-Lognormal
     aggregated data per variant. For that reason, the method works with both totals and non_zeros.
 
     Parameters
@@ -303,7 +304,7 @@ def eval_numerical_dirichlet_agg(
     min_is_best: bool = False,
 ):
     """
-    Method estimating probabilities of being best and expected loss for dirichlet-multinomial
+    Method estimating probabilities of being best and expected loss for Dirichlet-multinomial
     aggregated data per variant. States in this case are expected to be a numerical values
     (e.g. dice numbers, number of stars in a rating, etc.).
 
@@ -342,5 +343,53 @@ def eval_numerical_dirichlet_agg(
 
     res_pbbs = estimate_probabilities(means_samples, min_is_best)
     res_loss = estimate_expected_loss(means_samples, min_is_best)
+
+    return res_pbbs, res_loss
+
+
+def eval_poisson_agg(
+    totals: List[int],
+    sums: List[Union[float, int]],
+    a_priors_gamma: List[Number] = None,
+    b_priors_gamma: List[Number] = None,
+    sim_count: int = 20000,
+    seed: int = None,
+    min_is_best: bool = False,
+) -> Tuple[List[float], List[float]]:
+    """
+    Method estimating probabilities of being best and expected loss for
+    Poisson aggregated data per variant.
+
+    Parameters
+    ----------
+    totals : List of total experiment observations (e.g. number of matches) for each variant.
+    sums : List of sums of observations (e.g. number of goals) for each variant.
+    sim_count : Number of simulations to be used for probability estimation.
+    a_priors_gamma : List of prior alpha parameters of Gamma distributions for each variant.
+    b_priors_gamma : List of prior beta parameters of Gamma distributions for each variant.
+    seed : Random seed.
+    min_is_best : Option to change "being best" to a minimum. Default is maximum.
+
+    Returns
+    -------
+    res_pbbs : List of probabilities of being best for each variant.
+    res_loss : List of expected loss for each variant.
+    """
+
+    if len(totals) == 0:
+        return [], []
+
+    # Default prior for all variants is Gamma(0.1, 0.1) which is on purpose quite vague.
+    if not a_priors_gamma:
+        a_priors_gamma = [0.1] * len(totals)
+    if not b_priors_gamma:
+        b_priors_gamma = [0.1] * len(totals)
+
+    gamma_samples = gamma_posteriors_all(
+        totals, sums, sim_count, a_priors_gamma, b_priors_gamma, seed
+    )
+
+    res_pbbs = estimate_probabilities(gamma_samples, min_is_best)
+    res_loss = estimate_expected_loss(gamma_samples, min_is_best)
 
     return res_pbbs, res_loss

@@ -82,6 +82,7 @@ class PoissonDataTest(BaseDataTest):
         keys = [
             "variant",
             "totals",
+            "sum_values",
             "observed_average",
             "posterior_mean",
             "prob_being_best",
@@ -98,6 +99,7 @@ class PoissonDataTest(BaseDataTest):
         data = [
             self.variant_names,
             self.totals,
+            self.sum_values,
             observed_average,
             posterior_mean,
             pbbs,

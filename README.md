@@ -278,7 +278,7 @@ results # print(pd.DataFrame(results).to_markdown(tablefmt="grid", index=False))
     | bayern    |       15 |           13 |            0.86667 |          0.86755 |           0.18385 |       0.300335  |
     +-----------+----------+--------------+--------------------+------------------+-------------------+-----------------+
 
-_note: Since we set `min_is_best=True` (because received goals are "bad"), probability and loss are in favor of a variants with lower posterior means._
+_note: Since we set `min_is_best=True` (because received goals are "bad"), probability and loss are in a favor of variants with lower posterior means._
 
 ## Development
 To set up a development environment, use [Poetry](https://python-poetry.org/) and [pre-commit](https://pre-commit.com):

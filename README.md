@@ -174,8 +174,8 @@ data_b = [4.0, 0, 3.3, 19.3, 18.5, 0, 0, 0, 12.9, 0, 0, 0, 10.2, 0, 0, 23.1, 0, 
 test.add_variant_data("A", data_a)
 # test.add_variant_data("B", data_b)
 
-# alternatively, variant can be also added using aggregated data:
-# (looks more complicated but for large data it can be quite handy to move around only these sums)
+# alternatively, variant can be also added using aggregated data
+# (looks more complicated, but it can be quite handy for a large data):
 test.add_variant_data_agg(
     name="B",
     totals=len(data_b),
@@ -258,7 +258,7 @@ test = PoissonDataTest()
 test.add_variant_data('psg', psg_goals_against)
 
 # example with specific priors
-# ("b_prior" as an effective sample size, and "a_prior/b_prior" as a prior mean)
+# ("b_prior" as an effective sample size, and "a_prior/b_prior" as a prior mean):
 test.add_variant_data('city', city_goals_against, a_prior=3, b_prior=1)
 # test.add_variant_data('bayern', bayern_goals_against)
 

@@ -84,14 +84,27 @@ class BinaryDataTest(BaseDataTest):
             "totals",
             "positives",
             "positive_rate",
+            "posterior_mean",
             "prob_being_best",
             "expected_loss",
         ]
         positive_rate = [round(i[0] / i[1], 5) for i in zip(self.positives, self.totals)]
+        posterior_mean = [
+            round((i[2] + i[0]) / (i[2] + i[3] + i[1]), 5)
+            for i in zip(self.positives, self.totals, self.a_priors, self.b_priors)
+        ]
         eval_pbbs, eval_loss = self.eval_simulation(sim_count, seed, min_is_best)
         pbbs = list(eval_pbbs.values())
         loss = list(eval_loss.values())
-        data = [self.variant_names, self.totals, self.positives, positive_rate, pbbs, loss]
+        data = [
+            self.variant_names,
+            self.totals,
+            self.positives,
+            positive_rate,
+            posterior_mean,
+            pbbs,
+            loss,
+        ]
         res = [dict(zip(keys, item)) for item in zip(*data)]
 
         return res

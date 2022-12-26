@@ -113,7 +113,7 @@ class NormalDataTest(BaseDataTest):
         ]
         avg_values = [round(i[0] / i[1], 5) for i in zip(self.sum_values, self.totals)]
         posterior_mean = [
-            round((i[0] + i[3] + i[2]) / (i[1] + i[3]), 5)
+            round((i[0] + i[3] * i[2]) / (i[1] + i[3]), 5)
             for i in zip(self.sum_values, self.totals, self.m_priors, self.w_priors)
         ]
         eval_pbbs, eval_loss = self.eval_simulation(sim_count, seed, min_is_best)

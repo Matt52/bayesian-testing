@@ -256,7 +256,9 @@ test = PoissonDataTest()
 
 # add variant using raw data:
 test.add_variant_data('psg', psg_goals_against)
-# example with specific priors ("b_prior" as an effective sample size, and "a_prior/b_prior" as a prior mean)
+
+# example with specific priors
+# ("b_prior" as an effective sample size, and "a_prior/b_prior" as a prior mean)
 test.add_variant_data('city', city_goals_against, a_prior=3, b_prior=1)
 # test.add_variant_data('bayern', bayern_goals_against)
 

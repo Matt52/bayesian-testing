@@ -107,10 +107,15 @@ class NormalDataTest(BaseDataTest):
             "totals",
             "sum_values",
             "avg_values",
+            "posterior_mean",
             "prob_being_best",
             "expected_loss",
         ]
         avg_values = [round(i[0] / i[1], 5) for i in zip(self.sum_values, self.totals)]
+        posterior_mean = [
+            round((i[0] + i[3] + i[2]) / (i[1] + i[3]), 5)
+            for i in zip(self.sum_values, self.totals, self.m_priors, self.w_priors)
+        ]
         eval_pbbs, eval_loss = self.eval_simulation(sim_count, seed, min_is_best)
         pbbs = list(eval_pbbs.values())
         loss = list(eval_loss.values())
@@ -119,6 +124,7 @@ class NormalDataTest(BaseDataTest):
             self.totals,
             [round(i, 5) for i in self.sum_values],
             avg_values,
+            posterior_mean,
             pbbs,
             loss,
         ]

@@ -54,6 +54,7 @@ def test_evaluate(conv_test):
             "totals": 10,
             "positives": 3,
             "positive_rate": 0.3,
+            "posterior_mean": 0.31818,
             "prob_being_best": 0.57225,
             "expected_loss": 0.0529281,
         },
@@ -62,6 +63,7 @@ def test_evaluate(conv_test):
             "totals": 10,
             "positives": 2,
             "positive_rate": 0.2,
+            "posterior_mean": 0.22727,
             "prob_being_best": 0.233,
             "expected_loss": 0.1452113,
         },
@@ -70,7 +72,24 @@ def test_evaluate(conv_test):
             "totals": 11,
             "positives": 2,
             "positive_rate": 0.18182,
+            "posterior_mean": 0.21429,
             "prob_being_best": 0.19475,
             "expected_loss": 0.1557502,
         },
     ]
+
+
+def test_wrong_inputs():
+    cv = BinaryDataTest()
+    with pytest.raises(ValueError):
+        cv.add_variant_data(10, [1, 0, 1])
+    with pytest.raises(ValueError):
+        cv.add_variant_data("A", [1, 0, 1], a_prior=-1)
+    with pytest.raises(ValueError):
+        cv.add_variant_data_agg("A", -1, 7)
+    with pytest.raises(ValueError):
+        cv.add_variant_data_agg("A", 1, -7)
+    with pytest.raises(ValueError):
+        cv.add_variant_data("A", [])
+    with pytest.raises(ValueError):
+        cv.add_variant_data("A", [1, 2, 0])

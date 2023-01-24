@@ -9,8 +9,21 @@ logger = get_logger("bayesian_testing")
 
 
 class DeltaNormalDataTest(BaseDataTest):
+    """
+    Class for Bayesian A/B test for Delta-Normal data (Normal with - values).
+    Delta-normal data is typical case of net profit data where many
+    sessions are with negative net profit.
+    To handle this data, the evaluation methods are combining binary bayes model for
+    zero vs non-zero "conversion" and normal model for non-positive values.
+
+    After class initialization, use add_variant methods to insert variant data.
+    Then to get results of the test, use for instance `evaluate` method.
+    """
 
     def __init__(self) -> None:
+        """
+        Initialize DeltaNormalDataTest class.
+        """
         super().__init__()
 
     @property

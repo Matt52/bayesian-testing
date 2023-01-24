@@ -2,28 +2,15 @@ from numbers import Number
 from typing import List, Tuple
 import numpy as np
 from bayesian_testing.experiments.base import BaseDataTest
-from bayesian_testing.metrics import eval_delta_lognormal_agg
+from bayesian_testing.metrics import eval_delta_normal_agg
 from bayesian_testing.utilities import get_logger
 
 logger = get_logger("bayesian_testing")
 
 
-class DeltaLognormalDataTest(BaseDataTest):
-    """
-    Class for Bayesian A/B test for Delta-LogNormal data (Log-Normal with possible zeros).
-    Delta-lognormal data is typical case of revenue/session data where many
-    sessions are with 0 revenue.
-    To handle this data, the evaluation methods are combining binary bayes model for
-    zero vs non-zero "conversion" and log-normal model for non-zero values.
-
-    After class initialization, use add_variant methods to insert variant data.
-    Then to get results of the test, use for instance `evaluate` method.
-    """
+class DeltaNormalDataTest(BaseDataTest):
 
     def __init__(self) -> None:
-        """
-        Initialize DeltaLognormalDataTest class.
-        """
         super().__init__()
 
     @property
@@ -39,12 +26,8 @@ class DeltaLognormalDataTest(BaseDataTest):
         return [self.data[k]["sum_values"] for k in self.data]
 
     @property
-    def sum_logs(self):
-        return [self.data[k]["sum_logs"] for k in self.data]
-
-    @property
-    def sum_logs_2(self):
-        return [self.data[k]["sum_logs_2"] for k in self.data]
+    def sum_values_2(self):
+        return [self.data[k]["sum_values_2"] for k in self.data]
 
     @property
     def a_priors_beta(self):
@@ -71,27 +54,25 @@ class DeltaLognormalDataTest(BaseDataTest):
         return [self.data[k]["w_prior"] for k in self.data]
 
     def eval_simulation(
-        self, sim_count: int = 20000, seed: int = None, min_is_best: bool = False
+            self, sim_count: int = 20000, seed: int = None, min_is_best: bool = False
     ) -> Tuple[dict, dict]:
         """
         Calculate probabilities of being best and expected loss for a current class state.
-
         Parameters
         ----------
         sim_count : Number of simulations to be used for probability estimation.
         seed : Random seed.
         min_is_best : Option to change "being best" to a minimum. Default is maximum.
-
         Returns
         -------
         res_pbbs : Dictionary with probabilities of being best for all variants in experiment.
         res_loss : Dictionary with expected loss for all variants in experiment.
         """
-        pbbs, loss = eval_delta_lognormal_agg(
+        pbbs, loss = eval_delta_normal_agg(
             self.totals,
             self.positives,
-            self.sum_logs,
-            self.sum_logs_2,
+            self.sum_values,
+            self.sum_values_2,
             sim_count=sim_count,
             a_priors_beta=self.a_priors_beta,
             b_priors_beta=self.b_priors_beta,
@@ -108,17 +89,15 @@ class DeltaLognormalDataTest(BaseDataTest):
         return res_pbbs, res_loss
 
     def evaluate(
-        self, sim_count: int = 20000, seed: int = None, min_is_best: bool = False
+            self, sim_count: int = 20000, seed: int = None, min_is_best: bool = False
     ) -> List[dict]:
         """
         Evaluation of experiment.
-
         Parameters
         ----------
         sim_count : Number of simulations to be used for probability estimation.
         seed : Random seed.
         min_is_best : Option to change "being best" to a minimum. Default is maximum.
-
         Returns
         -------
         res : List of dictionaries with results per variant.
@@ -153,36 +132,33 @@ class DeltaLognormalDataTest(BaseDataTest):
         return res
 
     def add_variant_data_agg(
-        self,
-        name: str,
-        totals: int,
-        positives: int,
-        sum_values: float,
-        sum_logs: float,
-        sum_logs_2: float,
-        a_prior_beta: Number = 0.5,
-        b_prior_beta: Number = 0.5,
-        m_prior: Number = 1,
-        a_prior_ig: Number = 0,
-        b_prior_ig: Number = 0,
-        w_prior: Number = 0.01,
-        replace: bool = True,
+            self,
+            name: str,
+            totals: int,
+            positives: int,
+            sum_values: float,
+            sum_values_2: float,
+            a_prior_beta: Number = 0.5,
+            b_prior_beta: Number = 0.5,
+            m_prior: Number = 1,
+            a_prior_ig: Number = 0,
+            b_prior_ig: Number = 0,
+            w_prior: Number = 0.01,
+            replace: bool = True,
     ) -> None:
         """
         Add variant data to test class using aggregated Delta-LogNormal data.
         This can be convenient as aggregation can be done on database level.
-
         The goal of default prior setup is to be low information.
         It should be tuned with caution.
-
         Parameters
         ----------
         name : Variant name.
         totals : Total number of experiment observations (e.g. number of sessions).
         positives : Total number of non-zero values for a given variant.
         sum_values : Sum of non-zero values for a given variant.
-        sum_logs : Sum of logarithms of non-zero data values for a given variant.
-        sum_logs_2 : Sum of logarithms squrared of non-zero data values for a given variant.
+        sum_values_2 : Sum of values squared for a given variant.
+
         a_prior_beta : Prior alpha parameter from Beta distribution for conversion part.
         b_prior_beta : Prior beta parameter from Beta distribution for conversion part.
         m_prior : Prior normal mean for logarithms of non-zero data.
@@ -210,8 +186,7 @@ class DeltaLognormalDataTest(BaseDataTest):
                 "totals": totals,
                 "positives": positives,
                 "sum_values": sum_values,
-                "sum_logs": sum_logs,
-                "sum_logs_2": sum_logs_2,
+                "sum_values_2": sum_values_2,
                 "a_prior_beta": a_prior_beta,
                 "b_prior_beta": b_prior_beta,
                 "m_prior": m_prior,
@@ -229,8 +204,7 @@ class DeltaLognormalDataTest(BaseDataTest):
                 "totals": totals,
                 "positives": positives,
                 "sum_values": sum_values,
-                "sum_logs": sum_logs,
-                "sum_logs_2": sum_logs_2,
+                "sum_values_2": sum_values_2,
                 "a_prior_beta": a_prior_beta,
                 "b_prior_beta": b_prior_beta,
                 "m_prior": m_prior,
@@ -248,26 +222,23 @@ class DeltaLognormalDataTest(BaseDataTest):
             self.data[name]["totals"] += totals
             self.data[name]["positives"] += positives
             self.data[name]["sum_values"] += sum_values
-            self.data[name]["sum_logs"] += sum_logs
-            self.data[name]["sum_logs_2"] += sum_logs_2
+            self.data[name]["sum_values_2"] += sum_values_2
 
     def add_variant_data(
-        self,
-        name: str,
-        data: List[Number],
-        a_prior_beta: Number = 0.5,
-        b_prior_beta: Number = 0.5,
-        m_prior: Number = 1,
-        a_prior_ig: Number = 0,
-        b_prior_ig: Number = 0,
-        w_prior: Number = 0.01,
-        replace: bool = True,
+            self,
+            name: str,
+            data: List[Number],
+            a_prior_beta: Number = 0.5,
+            b_prior_beta: Number = 0.5,
+            m_prior: Number = 1,
+            a_prior_ig: Number = 0,
+            b_prior_ig: Number = 0,
+            w_prior: Number = 0.01,
+            replace: bool = True,
     ) -> None:
         """
         Add variant data to test class using raw Delta-LogNormal data.
-
         The goal of default prior setup is to be low information. It should be tuned with caution.
-
         Parameters
         ----------
         name : Variant name.
@@ -285,22 +256,18 @@ class DeltaLognormalDataTest(BaseDataTest):
         """
         if len(data) == 0:
             raise ValueError("Data of added variant needs to have some observations.")
-        if min(data) < 0:
-            raise ValueError("Input data needs to be a list of non-negative numbers.")
 
         totals = len(data)
         positives = sum(x > 0 for x in data)
         sum_values = sum(data)
-        sum_logs = sum([np.log(x) for x in data if x > 0])
-        sum_logs_2 = sum([np.square(np.log(x)) for x in data if x > 0])
+        sum_values_2 = sum([x ** 2 for x in data])
 
         self.add_variant_data_agg(
             name,
             totals,
             positives,
             sum_values,
-            sum_logs,
-            sum_logs_2,
+            sum_values_2,
             a_prior_beta,
             b_prior_beta,
             m_prior,

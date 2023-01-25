@@ -17,6 +17,7 @@ class DeltaLognormalDataTest(BaseDataTest):
     sessions are with 0 revenue.
     To handle this data, the evaluation methods are combining binary bayes model for
     zero vs non-zero "conversion" and log-normal model for non-zero values.
+
     After class initialization, use add_variant methods to insert variant data.
     Then to get results of the test, use for instance `evaluate` method.
     """
@@ -76,11 +77,13 @@ class DeltaLognormalDataTest(BaseDataTest):
     ) -> Tuple[dict, dict]:
         """
         Calculate probabilities of being best and expected loss for a current class state.
+
         Parameters
         ----------
         sim_count : Number of simulations to be used for probability estimation.
         seed : Random seed.
         min_is_best : Option to change "being best" to a minimum. Default is maximum.
+
         Returns
         -------
         res_pbbs : Dictionary with probabilities of being best for all variants in experiment.
@@ -111,11 +114,13 @@ class DeltaLognormalDataTest(BaseDataTest):
     ) -> List[dict]:
         """
         Evaluation of experiment.
+
         Parameters
         ----------
         sim_count : Number of simulations to be used for probability estimation.
         seed : Random seed.
         min_is_best : Option to change "being best" to a minimum. Default is maximum.
+
         Returns
         -------
         res : List of dictionaries with results per variant.
@@ -168,8 +173,10 @@ class DeltaLognormalDataTest(BaseDataTest):
         """
         Add variant data to test class using aggregated Delta-LogNormal data.
         This can be convenient as aggregation can be done on database level.
+
         The goal of default prior setup is to be low information.
         It should be tuned with caution.
+
         Parameters
         ----------
         name : Variant name.
@@ -260,7 +267,9 @@ class DeltaLognormalDataTest(BaseDataTest):
     ) -> None:
         """
         Add variant data to test class using raw Delta-LogNormal data.
+
         The goal of default prior setup is to be low information. It should be tuned with caution.
+
         Parameters
         ----------
         name : Variant name.

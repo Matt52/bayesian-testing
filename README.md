@@ -20,6 +20,9 @@
 - [PoissonDataTest](bayesian_testing/experiments/poisson.py)
   - **_input data_** - observations of non-negative integers (`[1, 0, 3, ...]`)
   - designed for poisson data A/B testing
+- [DeltaNormalDataTest](bayesian_testing/experiments/delta_normal.py)
+  - **_input data_** - normal data with zeros
+  - designed for profit-like A/B testing
 
 **Implemented evaluation metrics:**
 - `Probability of Being Best`
@@ -54,6 +57,7 @@ The primary features are classes:
 - `DeltaLognormalDataTest`
 - `DiscreteDataTest`
 - `PoissonDataTest`
+- `DeltaNormalDataTest`
 
 All test classes support two methods to insert the data:
 - `add_variant_data` - adding raw data for a variant as a list of observations (or numpy 1-D array)

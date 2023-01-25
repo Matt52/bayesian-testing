@@ -10,11 +10,11 @@ logger = get_logger("bayesian_testing")
 
 class DeltaNormalDataTest(BaseDataTest):
     """
-    Class for Bayesian A/B test for Delta-Normal data (Normal with - values).
-    Delta-normal data is typical case of net profit data where many
-    sessions are with negative net profit.
-    To handle this data, the evaluation methods are combining binary bayes model for
-    zero vs non-zero "conversion" and normal model for non-positive values.
+    Class for Bayesian A/B test for Delta-Normal data (Normal with non-positive values).
+    Delta-normal data is typical case of net profit data where sessions could have 0 values,
+    positive or negative values.
+    To handle this data, the evaluation methods are combining binary bayes model
+    for zero vs non-zero “conversion” and normal model.
 
     After class initialization, use add_variant methods to insert variant data.
     Then to get results of the test, use for instance `evaluate` method.
@@ -71,11 +71,13 @@ class DeltaNormalDataTest(BaseDataTest):
     ) -> Tuple[dict, dict]:
         """
         Calculate probabilities of being best and expected loss for a current class state.
+
         Parameters
         ----------
         sim_count : Number of simulations to be used for probability estimation.
         seed : Random seed.
         min_is_best : Option to change "being best" to a minimum. Default is maximum.
+
         Returns
         -------
         res_pbbs : Dictionary with probabilities of being best for all variants in experiment.
@@ -102,15 +104,17 @@ class DeltaNormalDataTest(BaseDataTest):
         return res_pbbs, res_loss
 
     def evaluate(
-            self, sim_count: int = 20000, seed: int = None, min_is_best: bool = False
+        self, sim_count: int = 20000, seed: int = None, min_is_best: bool = False
     ) -> List[dict]:
         """
         Evaluation of experiment.
+
         Parameters
         ----------
         sim_count : Number of simulations to be used for probability estimation.
         seed : Random seed.
         min_is_best : Option to change "being best" to a minimum. Default is maximum.
+
         Returns
         -------
         res : List of dictionaries with results per variant.
@@ -160,10 +164,12 @@ class DeltaNormalDataTest(BaseDataTest):
             replace: bool = True,
     ) -> None:
         """
-        Add variant data to test class using aggregated Delta-LogNormal data.
+        Add variant data to test class using aggregated Delta-Normal data.
         This can be convenient as aggregation can be done on database level.
+
         The goal of default prior setup is to be low information.
         It should be tuned with caution.
+
         Parameters
         ----------
         name : Variant name.
@@ -171,7 +177,6 @@ class DeltaNormalDataTest(BaseDataTest):
         positives : Total number of non-zero values for a given variant.
         sum_values : Sum of non-zero values for a given variant.
         sum_values_2 : Sum of values squared for a given variant.
-
         a_prior_beta : Prior alpha parameter from Beta distribution for conversion part.
         b_prior_beta : Prior beta parameter from Beta distribution for conversion part.
         m_prior : Prior normal mean for logarithms of non-zero data.
@@ -250,12 +255,14 @@ class DeltaNormalDataTest(BaseDataTest):
             replace: bool = True,
     ) -> None:
         """
-        Add variant data to test class using raw Delta-LogNormal data.
+        Add variant data to test class using raw Delta-Normal data.
+
         The goal of default prior setup is to be low information. It should be tuned with caution.
+
         Parameters
         ----------
         name : Variant name.
-        data : List of delta-lognormal data (e.g. revenues in sessions).
+        data : List of delta-normal data (e.g. revenues in sessions).
         a_prior_beta : Prior alpha parameter from Beta distribution for conversion part.
         b_prior_beta : Prior beta parameter from Beta distribution for conversion part.
         m_prior : Prior mean for logarithms of non-zero data.
@@ -273,7 +280,7 @@ class DeltaNormalDataTest(BaseDataTest):
         totals = len(data)
         positives = sum(x > 0 for x in data)
         sum_values = sum(data)
-        sum_values_2 = sum([x ** 2 for x in data])
+        sum_values_2 = sum(np.square(data))
 
         self.add_variant_data_agg(
             name,

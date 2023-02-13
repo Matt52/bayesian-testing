@@ -51,6 +51,18 @@ class DeltaNormalDataTest(BaseDataTest):
         return [self.data[k]["b_prior_beta"] for k in self.data]
 
     @property
+    def m_priors(self):
+        return [self.data[k]["m_prior"] for k in self.data]
+
+    @property
+    def a_priors_ig(self):
+        return [self.data[k]["a_prior_ig"] for k in self.data]
+
+    @property
+    def b_priors_ig(self):
+        return [self.data[k]["b_prior_ig"] for k in self.data]
+
+    @property
     def w_priors(self):
         return [self.data[k]["w_prior"] for k in self.data]
 
@@ -79,6 +91,9 @@ class DeltaNormalDataTest(BaseDataTest):
             sim_count=sim_count,
             a_priors_beta=self.a_priors_beta,
             b_priors_beta=self.b_priors_beta,
+            m_priors=self.m_priors,
+            a_priors_ig=self.a_priors_ig,
+            b_priors_ig=self.b_priors_ig,
             w_priors=self.w_priors,
             seed=seed,
             min_is_best=min_is_best,
@@ -142,6 +157,9 @@ class DeltaNormalDataTest(BaseDataTest):
             sum_values_2: float,
             a_prior_beta: Number = 0.5,
             b_prior_beta: Number = 0.5,
+            m_prior: Number = 1,
+            a_prior_ig: Number = 0,
+            b_prior_ig: Number = 0,
             w_prior: Number = 0.01,
             replace: bool = True,
     ) -> None:
@@ -161,11 +179,21 @@ class DeltaNormalDataTest(BaseDataTest):
         sum_values_2 : Sum of values squared for a given variant.
         a_prior_beta : Prior alpha parameter from Beta distribution for conversion part.
         b_prior_beta : Prior beta parameter from Beta distribution for conversion part.
+        m_prior : Prior normal mean.
+        a_prior_ig : Prior alpha from inverse gamma dist. for unknown variance.
+            In theory a > 0, but as we always have at least one observation, we can start at 0.
+        b_prior_ig : Prior beta from inverse gamma dist. for unknown variance.
+            In theory b > 0, but as we always have at least one observation, we can start at 0.
+        w_prior : Prior effective sample sizes.
         replace : Replace data if variant already exists.
             If set to False, data of existing variant will be appended to existing data.
         """
         if not isinstance(name, str):
             raise ValueError("Variant name has to be a string.")
+        if a_prior_beta <= 0 or b_prior_beta <= 0:
+            raise ValueError("Both [a_prior_beta, b_prior_beta] have to be positive numbers.")
+        if m_prior < 0 or a_prior_ig < 0 or b_prior_ig < 0 or w_prior < 0:
+            raise ValueError("All priors of [m, a_ig, b_ig, w] have to be non-negative numbers.")
         if positives < 0:
             raise ValueError("Input variable 'positives' is expected to be non-negative integer.")
         if totals < positives:
@@ -179,6 +207,9 @@ class DeltaNormalDataTest(BaseDataTest):
                 "sum_values_2": sum_values_2,
                 "a_prior_beta": a_prior_beta,
                 "b_prior_beta": b_prior_beta,
+                "m_prior": m_prior,
+                "a_prior_ig": a_prior_ig,
+                "b_prior_ig": b_prior_ig,
                 "w_prior": w_prior,
             }
         elif name in self.variant_names and replace:
@@ -194,6 +225,9 @@ class DeltaNormalDataTest(BaseDataTest):
                 "sum_values_2": sum_values_2,
                 "a_prior_beta": a_prior_beta,
                 "b_prior_beta": b_prior_beta,
+                "m_prior": m_prior,
+                "a_prior_ig": a_prior_ig,
+                "b_prior_ig": b_prior_ig,
                 "w_prior": w_prior,
             }
         elif name in self.variant_names and not replace:
@@ -214,6 +248,9 @@ class DeltaNormalDataTest(BaseDataTest):
             data: List[Number],
             a_prior_beta: Number = 0.5,
             b_prior_beta: Number = 0.5,
+            m_prior: Number = 1,
+            a_prior_ig: Number = 0,
+            b_prior_ig: Number = 0,
             w_prior: Number = 0.01,
             replace: bool = True,
     ) -> None:
@@ -228,7 +265,12 @@ class DeltaNormalDataTest(BaseDataTest):
         data : List of delta-normal data (e.g. revenues in sessions).
         a_prior_beta : Prior alpha parameter from Beta distribution for conversion part.
         b_prior_beta : Prior beta parameter from Beta distribution for conversion part.
-        w_prior : Prior effective sample sizes for normal distribution of logarithms of data.
+        m_prior : Prior normal mean.
+        a_prior_ig : Prior alpha from inverse gamma dist. for unknown variance.
+            In theory a > 0, but as we always have at least one observation, we can start at 0.
+        b_prior_ig : Prior beta from inverse gamma dist. for unknown variance.
+            In theory b > 0, but as we always have at least one observation, we can start at 0.
+        w_prior : Prior effective sample sizes.
         replace : Replace data if variant already exists.
             If set to False, data of existing variant will be appended to existing data.
         """
@@ -248,6 +290,9 @@ class DeltaNormalDataTest(BaseDataTest):
             sum_values_2,
             a_prior_beta,
             b_prior_beta,
+            m_prior,
+            a_prior_ig,
+            b_prior_ig,
             w_prior,
             replace,
         )

@@ -421,9 +421,9 @@ def eval_delta_normal_agg(
     sim_count : Number of simulations.
     a_priors_beta : List of prior alpha parameters for Beta distributions for each variant.
     b_priors_beta : List of prior beta parameters for Beta distributions for each variant.
-    m_priors : List of prior means for logarithms of non-zero data for each variant.
-    a_priors_ig : List of prior alphas from inverse gamma dist approximating variance of logarithms.
-    b_priors_ig : List of prior betas from inverse gamma dist approximating variance of logarithms.
+    m_priors : List of prior means for each variant.
+    a_priors_ig : List of prior alphas from inverse gamma dist approximating variance.
+    b_priors_ig : List of prior betas from inverse gamma dist approximating variance.
     w_priors : List of prior effective sample sizes for each variant.
     seed : Random seed.
     min_is_best : Option to change "being best" to a minimum. Default is maximum.
@@ -473,7 +473,7 @@ def eval_delta_normal_agg(
                         a_priors_ig[i],
                         b_priors_ig[i],
                         w_priors[i],
-                        child_seeds[1 + i],
+                        child_seeds[i+1],
                     )[0]
                     for i in range(len(totals))
                 ]

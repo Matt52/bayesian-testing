@@ -473,7 +473,7 @@ def eval_delta_normal_agg(
                         a_priors_ig[i],
                         b_priors_ig[i],
                         w_priors[i],
-                        child_seeds[i],
+                        child_seeds[1 + i],
                     )[0]
                     for i in range(len(totals))
                 ]

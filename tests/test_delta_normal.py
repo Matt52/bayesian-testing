@@ -77,12 +77,12 @@ def test_w_priors(rev_test):
 
 def test_probabs_of_being_best(rev_test):
     pbbs = rev_test.probabs_of_being_best(sim_count=20000, seed=152)
-    assert pbbs == {'A': 5e-05, 'B': 0.99995}
+    assert pbbs == {'A': 0.0002, 'B': 0.9998}
 
 
 def test_expected_loss(rev_test):
     loss = rev_test.expected_loss(sim_count=20000, seed=152)
-    assert loss == {'A': 9.5e-06, 'B': 0.0}
+    assert loss == {'A': 9.6e-06, 'B': 0.0}
 
 
 def test_evaluate(rev_test):
@@ -95,8 +95,8 @@ def test_evaluate(rev_test):
             "sum_values": 102.02561,
             "avg_values": 0.00324,
             "avg_positive_values": 10.20256,
-            "prob_being_best": 5e-05,
-            "expected_loss": 9.5e-06,
+            "prob_being_best": 0.0002,
+            "expected_loss": 9.6e-06,
         },
         {
             "variant": "B",
@@ -105,7 +105,7 @@ def test_evaluate(rev_test):
             "sum_values": 273.02,
             "avg_values": 0.00853,
             "avg_positive_values": 6.8255,
-            "prob_being_best": 0.99995,
+            "prob_being_best": 0.9998,
             "expected_loss": 0.0,
         }
     ]

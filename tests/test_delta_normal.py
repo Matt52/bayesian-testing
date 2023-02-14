@@ -8,7 +8,7 @@ def rev_test():
     rev.add_variant_data_agg(
         name="A",
         totals=31500,
-        positives=1000,
+        positives=10,
         sum_values=102.02561,
         sum_values_2=1700.8,
         a_prior_beta=1
@@ -16,7 +16,7 @@ def rev_test():
     rev.add_variant_data_agg(
         name="B",
         totals=32000,
-        positives=4000,
+        positives=40,
         sum_values=273.02,
         sum_values_2=3567.5,
         a_prior_beta=0.02,
@@ -40,7 +40,7 @@ def test_totals(rev_test):
 
 
 def test_positives(rev_test):
-    assert rev_test.positives == [1000, 4000]
+    assert rev_test.positives == [10, 40]
 
 
 def test_sum_values(rev_test):

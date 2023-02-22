@@ -8,7 +8,7 @@ def rev_test():
     rev.add_variant_data_agg(
         name="A",
         totals=31500,
-        positives=10,
+        non_zeros=10,
         sum_values=102.02561,
         sum_values_2=1700.8,
         a_prior_beta=1
@@ -16,7 +16,7 @@ def rev_test():
     rev.add_variant_data_agg(
         name="B",
         totals=32000,
-        positives=40,
+        non_zeros=40,
         sum_values=273.02,
         sum_values_2=3567.5,
         a_prior_beta=0.02,
@@ -39,8 +39,8 @@ def test_totals(rev_test):
     assert rev_test.totals == [31500, 32000]
 
 
-def test_positives(rev_test):
-    assert rev_test.positives == [10, 40]
+def test_non_zeros(rev_test):
+    assert rev_test.non_zeros == [10, 40]
 
 
 def test_sum_values(rev_test):
@@ -91,20 +91,20 @@ def test_evaluate(rev_test):
         {
             "variant": "A",
             "totals": 31500,
-            "positives": 10,
+            "non_zeros": 10,
             "sum_values": 102.02561,
             "avg_values": 0.00324,
-            "avg_positive_values": 10.20256,
+            "avg_non_zero_values": 10.20256,
             "prob_being_best": 0.0002,
             "expected_loss": 9.6e-06,
         },
         {
             "variant": "B",
             "totals": 32000,
-            "positives": 40,
+            "non_zeros": 40,
             "sum_values": 273.02,
             "avg_values": 0.00853,
-            "avg_positive_values": 6.8255,
+            "avg_non_zero_values": 6.8255,
             "prob_being_best": 0.9998,
             "expected_loss": 0.0,
         }

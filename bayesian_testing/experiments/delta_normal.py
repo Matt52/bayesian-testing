@@ -10,7 +10,7 @@ logger = get_logger("bayesian_testing")
 
 class DeltaNormalDataTest(BaseDataTest):
     """
-    Class for Bayesian A/B test for Delta-Normal data (Normal with non-positive values).
+    Class for Bayesian A/B test for Delta-Normal data (Normally distributed conversions).
     Delta-normal data is typical case of net profit data where sessions could have 0 values,
     positive or negative values.
     To handle this data, the evaluation methods are combining binary bayes model
@@ -31,8 +31,8 @@ class DeltaNormalDataTest(BaseDataTest):
         return [self.data[k]["totals"] for k in self.data]
 
     @property
-    def positives(self):
-        return [self.data[k]["positives"] for k in self.data]
+    def non_zeros(self):
+        return [self.data[k]["non_zeros"] for k in self.data]
 
     @property
     def sum_values(self):
@@ -85,7 +85,7 @@ class DeltaNormalDataTest(BaseDataTest):
         """
         pbbs, loss = eval_delta_normal_agg(
             self.totals,
-            self.positives,
+            self.non_zeros,
             self.sum_values,
             self.sum_values_2,
             sim_count=sim_count,
@@ -122,22 +122,22 @@ class DeltaNormalDataTest(BaseDataTest):
         keys = [
             "variant",
             "totals",
-            "positives",
+            "non_zeros",
             "sum_values",
             "avg_values",
-            "avg_positive_values",
+            "avg_non_zero_values",
             "prob_being_best",
             "expected_loss",
         ]
         avg_values = [round(i[0] / i[1], 5) for i in zip(self.sum_values, self.totals)]
-        avg_pos_values = [round(i[0] / i[1], 5) for i in zip(self.sum_values, self.positives)]
+        avg_pos_values = [round(i[0] / i[1], 5) for i in zip(self.sum_values, self.non_zeros)]
         eval_pbbs, eval_loss = self.eval_simulation(sim_count, seed, min_is_best)
         pbbs = list(eval_pbbs.values())
         loss = list(eval_loss.values())
         data = [
             self.variant_names,
             self.totals,
-            self.positives,
+            self.non_zeros,
             [round(i, 5) for i in self.sum_values],
             avg_values,
             avg_pos_values,
@@ -152,7 +152,7 @@ class DeltaNormalDataTest(BaseDataTest):
             self,
             name: str,
             totals: int,
-            positives: int,
+            non_zeros: int,
             sum_values: float,
             sum_values_2: float,
             a_prior_beta: Number = 0.5,
@@ -174,7 +174,7 @@ class DeltaNormalDataTest(BaseDataTest):
         ----------
         name : Variant name.
         totals : Total number of experiment observations (e.g. number of sessions).
-        positives : Total number of non-zero values for a given variant.
+        non_zeros : Total number of non-zero values for a given variant.
         sum_values : Sum of non-zero values for a given variant.
         sum_values_2 : Sum of values squared for a given variant.
         a_prior_beta : Prior alpha parameter from Beta distribution for conversion part.
@@ -194,15 +194,15 @@ class DeltaNormalDataTest(BaseDataTest):
             raise ValueError("Both [a_prior_beta, b_prior_beta] have to be positive numbers.")
         if m_prior < 0 or a_prior_ig < 0 or b_prior_ig < 0 or w_prior < 0:
             raise ValueError("All priors of [m, a_ig, b_ig, w] have to be non-negative numbers.")
-        if positives < 0:
-            raise ValueError("Input variable 'positives' is expected to be non-negative integer.")
-        if totals < positives:
-            raise ValueError("Not possible to have more positives that totals!")
+        if non_zeros < 0:
+            raise ValueError("Input variable 'non_zeros' is expected to be non-zero integer.")
+        if totals < non_zeros:
+            raise ValueError("Not possible to have more non_zero numbers that totals!")
 
         if name not in self.variant_names:
             self.data[name] = {
                 "totals": totals,
-                "positives": positives,
+                "non_zeros": non_zeros,
                 "sum_values": sum_values,
                 "sum_values_2": sum_values_2,
                 "a_prior_beta": a_prior_beta,
@@ -220,7 +220,7 @@ class DeltaNormalDataTest(BaseDataTest):
             logger.info(msg)
             self.data[name] = {
                 "totals": totals,
-                "positives": positives,
+                "non_zeros": non_zeros,
                 "sum_values": sum_values,
                 "sum_values_2": sum_values_2,
                 "a_prior_beta": a_prior_beta,
@@ -238,7 +238,7 @@ class DeltaNormalDataTest(BaseDataTest):
             )
             logger.info(msg)
             self.data[name]["totals"] += totals
-            self.data[name]["positives"] += positives
+            self.data[name]["non_zeros"] += non_zeros
             self.data[name]["sum_values"] += sum_values
             self.data[name]["sum_values_2"] += sum_values_2
 
@@ -278,14 +278,14 @@ class DeltaNormalDataTest(BaseDataTest):
             raise ValueError("Data of added variant needs to have some observations.")
 
         totals = len(data)
-        positives = sum(x > 0 for x in data)
+        non_zeros = sum(x != 0 for x in data)
         sum_values = sum(data)
         sum_values_2 = sum(np.square(data))
 
         self.add_variant_data_agg(
             name,
             totals,
-            positives,
+            non_zeros,
             sum_values,
             sum_values_2,
             a_prior_beta,

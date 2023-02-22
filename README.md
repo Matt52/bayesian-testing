@@ -14,15 +14,15 @@
 - [DeltaLognormalDataTest](bayesian_testing/experiments/delta_lognormal.py)
   - **_input data_** - lognormal data with zeros
   - designed for revenue-like A/B testing
+- [DeltaNormalDataTest](bayesian_testing/experiments/delta_normal.py)
+  - **_input data_** - normal data with zeros
+  - designed for profit-like A/B testing
 - [DiscreteDataTest](bayesian_testing/experiments/discrete.py)
   - **_input data_** - categorical data with numerical categories
   - designed for discrete data A/B testing (e.g. dice rolls, star ratings, 1-10 ratings)
 - [PoissonDataTest](bayesian_testing/experiments/poisson.py)
   - **_input data_** - observations of non-negative integers (`[1, 0, 3, ...]`)
   - designed for poisson data A/B testing
-- [DeltaNormalDataTest](bayesian_testing/experiments/delta_normal.py)
-  - **_input data_** - normal data with zeros
-  - designed for profit-like A/B testing
 
 **Implemented evaluation metrics:**
 - `Probability of Being Best`

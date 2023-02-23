@@ -55,9 +55,9 @@ The primary features are classes:
 - `BinaryDataTest`
 - `NormalDataTest`
 - `DeltaLognormalDataTest`
+- `DeltaNormalDataTest`
 - `DiscreteDataTest`
 - `PoissonDataTest`
-- `DeltaNormalDataTest`
 
 All test classes support two methods to insert the data:
 - `add_variant_data` - adding raw data for a variant as a list of observations (or numpy 1-D array)
@@ -160,7 +160,7 @@ results # print(pd.DataFrame(results).to_markdown(tablefmt="grid", index=False))
 ### DeltaLognormalDataTest
 Class for Bayesian A/B test for delta-lognormal data (log-normal with zeros).
 Delta-lognormal data is typical case of revenue per session data where many sessions have 0 revenue
-but non-zero values are positive numbers with possible log-normal distribution.
+but non-zero values are positive values with possible log-normal distribution.
 To handle this data, the calculation is combining binary Bayes model for zero vs non-zero
 "conversions" and log-normal model for non-zero values.
 
@@ -201,6 +201,9 @@ results # print(pd.DataFrame(results).to_markdown(tablefmt="grid", index=False))
     +---------+--------+-----------+------------+------------+---------------------+-----------------+---------------+
     | B       |     25 |        12 |      146.7 |    5.868   |            12.225   |         0.95185 |      0.158863 |
     +---------+--------+-----------+------------+------------+---------------------+-----------------+---------------+
+
+***Note**: Alternatively, `DeltaNormalDataTest` can be used for a case when
+conversions are not necessarily positive values.*
 
 ### DiscreteDataTest
 Class for Bayesian A/B test for discrete data with finite number of numerical categories (states),

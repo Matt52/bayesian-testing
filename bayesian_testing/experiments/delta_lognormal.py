@@ -14,7 +14,7 @@ class DeltaLognormalDataTest(BaseDataTest):
     """
     Class for Bayesian A/B test for Delta-LogNormal data (Log-Normal with possible zeros).
     Delta-lognormal data is typical case of revenue/session data where many
-    sessions are with 0 revenue.
+    sessions are with 0 revenue (meaning non-conversions).
     To handle this data, the evaluation methods are combining binary bayes model for
     zero vs non-zero "conversion" and log-normal model for non-zero values.
 

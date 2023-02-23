@@ -9,7 +9,7 @@ __all__ = [
     "BinaryDataTest",
     "NormalDataTest",
     "DeltaLognormalDataTest",
+    "DeltaNormalDataTest",
     "DiscreteDataTest",
     "PoissonDataTest",
-    "DeltaNormalDataTest"
 ]

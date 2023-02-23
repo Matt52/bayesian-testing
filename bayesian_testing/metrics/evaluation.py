@@ -394,6 +394,7 @@ def eval_poisson_agg(
 
     return res_pbbs, res_loss
 
+
 def eval_delta_normal_agg(
     totals: List[int],
     non_zeros: List[int],
@@ -412,6 +413,7 @@ def eval_delta_normal_agg(
     """
     Method estimating probabilities of being best and expected loss for Delta-Normal
     aggregated data per variant. For that reason, the method works with both totals and non_zeros.
+
     Parameters
     ----------
     totals : List of numbers of experiment observations (e.g. number of sessions) for each variant.
@@ -463,21 +465,21 @@ def eval_delta_normal_agg(
         )
 
         normal_samples = np.array(
-                [
-                    normal_posteriors(
-                        totals[i],
-                        sums[i],
-                        sums_2[i],
-                        sim_count,
-                        m_priors[i],
-                        a_priors_ig[i],
-                        b_priors_ig[i],
-                        w_priors[i],
-                        child_seeds[i+1],
-                    )[0]
-                    for i in range(len(totals))
-                ]
-            )
+            [
+                normal_posteriors(
+                    totals[i],
+                    sums[i],
+                    sums_2[i],
+                    sim_count,
+                    m_priors[i],
+                    a_priors_ig[i],
+                    b_priors_ig[i],
+                    w_priors[i],
+                    child_seeds[i + 1],
+                )[0]
+                for i in range(len(totals))
+            ]
+        )
 
         combined_samples = beta_samples * normal_samples
 

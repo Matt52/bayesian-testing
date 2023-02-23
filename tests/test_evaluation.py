@@ -5,6 +5,7 @@ from bayesian_testing.metrics import (
     eval_bernoulli_agg,
     eval_normal_agg,
     eval_delta_lognormal_agg,
+    eval_delta_normal_agg,
     eval_numerical_dirichlet_agg,
     eval_poisson_agg,
 )
@@ -273,6 +274,53 @@ PBB_POISSON_AGG_INPUTS = [
     },
 ]
 
+PBB_DELTA_NORMAL_AGG_INPUTS = [
+    {
+        "input": {
+            "totals": [31500, 32000],
+            "non_zeros": [10, 20],
+            "sums": [102.02561, 273.02],
+            "sums_2": [1700.8, 3567.5],
+            "sim_count": 20000,
+            "seed": 52,
+        },
+        "expected_output": ([0.0024, 0.9976], [4.4e-06, 0.0]),
+    },
+    {
+        "input": {
+            "totals": [10, 20, 30, 40],
+            "non_zeros": [0, 0, 0, 0],
+            "sums": [0, 0, 0, 0],
+            "sums_2": [0, 0, 0, 0],
+            "sim_count": 10000,
+            "seed": 52,
+        },
+        "expected_output": ([0.25, 0.25, 0.25, 0.25], [np.nan, np.nan, np.nan, np.nan]),
+    },
+    {
+        "input": {
+            "totals": [100],
+            "non_zeros": [10],
+            "sums": [0],
+            "sums_2": [0],
+            "sim_count": 10000,
+            "seed": 52,
+        },
+        "expected_output": ([1], [0]),
+    },
+    {
+        "input": {
+            "totals": [],
+            "non_zeros": [],
+            "sums": [],
+            "sums_2": [],
+            "sim_count": 10000,
+            "seed": 52,
+        },
+        "expected_output": ([], []),
+    },
+]
+
 
 @pytest.mark.parametrize("inp", PBB_BERNOULLI_AGG_INPUTS)
 def test_eval_bernoulli_agg(inp):
@@ -353,5 +401,19 @@ def test_eval_poisson_agg(inp):
         sim_count=i["sim_count"],
         seed=i["seed"],
         min_is_best=i["min_is_best"],
+    )
+    assert res == inp["expected_output"]
+
+
+@pytest.mark.parametrize("inp", PBB_DELTA_NORMAL_AGG_INPUTS)
+def test_eval_delta_normal_agg(inp):
+    i = inp["input"]
+    res = eval_delta_normal_agg(
+        i["totals"],
+        i["non_zeros"],
+        i["sums"],
+        i["sums_2"],
+        sim_count=i["sim_count"],
+        seed=i["seed"],
     )
     assert res == inp["expected_output"]

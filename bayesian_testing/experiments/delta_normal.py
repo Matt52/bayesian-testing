@@ -11,8 +11,8 @@ logger = get_logger("bayesian_testing")
 class DeltaNormalDataTest(BaseDataTest):
     """
     Class for Bayesian A/B test for Delta-Normal data (Normally distributed conversions).
-    Delta-normal data is typical case of net profit data where sessions could have 0 values,
-    positive or negative values.
+    Delta-normal data is typical case of net profit data where many sessions have 0 values
+    (meaning non-conversions), and the remaining revenue data is normally distributed.
     To handle this data, the evaluation methods are combining binary bayes model
     for zero vs non-zero “conversion” and normal model.
 
@@ -67,7 +67,7 @@ class DeltaNormalDataTest(BaseDataTest):
         return [self.data[k]["w_prior"] for k in self.data]
 
     def eval_simulation(
-            self, sim_count: int = 20000, seed: int = None, min_is_best: bool = False
+        self, sim_count: int = 20000, seed: int = None, min_is_best: bool = False
     ) -> Tuple[dict, dict]:
         """
         Calculate probabilities of being best and expected loss for a current class state.
@@ -149,19 +149,19 @@ class DeltaNormalDataTest(BaseDataTest):
         return res
 
     def add_variant_data_agg(
-            self,
-            name: str,
-            totals: int,
-            non_zeros: int,
-            sum_values: float,
-            sum_values_2: float,
-            a_prior_beta: Number = 0.5,
-            b_prior_beta: Number = 0.5,
-            m_prior: Number = 1,
-            a_prior_ig: Number = 0,
-            b_prior_ig: Number = 0,
-            w_prior: Number = 0.01,
-            replace: bool = True,
+        self,
+        name: str,
+        totals: int,
+        non_zeros: int,
+        sum_values: float,
+        sum_values_2: float,
+        a_prior_beta: Number = 0.5,
+        b_prior_beta: Number = 0.5,
+        m_prior: Number = 1,
+        a_prior_ig: Number = 0,
+        b_prior_ig: Number = 0,
+        w_prior: Number = 0.01,
+        replace: bool = True,
     ) -> None:
         """
         Add variant data to test class using aggregated Delta-Normal data.
@@ -243,16 +243,16 @@ class DeltaNormalDataTest(BaseDataTest):
             self.data[name]["sum_values_2"] += sum_values_2
 
     def add_variant_data(
-            self,
-            name: str,
-            data: List[Number],
-            a_prior_beta: Number = 0.5,
-            b_prior_beta: Number = 0.5,
-            m_prior: Number = 1,
-            a_prior_ig: Number = 0,
-            b_prior_ig: Number = 0,
-            w_prior: Number = 0.01,
-            replace: bool = True,
+        self,
+        name: str,
+        data: List[Number],
+        a_prior_beta: Number = 0.5,
+        b_prior_beta: Number = 0.5,
+        m_prior: Number = 1,
+        a_prior_ig: Number = 0,
+        b_prior_ig: Number = 0,
+        w_prior: Number = 0.01,
+        replace: bool = True,
     ) -> None:
         """
         Add variant data to test class using raw Delta-Normal data.

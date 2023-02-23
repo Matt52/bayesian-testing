@@ -393,3 +393,95 @@ def eval_poisson_agg(
     res_loss = estimate_expected_loss(gamma_samples, min_is_best)
 
     return res_pbbs, res_loss
+
+def eval_delta_normal_agg(
+    totals: List[int],
+    non_zeros: List[int],
+    sums: List[float],
+    sums_2: List[float],
+    sim_count: int = 20000,
+    a_priors_beta: List[Number] = None,
+    b_priors_beta: List[Number] = None,
+    m_priors: List[Number] = None,
+    a_priors_ig: List[Number] = None,
+    b_priors_ig: List[Number] = None,
+    w_priors: List[Number] = None,
+    seed: int = None,
+    min_is_best: bool = False,
+) -> Tuple[List[float], List[float]]:
+    """
+    Method estimating probabilities of being best and expected loss for Delta-Normal
+    aggregated data per variant. For that reason, the method works with both totals and non_zeros.
+    Parameters
+    ----------
+    totals : List of numbers of experiment observations (e.g. number of sessions) for each variant.
+    non_zeros : List of numbers of non-zeros (e.g. number of conversions) for each variant.
+    sums : List of sum of original data for each variant.
+    sums_2 : List of sum of squared of original data for each variant.
+    sim_count : Number of simulations.
+    a_priors_beta : List of prior alpha parameters for Beta distributions for each variant.
+    b_priors_beta : List of prior beta parameters for Beta distributions for each variant.
+    m_priors : List of prior means for each variant.
+    a_priors_ig : List of prior alphas from inverse gamma dist approximating variance.
+    b_priors_ig : List of prior betas from inverse gamma dist approximating variance.
+    w_priors : List of prior effective sample sizes for each variant.
+    seed : Random seed.
+    min_is_best : Option to change "being best" to a minimum. Default is maximum.
+    Returns
+    -------
+    res_pbbs : List of probabilities of being best for each variant.
+    res_loss : List of expected loss for each variant.
+    """
+    if len(totals) == 0:
+        return [], []
+    # Same default priors for all variants if they are not provided.
+    if not a_priors_beta:
+        a_priors_beta = [0.5] * len(totals)
+    if not b_priors_beta:
+        b_priors_beta = [0.5] * len(totals)
+    if not m_priors:
+        m_priors = [1] * len(totals)
+    if not a_priors_ig:
+        a_priors_ig = [0] * len(totals)
+    if not b_priors_ig:
+        b_priors_ig = [0] * len(totals)
+    if not w_priors:
+        w_priors = [0.01] * len(totals)
+
+    if max(non_zeros) <= 0:
+        # if only zeros in all variants
+        res_pbbs = list(np.full(len(totals), round(1 / len(totals), 7)))
+        res_loss = [np.nan] * len(totals)
+        return res_pbbs, res_loss
+    else:
+        # we will need different generators for each call of normal_posteriors
+        ss = np.random.SeedSequence(seed)
+        child_seeds = ss.spawn(len(totals) + 1)
+
+        beta_samples = beta_posteriors_all(
+            totals, non_zeros, sim_count, a_priors_beta, b_priors_beta, child_seeds[0]
+        )
+
+        normal_samples = np.array(
+                [
+                    normal_posteriors(
+                        totals[i],
+                        sums[i],
+                        sums_2[i],
+                        sim_count,
+                        m_priors[i],
+                        a_priors_ig[i],
+                        b_priors_ig[i],
+                        w_priors[i],
+                        child_seeds[i+1],
+                    )[0]
+                    for i in range(len(totals))
+                ]
+            )
+
+        combined_samples = beta_samples * normal_samples
+
+        res_pbbs = estimate_probabilities(combined_samples, min_is_best)
+        res_loss = estimate_expected_loss(combined_samples, min_is_best)
+
+        return res_pbbs, res_loss

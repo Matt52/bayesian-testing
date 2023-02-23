@@ -14,6 +14,9 @@
 - [DeltaLognormalDataTest](bayesian_testing/experiments/delta_lognormal.py)
   - **_input data_** - lognormal data with zeros
   - designed for revenue-like A/B testing
+- [DeltaNormalDataTest](bayesian_testing/experiments/delta_normal.py)
+  - **_input data_** - normal data with zeros
+  - designed for profit-like A/B testing
 - [DiscreteDataTest](bayesian_testing/experiments/discrete.py)
   - **_input data_** - categorical data with numerical categories
   - designed for discrete data A/B testing (e.g. dice rolls, star ratings, 1-10 ratings)
@@ -54,6 +57,7 @@ The primary features are classes:
 - `DeltaLognormalDataTest`
 - `DiscreteDataTest`
 - `PoissonDataTest`
+- `DeltaNormalDataTest`
 
 All test classes support two methods to insert the data:
 - `add_variant_data` - adding raw data for a variant as a list of observations (or numpy 1-D array)

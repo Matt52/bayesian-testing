@@ -1,5 +1,6 @@
 from numbers import Number
-from typing import List, Tuple
+from typing import List, Tuple, Union
+import numpy as np
 
 from bayesian_testing.experiments.base import BaseDataTest
 from bayesian_testing.metrics import eval_bernoulli_agg
@@ -209,3 +210,43 @@ class BinaryDataTest(BaseDataTest):
         positives = sum(data)
 
         self.add_variant_data_agg(name, totals, positives, a_prior, b_prior, replace)
+
+    def posteriors(
+        totals: List[int],
+        positives: List[int],
+        sim_count: int,
+        a_priors_beta: List[Union[float, int]],
+        b_priors_beta: List[Union[float, int]],
+        seed: Union[int, np.random.bit_generator.SeedSequence] = None,
+    ) -> np.ndarray:
+        """
+        Draw from Beta posterior distributions for all variants at once.
+
+        Parameters
+        ----------
+        totals : List of total experiment observations (e.g. number of sessions) for each variant.
+        positives : List of total number of ones (e.g. number of conversions) for each variant.
+        sim_count : Number of simulations to be used for probability estimation.
+        a_priors_beta : List of prior alpha parameters of Beta distributions for each variant.
+        b_priors_beta : List of prior beta parameters of Beta distributions for each variant.
+        seed : Random seed.
+
+        Returns
+        -------
+        beta_samples : List of lists of beta distribution samples for all variants.
+        """
+        rng = np.random.default_rng(seed)
+
+        beta_samples = np.array(
+            [
+                rng.beta(
+                    positives[i] + a_priors_beta[i],
+                    totals[i] - positives[i] + b_priors_beta[i],
+                    sim_count,
+                )
+                for i in range(len(totals))
+            ]
+        )
+        return beta_samples
+                
+        

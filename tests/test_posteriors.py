@@ -5,7 +5,7 @@ from bayesian_testing.metrics.posteriors import (
     beta_posteriors_all,
     lognormal_posteriors,
     dirichlet_posteriors,
-    gamma_posteriors_all,
+    pois_gamma_posteriors_all,
 )
 
 BETA_POSTERIORS_ALL_INPUTS = [
@@ -112,8 +112,8 @@ def test_dirichlet_posteriors(inp):
 
 
 @pytest.mark.parametrize("inp", GAMMA_POSTERIORS_ALL_INPUTS)
-def test_gamma_posteriors_all(inp):
-    all_pos = gamma_posteriors_all(
+def test_pois_gamma_posteriors_all(inp):
+    all_pos = pois_gamma_posteriors_all(
         inp["totals"],
         inp["sums"],
         inp["sim_count"],

@@ -174,7 +174,7 @@ def dirichlet_posteriors(
     return res
 
 
-def gamma_posteriors_all(
+def pois_gamma_posteriors_all(
     totals: List[int],
     sums: List[Union[float, int]],
     sim_count: int,
@@ -183,7 +183,7 @@ def gamma_posteriors_all(
     seed: Union[int, np.random.bit_generator.SeedSequence] = None,
 ) -> np.ndarray:
     """
-    Draw from Gamma posterior distributions for all variants at once.
+    Draw from Gamma posterior distributions for all variants of a Poisson data at once.
 
     Parameters
     ----------

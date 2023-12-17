@@ -8,7 +8,7 @@ from bayesian_testing.metrics.posteriors import (
     lognormal_posteriors,
     normal_posteriors,
     dirichlet_posteriors,
-    gamma_posteriors_all,
+    pois_gamma_posteriors_all,
 )
 from bayesian_testing.utilities import get_logger
 
@@ -385,7 +385,7 @@ def eval_poisson_agg(
     if not b_priors_gamma:
         b_priors_gamma = [0.1] * len(totals)
 
-    gamma_samples = gamma_posteriors_all(
+    gamma_samples = pois_gamma_posteriors_all(
         totals, sums, sim_count, a_priors_gamma, b_priors_gamma, seed
     )
 

@@ -126,7 +126,7 @@ class DiscreteDataTest(BaseDataTest):
         name : Variant name.
         concentration : Total number of experiment observations for each state
             (e.g. number of rolls for each side in a die roll data).
-        prior : Prior alpha parameters of Dirichlet distribution.
+        prior : Prior alpha parameters of a Dirichlet distribution (conjugate prior).
         replace : Replace data if variant already exists.
             If set to False, data of existing variant will be appended to existing data.
         """
@@ -181,7 +181,7 @@ class DiscreteDataTest(BaseDataTest):
         ----------
         name : Variant name.
         data : List of numerical data observations from possible states.
-        prior : Prior alpha parameters of Dirichlet distribution.
+        prior : Prior alpha parameters of a Dirichlet distribution (conjugate prior).
         replace : Replace data if variant already exists.
             If set to False, data of existing variant will be appended to existing data.
         """

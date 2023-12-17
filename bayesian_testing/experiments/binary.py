@@ -128,10 +128,10 @@ class BinaryDataTest(BaseDataTest):
         ----------
         name : Variant name.
         totals : Total number of experiment observations (e.g. number of sessions).
-        positives : Total number of ones for a given variant (e.g. number of conversions).
-        a_prior : Prior alpha parameter for Beta distributions.
+        positives : Total number of 1s for a given variant (e.g. number of conversions).
+        a_prior : Prior alpha parameter of a Beta distribution (conjugate prior).
             Default value 0.5 is based on non-information prior Beta(0.5, 0.5).
-        b_prior : Prior beta parameter for Beta distributions.
+        b_prior : Prior beta parameter of a Beta distribution (conjugate prior).
             Default value 0.5 is based on non-information prior Beta(0.5, 0.5).
         replace : Replace data if variant already exists.
             If set to False, data of existing variant will be appended to existing data.
@@ -193,9 +193,9 @@ class BinaryDataTest(BaseDataTest):
         ----------
         name : Variant name.
         data : List of binary data containing zeros (non-conversion) and ones (conversions).
-        a_prior : Prior alpha parameter for Beta distributions.
+        a_prior : Prior alpha parameter of a Beta distribution (conjugate prior).
             Default value 0.5 is based on non-information prior Beta(0.5, 0.5).
-        b_prior : Prior beta parameter for Beta distributions.
+        b_prior : Prior beta parameter of a Beta distribution (conjugate prior).
             Default value 0.5 is based on non-information prior Beta(0.5, 0.5).
         replace : Replace data if variant already exists.
             If set to False, data of existing variant will be appended to existing data.

@@ -183,7 +183,7 @@ def pois_gamma_posteriors_all(
     seed: Union[int, np.random.bit_generator.SeedSequence] = None,
 ) -> np.ndarray:
     """
-    Draw from Gamma posterior distributions for all variants of a Poisson data at once.
+    Draw from Gamma posterior distributions for all variants of Poisson data at once.
 
     Parameters
     ----------
@@ -191,7 +191,7 @@ def pois_gamma_posteriors_all(
     sums : List of sums of observations (e.g. number of goals) for each variant.
     sim_count : Number of simulations to be used for probability estimation.
     a_priors_gamma : List of prior alpha parameters of Gamma distributions for each variant.
-    b_priors_gamma : List of prior beta parameters of Gamma distributions for each variant.
+    b_priors_gamma : List of prior beta parameters (rates) of Gamma distributions for each variant.
     seed : Random seed.
 
     Returns
@@ -206,6 +206,46 @@ def pois_gamma_posteriors_all(
                 sums[i] + a_priors_gamma[i],
                 # here it has to be 1/(...) as it is a scale, and not a rate
                 1 / (totals[i] + b_priors_gamma[i]),
+                sim_count,
+            )
+            for i in range(len(totals))
+        ]
+    )
+    return gamma_samples
+
+
+def exp_gamma_posteriors_all(
+    totals: List[int],
+    sums: List[Union[float, int]],
+    sim_count: int,
+    a_priors_gamma: List[Union[float, int]],
+    b_priors_gamma: List[Union[float, int]],
+    seed: Union[int, np.random.bit_generator.SeedSequence] = None,
+) -> np.ndarray:
+    """
+    Draw from Gamma posterior distributions for all variants of Exponential data at once.
+
+    Parameters
+    ----------
+    totals : List of total experiment observations (e.g. number of sessions) for each variant.
+    sums : List of sums of observations (e.g. total time spent) for each variant.
+    sim_count : Number of simulations to be used for probability estimation.
+    a_priors_gamma : List of prior alpha parameters of Gamma distributions for each variant.
+    b_priors_gamma : List of prior beta parameters (rates) of Gamma distributions for each variant.
+    seed : Random seed.
+
+    Returns
+    -------
+    gamma_samples : List of lists of Gamma distribution samples for all variants.
+    """
+    rng = np.random.default_rng(seed)
+
+    gamma_samples = np.array(
+        [
+            rng.gamma(
+                totals[i] + a_priors_gamma[i],
+                # here it has to be 1/(...) as it is a scale, and not a rate
+                1 / (sums[i] + b_priors_gamma[i]),
                 sim_count,
             )
             for i in range(len(totals))

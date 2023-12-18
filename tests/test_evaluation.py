@@ -8,6 +8,7 @@ from bayesian_testing.metrics import (
     eval_delta_normal_agg,
     eval_numerical_dirichlet_agg,
     eval_poisson_agg,
+    eval_exponential_agg,
 )
 
 PBB_BERNOULLI_AGG_INPUTS = [
@@ -274,6 +275,49 @@ PBB_POISSON_AGG_INPUTS = [
     },
 ]
 
+PBB_EXPONENTIAL_AGG_INPUTS = [
+    {
+        "input": {
+            "totals": [100, 90, 80],
+            "sums": [1040.29884, 993.66883, 883.05801],
+            "sim_count": 20000,
+            "seed": 52,
+            "min_is_best": False,
+        },
+        "expected_output": ([0.1826, 0.4065, 0.4109], [1.5415303, 0.874454, 0.8968751]),
+    },
+    {
+        "input": {
+            "totals": [1000, 1000, 1000],
+            "sums": [2288.69431, 2471.61961, 2745.7794],
+            "sim_count": 20000,
+            "seed": 52,
+            "min_is_best": True,
+        },
+        "expected_output": ([0.9594, 0.0406, 0.0], [0.0015906, 0.1860726, 0.4593495]),
+    },
+    {
+        "input": {
+            "totals": [100],
+            "sums": [1007.25317],
+            "sim_count": 20000,
+            "seed": 52,
+            "min_is_best": True,
+        },
+        "expected_output": ([1], [0]),
+    },
+    {
+        "input": {
+            "totals": [],
+            "sums": [],
+            "sim_count": 20000,
+            "seed": 52,
+            "min_is_best": False,
+        },
+        "expected_output": ([], []),
+    },
+]
+
 PBB_DELTA_NORMAL_AGG_INPUTS = [
     {
         "input": {
@@ -396,6 +440,19 @@ def test_eval_numerical_dirichlet_agg_different_runs():
 def test_eval_poisson_agg(inp):
     i = inp["input"]
     res = eval_poisson_agg(
+        i["totals"],
+        i["sums"],
+        sim_count=i["sim_count"],
+        seed=i["seed"],
+        min_is_best=i["min_is_best"],
+    )
+    assert res == inp["expected_output"]
+
+
+@pytest.mark.parametrize("inp", PBB_EXPONENTIAL_AGG_INPUTS)
+def test_eval_exponential_agg(inp):
+    i = inp["input"]
+    res = eval_exponential_agg(
         i["totals"],
         i["sums"],
         sim_count=i["sim_count"],

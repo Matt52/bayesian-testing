@@ -9,6 +9,7 @@ from bayesian_testing.metrics.posteriors import (
     normal_posteriors,
     dirichlet_posteriors,
     pois_gamma_posteriors_all,
+    exp_gamma_posteriors_all,
 )
 from bayesian_testing.utilities import get_logger
 
@@ -366,7 +367,7 @@ def eval_poisson_agg(
     sums : List of sums of observations (e.g. number of goals) for each variant.
     sim_count : Number of simulations to be used for probability estimation.
     a_priors_gamma : List of prior alpha parameters of Gamma distributions for each variant.
-    b_priors_gamma : List of prior beta parameters of Gamma distributions for each variant.
+    b_priors_gamma : List of prior beta parameters (rates) of Gamma distributions for each variant.
     seed : Random seed.
     min_is_best : Option to change "being best" to a minimum. Default is maximum.
 
@@ -487,3 +488,66 @@ def eval_delta_normal_agg(
         res_loss = estimate_expected_loss(combined_samples, min_is_best)
 
         return res_pbbs, res_loss
+
+
+def eval_exponential_agg(
+    totals: List[int],
+    sums: List[Union[float, int]],
+    a_priors_gamma: List[Number] = None,
+    b_priors_gamma: List[Number] = None,
+    sim_count: int = 20000,
+    seed: int = None,
+    min_is_best: bool = False,
+) -> Tuple[List[float], List[float]]:
+    """
+    Method estimating probabilities of being best and expected loss for
+    Exponential aggregated data per variant.
+
+    Parameters
+    ----------
+    totals : List of total experiment observations (e.g. number of matches) for each variant.
+    sums : List of sums of observations (e.g. number of goals) for each variant.
+    sim_count : Number of simulations to be used for probability estimation.
+    a_priors_gamma : List of prior alpha parameters of Gamma distributions for each variant.
+    b_priors_gamma : List of prior beta parameters (rates) of Gamma distributions for each variant.
+    seed : Random seed.
+    min_is_best : Option to change "being best" to a minimum. Default is maximum.
+
+    Returns
+    -------
+    res_pbbs : List of probabilities of being best for each variant.
+    res_loss : List of expected loss for each variant.
+    """
+
+    if len(totals) == 0:
+        return [], []
+
+    # Default prior for all variants is Gamma(0.1, 0.1) which is on purpose quite vague.
+    if not a_priors_gamma:
+        a_priors_gamma = [0.1] * len(totals)
+    if not b_priors_gamma:
+        b_priors_gamma = [0.1] * len(totals)
+
+    gamma_samples = exp_gamma_posteriors_all(
+        totals, sums, sim_count, a_priors_gamma, b_priors_gamma, seed
+    )
+
+    # Reversing min_is_best to get back to scale comparison (instead of a rate which is inverse).
+    res_pbbs = estimate_probabilities(gamma_samples, not min_is_best)
+    # Reversing also expected loss for the same reason (to see the loss on a scale, not on a rate).
+    res_loss_rate = estimate_expected_loss(gamma_samples, not min_is_best)
+    post_mean_rate = [
+        (i[2] + i[0]) / (i[3] + i[1]) for i in zip(totals, sums, a_priors_gamma, b_priors_gamma)
+    ]
+
+    res_loss_scale = [
+        # To convert from a rate to a scale loss:
+        #     when "max is best": 1/(mean_rate + loss_rate) - 1/mean_rate
+        #     when "min is best": 1/mean_rate - 1/(mean_rate - loss_rate)
+        1 / (i[0] - i[1]) - 1 / i[0] if not min_is_best else 1 / i[0] - 1 / (i[0] + i[1])
+        for i in zip(post_mean_rate, res_loss_rate)
+    ]
+
+    res_loss = [round(x, 7) for x in res_loss_scale]
+
+    return res_pbbs, res_loss

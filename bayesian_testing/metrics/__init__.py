@@ -5,6 +5,7 @@ from .evaluation import (
     eval_numerical_dirichlet_agg,
     eval_poisson_agg,
     eval_delta_normal_agg,
+    eval_exponential_agg,
 )
 
 __all__ = [
@@ -14,4 +15,5 @@ __all__ = [
     "eval_delta_normal_agg",
     "eval_numerical_dirichlet_agg",
     "eval_poisson_agg",
+    "eval_exponential_agg",
 ]

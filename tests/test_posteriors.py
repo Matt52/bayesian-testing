@@ -6,6 +6,7 @@ from bayesian_testing.metrics.posteriors import (
     lognormal_posteriors,
     dirichlet_posteriors,
     pois_gamma_posteriors_all,
+    exp_gamma_posteriors_all,
 )
 
 BETA_POSTERIORS_ALL_INPUTS = [
@@ -114,6 +115,19 @@ def test_dirichlet_posteriors(inp):
 @pytest.mark.parametrize("inp", GAMMA_POSTERIORS_ALL_INPUTS)
 def test_pois_gamma_posteriors_all(inp):
     all_pos = pois_gamma_posteriors_all(
+        inp["totals"],
+        inp["sums"],
+        inp["sim_count"],
+        inp["a_priors_gamma"],
+        inp["b_priors_gamma"],
+    )
+    all_pos_shape = np.array(all_pos).shape
+    assert all_pos_shape == (len(inp["totals"]), inp["sim_count"])
+
+
+@pytest.mark.parametrize("inp", GAMMA_POSTERIORS_ALL_INPUTS)
+def test_exp_gamma_posteriors_all(inp):
+    all_pos = exp_gamma_posteriors_all(
         inp["totals"],
         inp["sums"],
         inp["sim_count"],

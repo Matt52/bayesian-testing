@@ -8,16 +8,16 @@ Bayesian approach.
 **Implemented tests:**
 - [BinaryDataTest](bayesian_testing/experiments/binary.py)
   - **_Input data_** - binary data (`[0, 1, 0, ...]`)
-  - Designed for conversion-like A/B testing.
+  - Designed for conversion-like data A/B testing.
 - [NormalDataTest](bayesian_testing/experiments/normal.py)
   - **_Input data_** - normal data with unknown variance
   - Designed for normal data A/B testing.
 - [DeltaLognormalDataTest](bayesian_testing/experiments/delta_lognormal.py)
   - **_Input data_** - lognormal data with zeros
-  - Designed for revenue-like A/B testing.
+  - Designed for revenue-like data A/B testing.
 - [DeltaNormalDataTest](bayesian_testing/experiments/delta_normal.py)
   - **_Input data_** - normal data with zeros
-  - Designed for profit-like A/B testing.
+  - Designed for profit-like data A/B testing.
 - [DiscreteDataTest](bayesian_testing/experiments/discrete.py)
   - **_Input data_** - categorical data with numerical categories
   - Designed for discrete data A/B testing (e.g. dice rolls, star ratings, 1-10 ratings, etc.).

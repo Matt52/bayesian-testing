@@ -311,9 +311,9 @@ waiting_times_a = np.random.exponential(scale=10, size=200)
 waiting_times_b = np.random.exponential(scale=11, size=210)
 waiting_times_c = np.random.exponential(scale=11, size=220)
 
-# Exponential A/B/C test
+# initialize a test:
 test = ExponentialDataTest()
-# adding variants using the observations
+# adding variants using the observation data:
 test.add_variant_data('A', waiting_times_a)
 test.add_variant_data('B', waiting_times_b)
 test.add_variant_data('C', waiting_times_c)

@@ -177,7 +177,7 @@ class ExponentialDataTest(BaseDataTest):
     def add_variant_data(
         self,
         name: str,
-        data: List[int],
+        data: List[Union[float, int]],
         a_prior: Number = 0.1,
         b_prior: Number = 0.1,
         replace: bool = True,

@@ -344,9 +344,9 @@ poetry install
 poetry run pre-commit install
 ```
 
-## Roadmap
+## To be implemented
 
-Metrics to be added:
+Additional metrics:
 - `Potential Value Remaining`
 
 ## References

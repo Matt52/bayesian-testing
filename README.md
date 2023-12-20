@@ -64,6 +64,7 @@ The primary features are classes:
 - `DeltaNormalDataTest`
 - `DiscreteDataTest`
 - `PoissonDataTest`
+- `ExponentialDataTest`
 
 All test classes support two methods to insert the data:
 - `add_variant_data` - Adding raw data for a variant as a list of observations (or numpy 1-D array).

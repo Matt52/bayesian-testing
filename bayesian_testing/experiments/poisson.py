@@ -129,9 +129,9 @@ class PoissonDataTest(BaseDataTest):
         name : Variant name.
         totals : Total number of experiment observations (e.g. number of matches).
         sum_values : Sum of values for a given variant (e.g. total number of goals).
-        a_prior : Prior alpha parameter for Gamma distributions.
+        a_prior : Prior alpha parameter of a Gamma distribution (conjugate prior).
             Default value 0.1 is on purpose to be vague (lower information).
-        b_prior : Prior beta parameter for Gamma distributions.
+        b_prior : Prior beta parameter (rate) of a Gamma distribution (conjugate prior).
             Default value 0.1 is on purpose to be vague (lower information).
         replace : Replace data if variant already exists.
             If set to False, data of existing variant will be appended to existing data.
@@ -191,9 +191,9 @@ class PoissonDataTest(BaseDataTest):
         ----------
         name : Variant name.
         data : List of Poisson data.
-        a_prior : Prior alpha parameter for Gamma distributions.
+        a_prior : Prior alpha parameter of a Gamma distribution (conjugate prior).
             Default value 0.1 is on purpose to be vague (lower information).
-        b_prior : Prior beta parameter for Gamma distributions.
+        b_prior : Prior beta parameter (rate) of a Gamma distribution (conjugate prior).
             Default value 0.1 is on purpose to be vague (lower information).
         replace : Replace data if variant already exists.
             If set to False, data of existing variant will be appended to existing data.

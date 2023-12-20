@@ -2,39 +2,45 @@
 [![Codecov](https://codecov.io/gh/Matt52/bayesian-testing/branch/main/graph/badge.svg)](https://codecov.io/gh/Matt52/bayesian-testing)
 [![PyPI](https://img.shields.io/pypi/v/bayesian-testing.svg)](https://pypi.org/project/bayesian-testing/)
 # Bayesian A/B testing
-`bayesian_testing` is a small package for a quick evaluation of A/B (or A/B/C/...) tests using Bayesian approach.
+`bayesian_testing` is a small package for a quick evaluation of A/B (or A/B/C/...) tests using
+Bayesian approach.
 
 **Implemented tests:**
 - [BinaryDataTest](bayesian_testing/experiments/binary.py)
-  - **_input data_** - binary data (`[0, 1, 0, ...]`)
-  - designed for conversion-like A/B testing
+  - **_Input data_** - binary data (`[0, 1, 0, ...]`)
+  - Designed for conversion-like data A/B testing.
 - [NormalDataTest](bayesian_testing/experiments/normal.py)
-  - **_input data_** - normal data with unknown variance
-  - designed for normal data A/B testing
+  - **_Input data_** - normal data with unknown variance
+  - Designed for normal data A/B testing.
 - [DeltaLognormalDataTest](bayesian_testing/experiments/delta_lognormal.py)
-  - **_input data_** - lognormal data with zeros
-  - designed for revenue-like A/B testing
+  - **_Input data_** - lognormal data with zeros
+  - Designed for revenue-like data A/B testing.
 - [DeltaNormalDataTest](bayesian_testing/experiments/delta_normal.py)
-  - **_input data_** - normal data with zeros
-  - designed for profit-like A/B testing
+  - **_Input data_** - normal data with zeros
+  - Designed for profit-like data A/B testing.
 - [DiscreteDataTest](bayesian_testing/experiments/discrete.py)
-  - **_input data_** - categorical data with numerical categories
-  - designed for discrete data A/B testing (e.g. dice rolls, star ratings, 1-10 ratings)
+  - **_Input data_** - categorical data with numerical categories
+  - Designed for discrete data A/B testing (e.g. dice rolls, star ratings, 1-10 ratings, etc.).
 - [PoissonDataTest](bayesian_testing/experiments/poisson.py)
-  - **_input data_** - observations of non-negative integers (`[1, 0, 3, ...]`)
-  - designed for poisson data A/B testing
+  - **_Input data_** - non-negative integers (`[1, 0, 3, ...]`)
+  - Designed for poisson data A/B testing.
+- [ExponentialDataTest](bayesian_testing/experiments/exponential.py)
+  - **_Input data_** - exponential data (non-negative real numbers)
+  - Designed for exponential data A/B testing (e.g. session/waiting time, time between events,
+etc.).
 
 **Implemented evaluation metrics:**
 - `Probability of Being Best`
-  - probability that a given variant is best among all variants
-  - by default, `best` is equivalent to `greatest` (from a data/metric point of view),
-however it is possible to change it using `min_is_best=True` in the evaluation method
-(this can be useful if we try to find the variant while minimizing tested measure)
+  - Probability that a given variant is best among all variants.
+  - By default, `the best` is equivalent to `the greatest` (from a data/metric point of view),
+however it is possible to change this by using `min_is_best=True` in the evaluation method
+(this can be useful if we try to find the variant while minimizing the tested measure).
 - `Expected Loss`
-  - "risk" of choosing particular variant over other variants in the test
-  - measured in the same units as a tested measure (e.g. positive rate or average value)
+  - "Risk" of choosing particular variant over other variants in the test.
+  - Measured in the same units as a tested measure (e.g. positive rate or average value).
 
-Evaluation metrics are calculated using simulations from posterior distributions (considering given data).
+Both evaluation metrics are calculated using simulations from posterior distributions (considering
+given data).
 
 
 ## Installation
@@ -60,23 +66,24 @@ The primary features are classes:
 - `PoissonDataTest`
 
 All test classes support two methods to insert the data:
-- `add_variant_data` - adding raw data for a variant as a list of observations (or numpy 1-D array)
-- `add_variant_data_agg` - adding aggregated variant data (this can be practical for a large data, as the
-aggregation can be done already on a database level)
+- `add_variant_data` - Adding raw data for a variant as a list of observations (or numpy 1-D array).
+- `add_variant_data_agg` - Adding aggregated variant data (this can be practical for a large data,
+as the aggregation can be done already on a database level).
 
 Both methods for adding data allow specification of prior distributions
-(see details in respective docstrings). Default prior setup should be sufficient for most of the cases
-(e.g. cases with unknown priors or large amounts of data).
+(see details in respective docstrings). Default prior setup should be sufficient for most of the
+cases (e.g. cases with unknown priors or large amounts of data).
 
-To get the results of the test, simply call method `evaluate`.
+To get the results of the test, simply call the method `evaluate`.
 
-Probabilities of being best and expected loss are approximated using simulations, hence `evaluate` can return
-slightly different values for different runs. To stabilize it, you can set `sim_count` parameter of `evaluate`
-to higher value (default value is 20K), or even use `seed` parameter to fix it completely.
+Probabilities of being best and expected loss are approximated using simulations, hence the
+`evaluate` method can return slightly different values for different runs. To stabilize it, you can
+set the `sim_count` parameter of the `evaluate` to a higher value (default value is 20K), or even
+use the `seed` parameter to fix it completely.
 
 
 ### BinaryDataTest
-Class for Bayesian A/B test for binary-like data (e.g. conversions, successes, etc.).
+Class for a Bayesian A/B test for the binary-like data (e.g. conversions, successes, etc.).
 
 **Example:**
 ```python
@@ -118,7 +125,7 @@ results # print(pd.DataFrame(results).to_markdown(tablefmt="grid", index=False))
     +---------+--------+-----------+---------------+----------------+-----------------+---------------+
 
 ### NormalDataTest
-Class for Bayesian A/B test for normal data.
+Class for a Bayesian A/B test for the normal data.
 
 **Example:**
 ```python
@@ -158,7 +165,7 @@ results # print(pd.DataFrame(results).to_markdown(tablefmt="grid", index=False))
     +---------+--------+------------+------------+----------------+-----------------+---------------+
 
 ### DeltaLognormalDataTest
-Class for Bayesian A/B test for delta-lognormal data (log-normal with zeros).
+Class for a Bayesian A/B test for the delta-lognormal data (log-normal with zeros).
 Delta-lognormal data is typical case of revenue per session data where many sessions have 0 revenue
 but non-zero values are positive values with possible log-normal distribution.
 To handle this data, the calculation is combining binary Bayes model for zero vs non-zero
@@ -202,14 +209,14 @@ results # print(pd.DataFrame(results).to_markdown(tablefmt="grid", index=False))
     | B       |     25 |        12 |      146.7 |    5.868   |            12.225   |         0.95185 |      0.158863 |
     +---------+--------+-----------+------------+------------+---------------------+-----------------+---------------+
 
-***Note**: Alternatively, `DeltaNormalDataTest` can be used for a case when
-conversions are not necessarily positive values.*
+***Note**: Alternatively, `DeltaNormalDataTest` can be used for a case when conversions are not
+necessarily positive values.*
 
 ### DiscreteDataTest
-Class for Bayesian A/B test for discrete data with finite number of numerical categories (states),
-representing some value.
-This test can be used for instance for dice rolls data (when looking for the "best" of multiple dice) or rating data
-(e.g. 1-5 stars or 1-10 scale).
+Class for a Bayesian A/B test for the discrete data with finite number of numerical categories
+(states), representing some value.
+This test can be used for instance for dice rolls data (when looking for the "best" of multiple
+dice) or rating data (e.g. 1-5 stars or 1-10 scale).
 
 **Example:**
 ```python
@@ -247,7 +254,7 @@ results # print(pd.DataFrame(results).to_markdown(tablefmt="grid", index=False))
     +---------+--------------------------------------------------+---------------+-----------------+---------------+
 
 ### PoissonDataTest
-Class for Bayesian A/B test for poisson data.
+Class for a Bayesian A/B test for the poisson data.
 
 **Example:**
 ```python
@@ -272,7 +279,7 @@ test.add_variant_data('city', city_goals_against, a_prior=3, b_prior=1)
 # add variant using aggregated data:
 test.add_variant_data_agg("bayern", len(bayern_goals_against), sum(bayern_goals_against))
 
-# evaluate test (since fewer goals is better, we explicitly set min_is_best to True)
+# evaluate test (since fewer goals is better, we explicitly set the min_is_best to True)
 results = test.evaluate(sim_count=20000, seed=52, min_is_best=True)
 results # print(pd.DataFrame(results).to_markdown(tablefmt="grid", index=False))
 ```
@@ -287,7 +294,47 @@ results # print(pd.DataFrame(results).to_markdown(tablefmt="grid", index=False))
     | bayern  |     15 |         13 |          0.86667 |        0.86755 |         0.18385 |     0.300335  |
     +---------+--------+------------+------------------+----------------+-----------------+---------------+
 
-_note: Since we set `min_is_best=True` (because received goals are "bad"), probability and loss are in a favor of variants with lower posterior means._
+_note: Since we set `min_is_best=True` (because received goals are "bad"), probability and loss are
+in a favor of variants with lower posterior means._
+
+### ExponentialDataTest
+Class for a Bayesian A/B test for the exponential data.
+
+**Example:**
+```python
+import numpy as np
+from bayesian_testing.experiments import ExponentialDataTest
+
+# waiting times for 3 different variants, each with many observations,
+# generated using exponential distributions with defined scales (expected values)
+waiting_times_a = np.random.exponential(scale=10, size=200)
+waiting_times_b = np.random.exponential(scale=11, size=210)
+waiting_times_c = np.random.exponential(scale=11, size=220)
+
+# initialize a test:
+test = ExponentialDataTest()
+# adding variants using the observation data:
+test.add_variant_data('A', waiting_times_a)
+test.add_variant_data('B', waiting_times_b)
+test.add_variant_data('C', waiting_times_c)
+
+# alternatively, add variants using aggregated data:
+# test.add_variant_data_agg('A', len(waiting_times_a), sum(waiting_times_a))
+
+# evaluate test (since a lower waiting time is better, we explicitly set the min_is_best to True)
+results = test.evaluate(sim_count=20000, min_is_best=True)
+results # print(pd.DataFrame(results).to_markdown(tablefmt="grid", index=False))
+```
+
+    +---------+--------+------------+------------------+----------------+-----------------+---------------+
+    | variant | totals | sum_values | observed_average | posterior_mean | prob_being_best | expected_loss |
+    +=========+========+============+==================+================+=================+===============+
+    | A       |    200 |    1884.18 |          9.42092 |        9.41671 |         0.89785 |     0.0395505 |
+    +---------+--------+------------+------------------+----------------+-----------------+---------------+
+    | B       |    210 |    2350.03 |         11.1906  |       11.1858  |         0.03405 |     1.80781   |
+    +---------+--------+------------+------------------+----------------+-----------------+---------------+
+    | C       |    220 |    2380.65 |         10.8211  |       10.8167  |         0.0681  |     1.4408    |
+    +---------+--------+------------+------------------+----------------+-----------------+---------------+
 
 ## Development
 To set up a development environment, use [Poetry](https://python-poetry.org/) and [pre-commit](https://pre-commit.com):
@@ -297,12 +344,9 @@ poetry install
 poetry run pre-commit install
 ```
 
-## Roadmap
+## To be implemented
 
-Test classes to be added:
-- `ExponentialDataTest`
-
-Metrics to be added:
+Additional metrics:
 - `Potential Value Remaining`
 
 ## References

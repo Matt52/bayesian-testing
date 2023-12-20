@@ -1,16 +1,16 @@
 from numbers import Number
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
 from bayesian_testing.experiments.base import BaseDataTest
-from bayesian_testing.metrics import eval_bernoulli_agg
+from bayesian_testing.metrics import eval_exponential_agg
 from bayesian_testing.utilities import get_logger
 
 logger = get_logger("bayesian_testing")
 
 
-class BinaryDataTest(BaseDataTest):
+class ExponentialDataTest(BaseDataTest):
     """
-    Class for Bayesian A/B test for binary-like data (conversions, successes, etc.).
+    Class for Bayesian A/B test for Exponential data (e.g. session time, waiting time, etc.).
 
     After class initialization, use add_variant methods to insert variant data.
     Then to get results of the test, use for instance `evaluate` method.
@@ -27,8 +27,8 @@ class BinaryDataTest(BaseDataTest):
         return [self.data[k]["totals"] for k in self.data]
 
     @property
-    def positives(self):
-        return [self.data[k]["positives"] for k in self.data]
+    def sum_values(self):
+        return [self.data[k]["sum_values"] for k in self.data]
 
     @property
     def a_priors(self):
@@ -55,8 +55,8 @@ class BinaryDataTest(BaseDataTest):
         res_pbbs : Dictionary with probabilities of being best for all variants in experiment.
         res_loss : Dictionary with expected loss for all variants in experiment.
         """
-        pbbs, loss = eval_bernoulli_agg(
-            self.totals, self.positives, self.a_priors, self.b_priors, sim_count, seed, min_is_best
+        pbbs, loss = eval_exponential_agg(
+            self.totals, self.sum_values, self.a_priors, self.b_priors, sim_count, seed, min_is_best
         )
         res_pbbs = dict(zip(self.variant_names, pbbs))
         res_loss = dict(zip(self.variant_names, loss))
@@ -82,16 +82,16 @@ class BinaryDataTest(BaseDataTest):
         keys = [
             "variant",
             "totals",
-            "positives",
-            "positive_rate",
+            "sum_values",
+            "observed_average",
             "posterior_mean",
             "prob_being_best",
             "expected_loss",
         ]
-        positive_rate = [round(i[0] / i[1], 5) for i in zip(self.positives, self.totals)]
+        observed_average = [round(i[0] / i[1], 5) for i in zip(self.sum_values, self.totals)]
         posterior_mean = [
-            round((i[2] + i[0]) / (i[2] + i[3] + i[1]), 5)
-            for i in zip(self.positives, self.totals, self.a_priors, self.b_priors)
+            round((i[3] + i[1]) / (i[2] + i[0]), 5)
+            for i in zip(self.totals, self.sum_values, self.a_priors, self.b_priors)
         ]
         eval_pbbs, eval_loss = self.eval_simulation(sim_count, seed, min_is_best)
         pbbs = list(eval_pbbs.values())
@@ -99,8 +99,8 @@ class BinaryDataTest(BaseDataTest):
         data = [
             self.variant_names,
             self.totals,
-            self.positives,
-            positive_rate,
+            self.sum_values,
+            observed_average,
             posterior_mean,
             pbbs,
             loss,
@@ -113,26 +113,26 @@ class BinaryDataTest(BaseDataTest):
         self,
         name: str,
         totals: int,
-        positives: int,
-        a_prior: Number = 0.5,
-        b_prior: Number = 0.5,
+        sum_values: Union[float, int],
+        a_prior: Number = 0.1,
+        b_prior: Number = 0.1,
         replace: bool = True,
     ) -> None:
         """
-        Add variant data to test class using aggregated binary data.
+        Add variant data to a test class using aggregated Exponential data.
         This can be convenient as aggregation can be done on database level.
 
-        Default prior setup is set for Beta(1/2, 1/2) which is non-information prior.
+        Default prior setup is set for Gamma(0.1, 0.1) which is on purpose very vague prior.
 
         Parameters
         ----------
         name : Variant name.
         totals : Total number of experiment observations (e.g. number of sessions).
-        positives : Total number of 1s for a given variant (e.g. number of conversions).
-        a_prior : Prior alpha parameter of a Beta distribution (conjugate prior).
-            Default value 0.5 is based on non-information prior Beta(0.5, 0.5).
-        b_prior : Prior beta parameter of a Beta distribution (conjugate prior).
-            Default value 0.5 is based on non-information prior Beta(0.5, 0.5).
+        sum_values : Sum of values for a given variant (e.g. total sum of waiting time).
+        a_prior : Prior alpha parameter of a Gamma distribution (conjugate prior).
+            Default value 0.1 is on purpose to be vague (lower information).
+        b_prior : Prior beta parameter (rate) of a Gamma distribution (conjugate prior).
+            Default value 0.1 is on purpose to be vague (lower information).
         replace : Replace data if variant already exists.
             If set to False, data of existing variant will be appended to existing data.
         """
@@ -142,15 +142,13 @@ class BinaryDataTest(BaseDataTest):
             raise ValueError("Both [a_prior, b_prior] have to be positive numbers.")
         if totals <= 0:
             raise ValueError("Input variable 'totals' is expected to be positive integer.")
-        if positives < 0:
-            raise ValueError("Input variable 'positives' is expected to be non-negative integer.")
-        if totals < positives:
-            raise ValueError("Not possible to have more positives that totals!")
+        if sum_values < 0:
+            raise ValueError("Input variable 'sum_values' is expected to be non-negative number.")
 
         if name not in self.variant_names:
             self.data[name] = {
                 "totals": totals,
-                "positives": positives,
+                "sum_values": sum_values,
                 "a_prior": a_prior,
                 "b_prior": b_prior,
             }
@@ -162,7 +160,7 @@ class BinaryDataTest(BaseDataTest):
             logger.info(msg)
             self.data[name] = {
                 "totals": totals,
-                "positives": positives,
+                "sum_values": sum_values,
                 "a_prior": a_prior,
                 "b_prior": b_prior,
             }
@@ -174,38 +172,38 @@ class BinaryDataTest(BaseDataTest):
             )
             logger.info(msg)
             self.data[name]["totals"] += totals
-            self.data[name]["positives"] += positives
+            self.data[name]["sum_values"] += sum_values
 
     def add_variant_data(
         self,
         name: str,
-        data: List[int],
-        a_prior: Number = 0.5,
-        b_prior: Number = 0.5,
+        data: List[Union[float, int]],
+        a_prior: Number = 0.1,
+        b_prior: Number = 0.1,
         replace: bool = True,
     ) -> None:
         """
-        Add variant data to test class using raw binary data.
+        Add variant data to a test class using raw Exponential data.
 
-        Default prior setup is set for Beta(1/2, 1/2) which is non-information prior.
+        Default prior setup is set for Gamma(0.1, 0.1) which is non-information prior.
 
         Parameters
         ----------
-        name : Variant name.
-        data : List of binary data containing zeros (non-conversion) and ones (conversions).
-        a_prior : Prior alpha parameter of a Beta distribution (conjugate prior).
-            Default value 0.5 is based on non-information prior Beta(0.5, 0.5).
-        b_prior : Prior beta parameter of a Beta distribution (conjugate prior).
-            Default value 0.5 is based on non-information prior Beta(0.5, 0.5).
+        name : Variant name.s
+        data : List of Exponential data.
+        a_prior : Prior alpha parameter of a Gamma distribution (conjugate prior).
+            Default value 0.1 is on purpose to be vague (lower information).
+        b_prior : Prior beta parameter (rate) of a Gamma distribution (conjugate prior).
+            Default value 0.1 is on purpose to be vague (lower information).
         replace : Replace data if variant already exists.
             If set to False, data of existing variant will be appended to existing data.
         """
         if len(data) == 0:
             raise ValueError("Data of added variant needs to have some observations.")
-        if not min([i in [0, 1] for i in data]):
-            raise ValueError("Input data needs to be a list of zeros and ones.")
+        if not min([i >= 0 for i in data]):
+            raise ValueError("Input data needs to be a list of non-negative integers.")
 
         totals = len(data)
-        positives = sum(data)
+        sum_values = sum(data)
 
-        self.add_variant_data_agg(name, totals, positives, a_prior, b_prior, replace)
+        self.add_variant_data_agg(name, totals, sum_values, a_prior, b_prior, replace)

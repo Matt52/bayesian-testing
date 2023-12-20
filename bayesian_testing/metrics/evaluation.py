@@ -505,8 +505,8 @@ def eval_exponential_agg(
 
     Parameters
     ----------
-    totals : List of total experiment observations (e.g. number of matches) for each variant.
-    sums : List of sums of observations (e.g. number of goals) for each variant.
+    totals : List of total experiment observations (e.g. number of sessions) for each variant.
+    sums : List of sums of observations (e.g. session time) for each variant.
     sim_count : Number of simulations to be used for probability estimation.
     a_priors_gamma : List of prior alpha parameters of Gamma distributions for each variant.
     b_priors_gamma : List of prior beta parameters (rates) of Gamma distributions for each variant.
@@ -532,7 +532,7 @@ def eval_exponential_agg(
         totals, sums, sim_count, a_priors_gamma, b_priors_gamma, seed
     )
 
-    # Reversing min_is_best to get back to scale comparison (instead of a rate which is inverse).
+    # Reversing min_is_best to get back to a scale comparison (instead of a rate which is inverse).
     res_pbbs = estimate_probabilities(gamma_samples, not min_is_best)
     # Reversing also expected loss for the same reason (to see the loss on a scale, not on a rate).
     res_loss_rate = estimate_expected_loss(gamma_samples, not min_is_best)

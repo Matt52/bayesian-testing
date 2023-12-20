@@ -119,7 +119,7 @@ class ExponentialDataTest(BaseDataTest):
         replace: bool = True,
     ) -> None:
         """
-        Add variant data to test class using aggregated Exponential data.
+        Add variant data to a test class using aggregated Exponential data.
         This can be convenient as aggregation can be done on database level.
 
         Default prior setup is set for Gamma(0.1, 0.1) which is on purpose very vague prior.
@@ -183,7 +183,7 @@ class ExponentialDataTest(BaseDataTest):
         replace: bool = True,
     ) -> None:
         """
-        Add variant data to test class using raw Exponential data.
+        Add variant data to a test class using raw Exponential data.
 
         Default prior setup is set for Gamma(0.1, 0.1) which is non-information prior.
 

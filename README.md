@@ -32,8 +32,8 @@ etc.).
 **Implemented evaluation metrics:**
 - `Probability of Being Best`
   - Probability that a given variant is best among all variants.
-  - By default, `best` is equivalent to `greatest` (from a data/metric point of view),
-however it is possible to change it by using `min_is_best=True` in the evaluation method
+  - By default, `the best` is equivalent to `the greatest` (from a data/metric point of view),
+however it is possible to change this by using `min_is_best=True` in the evaluation method
 (this can be useful if we try to find the variant while minimizing the tested measure).
 - `Expected Loss`
   - "Risk" of choosing particular variant over other variants in the test.
@@ -68,13 +68,13 @@ The primary features are classes:
 All test classes support two methods to insert the data:
 - `add_variant_data` - Adding raw data for a variant as a list of observations (or numpy 1-D array).
 - `add_variant_data_agg` - Adding aggregated variant data (this can be practical for a large data,
-as the aggregation can be done already on a database level)
+as the aggregation can be done already on a database level).
 
 Both methods for adding data allow specification of prior distributions
 (see details in respective docstrings). Default prior setup should be sufficient for most of the
 cases (e.g. cases with unknown priors or large amounts of data).
 
-To get the results of the test, simply call method `evaluate`.
+To get the results of the test, simply call the method `evaluate`.
 
 Probabilities of being best and expected loss are approximated using simulations, hence the
 `evaluate` method can return slightly different values for different runs. To stabilize it, you can
@@ -305,7 +305,7 @@ Class for a Bayesian A/B test for the exponential data.
 import numpy as np
 from bayesian_testing.experiments import ExponentialDataTest
 
-# waiting times for 3 different variants, each with many observations
+# waiting times for 3 different variants, each with many observations,
 # generated using exponential distributions with defined scales (expected values)
 waiting_times_a = np.random.exponential(scale=10, size=200)
 waiting_times_b = np.random.exponential(scale=11, size=210)

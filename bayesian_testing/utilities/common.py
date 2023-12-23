@@ -10,5 +10,5 @@ def check_list_lengths(lists: List[List]) -> None:
     """
     it = iter(lists)
     the_len = len(next(it))
-    if not all(len(l) == the_len for l in it):
+    if not all(len(i) == the_len for i in it):
         raise ValueError("Not all lists have same length!")

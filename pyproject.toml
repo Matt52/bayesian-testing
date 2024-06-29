@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "bayesian-testing"
-version = "0.6.2"
+version = "0.7.0"
 description = "Bayesian A/B testing with simple probabilities."
 authors = ["Matus Baniar"]
 license = "MIT"

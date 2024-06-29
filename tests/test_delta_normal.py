@@ -77,12 +77,12 @@ def test_w_priors(delta_norm_test):
 
 def test_probabs_of_being_best(delta_norm_test):
     pbbs = delta_norm_test.probabs_of_being_best(sim_count=20000, seed=152)
-    assert pbbs == {"A": 0.0002, "B": 0.9998}
+    assert pbbs == {"A": 0.02235, "B": 0.97765}
 
 
 def test_expected_loss(delta_norm_test):
     loss = delta_norm_test.expected_loss(sim_count=20000, seed=152)
-    assert loss == {"A": 9.6e-06, "B": 0.0}
+    assert loss == {"A": 0.005, "B": 2.46e-05}
 
 
 def test_evaluate(delta_norm_test):
@@ -95,8 +95,9 @@ def test_evaluate(delta_norm_test):
             "sum_values": 102.02561,
             "avg_values": 0.00324,
             "avg_non_zero_values": 10.20256,
-            "prob_being_best": 0.0002,
-            "expected_loss": 9.6e-06,
+            "posterior_mean": 0.00356,
+            "prob_being_best": 0.02235,
+            "expected_loss": 0.005,
         },
         {
             "variant": "B",
@@ -105,23 +106,26 @@ def test_evaluate(delta_norm_test):
             "sum_values": 273.02,
             "avg_values": 0.00853,
             "avg_non_zero_values": 6.8255,
-            "prob_being_best": 0.9998,
-            "expected_loss": 0.0,
+            "posterior_mean": 0.00853,
+            "prob_being_best": 0.97765,
+            "expected_loss": 2.46e-05,
         },
     ]
 
 
 def test_wrong_inputs():
-    pois = DeltaNormalDataTest()
+    dn_test = DeltaNormalDataTest()
     with pytest.raises(ValueError):
-        pois.add_variant_data(10, [1, 2, 3])
+        dn_test.add_variant_data(10, [1, 2, 3])
     with pytest.raises(ValueError):
-        pois.add_variant_data("A", [1, 2, 3], a_prior_beta=-1)
+        dn_test.add_variant_data("A", [1, 2, 3], a_prior_beta=-1)
     with pytest.raises(ValueError):
-        pois.add_variant_data_agg("A", 2, 3, 6, 21)
+        dn_test.add_variant_data_agg("A", 2, 3, 6, 21)
     with pytest.raises(ValueError):
-        pois.add_variant_data_agg("A", 1, -7, 6, 21)
+        dn_test.add_variant_data_agg("A", 1, -7, 6, 21)
     with pytest.raises(ValueError):
-        pois.add_variant_data("A", [])
+        dn_test.add_variant_data("A", [])
     with pytest.raises(ValueError):
-        pois.add_variant_data("C", [0, 10.7, -1], a_prior_ig=-1)
+        dn_test.add_variant_data("A", [0, 0, 0])
+    with pytest.raises(ValueError):
+        dn_test.add_variant_data("C", [0, 10.7, -1], a_prior_ig=-1)

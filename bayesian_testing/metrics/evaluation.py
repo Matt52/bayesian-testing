@@ -468,7 +468,7 @@ def eval_delta_normal_agg(
         normal_samples = np.array(
             [
                 normal_posteriors(
-                    totals[i],
+                    non_zeros[i],
                     sums[i],
                     sums_2[i],
                     sim_count,

@@ -97,6 +97,7 @@ def test_evaluate(rev_test):
             "sum_values": 30830.02561,
             "avg_values": 0.97873,
             "avg_positive_values": 19.51267,
+            "posterior_mean": 0.98309,
             "prob_being_best": 0.0004,
             "expected_loss": 0.2214416,
         },
@@ -107,6 +108,7 @@ def test_evaluate(rev_test):
             "sum_values": 35203.21689,
             "avg_values": 1.1001,
             "avg_positive_values": 20.70777,
+            "posterior_mean": 1.08266,
             "prob_being_best": 0.03355,
             "expected_loss": 0.1212818,
         },
@@ -117,7 +119,22 @@ def test_evaluate(rev_test):
             "sum_values": 37259.56336,
             "avg_values": 1.20192,
             "avg_positive_values": 24.03843,
+            "posterior_mean": 1.20276,
             "prob_being_best": 0.96605,
             "expected_loss": 0.0008639,
         },
     ]
+
+
+def test_wrong_inputs():
+    dl_test = DeltaLognormalDataTest()
+    with pytest.raises(ValueError):
+        dl_test.add_variant_data(10, [1, 2, 3])
+    with pytest.raises(ValueError):
+        dl_test.add_variant_data("A", [1, 2, 3], a_prior_beta=-1)
+    with pytest.raises(ValueError):
+        dl_test.add_variant_data("A", [])
+    with pytest.raises(ValueError):
+        dl_test.add_variant_data("A", [0, 0, 0])
+    with pytest.raises(ValueError):
+        dl_test.add_variant_data("C", [0, 10.7, -1])

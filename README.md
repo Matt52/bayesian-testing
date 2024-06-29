@@ -30,6 +30,8 @@ Bayesian approach.
 etc.).
 
 **Implemented evaluation metrics:**
+- `Posterior Mean`
+  - Expected value from the posterior distribution for a given variant.
 - `Probability of Being Best`
   - Probability that a given variant is best among all variants.
   - By default, `the best` is equivalent to `the greatest` (from a data/metric point of view),
@@ -39,8 +41,8 @@ however it is possible to change this by using `min_is_best=True` in the evaluat
   - "Risk" of choosing particular variant over other variants in the test.
   - Measured in the same units as a tested measure (e.g. positive rate or average value).
 
-Both evaluation metrics are calculated using simulations from posterior distributions (considering
-given data).
+`Probability of Being Best` and `Expected Loss` are calculated using simulations from posterior
+distributions (considering given data).
 
 
 ## Installation
@@ -77,11 +79,10 @@ cases (e.g. cases with unknown priors or large amounts of data).
 
 To get the results of the test, simply call the method `evaluate`.
 
-Probabilities of being best and expected loss are approximated using simulations, hence the
-`evaluate` method can return slightly different values for different runs. To stabilize it, you can
-set the `sim_count` parameter of the `evaluate` to a higher value (default value is 20K), or even
-use the `seed` parameter to fix it completely.
-
+Probability of being best and expected loss are approximated using simulations, hence the `evaluate`
+method can return slightly different values for different runs. To stabilize it, you can  set the
+`sim_count` parameter of the `evaluate` to a higher value (default value is 20K), or even use the
+`seed` parameter to fix it completely.
 
 ### BinaryDataTest
 Class for a Bayesian A/B test for the binary-like data (e.g. conversions, successes, etc.).
@@ -112,18 +113,24 @@ test.add_variant_data_agg("C", totals=1000, positives=50)
 
 # evaluate test:
 results = test.evaluate()
-results # print(pd.DataFrame(results).to_markdown(tablefmt="grid", index=False))
+results # print(pd.DataFrame(results).set_index('variant').T.to_markdown(tablefmt="grid"))
 ```
 
-    +---------+--------+-----------+---------------+----------------+-----------------+---------------+
-    | variant | totals | positives | positive_rate | posterior_mean | prob_being_best | expected_loss |
-    +=========+========+===========+===============+================+=================+===============+
-    | A       |   1500 |        80 |       0.05333 |        0.05363 |         0.067   |     0.0138102 |
-    +---------+--------+-----------+---------------+----------------+-----------------+---------------+
-    | B       |   1200 |        80 |       0.06667 |        0.06703 |         0.88975 |     0.0004622 |
-    +---------+--------+-----------+---------------+----------------+-----------------+---------------+
-    | C       |   1000 |        50 |       0.05    |        0.05045 |         0.04325 |     0.0169686 |
-    +---------+--------+-----------+---------------+----------------+-----------------+---------------+
+    +-----------------+--------------+--------------+--------------+
+    | variant         |            A |            B |            C |
+    +=================+==============+==============+==============+
+    | totals          | 1500         | 1200         | 1000         |
+    +-----------------+--------------+--------------+--------------+
+    | positives       |   80         |   80         |   50         |
+    +-----------------+--------------+--------------+--------------+
+    | positive_rate   |    0.05333   |    0.06667   |    0.05      |
+    +-----------------+--------------+--------------+--------------+
+    | posterior_mean  |    0.05363   |    0.06703   |    0.05045   |
+    +-----------------+--------------+--------------+--------------+
+    | prob_being_best |    0.06575   |    0.894     |    0.04025   |
+    +-----------------+--------------+--------------+--------------+
+    | expected_loss   |    0.0138918 |    0.0004528 |    0.0171382 |
+    +-----------------+--------------+--------------+--------------+
 
 ### NormalDataTest
 Class for a Bayesian A/B test for the normal data.
@@ -152,18 +159,24 @@ test.add_variant_data_agg("C", len(data_c), sum(data_c), sum(np.square(data_c)))
 
 # evaluate test:
 results = test.evaluate(sim_count=20000, seed=52, min_is_best=False)
-results # print(pd.DataFrame(results).to_markdown(tablefmt="grid", index=False))
+results # print(pd.DataFrame(results).set_index('variant').T.to_markdown(tablefmt="grid"))
 ```
 
-    +---------+--------+------------+------------+----------------+-----------------+---------------+
-    | variant | totals | sum_values | avg_values | posterior_mean | prob_being_best | expected_loss |
-    +=========+========+============+============+================+=================+===============+
-    | A       |   1000 |    7294.68 |    7.29468 |        7.29462 |         0.1707  |     0.196874  |
-    +---------+--------+------------+------------+----------------+-----------------+---------------+
-    | B       |    800 |    5685.86 |    7.10733 |        7.10725 |         0.00125 |     0.385112  |
-    +---------+--------+------------+------------+----------------+-----------------+---------------+
-    | C       |    500 |    3736.92 |    7.47383 |        7.4737  |         0.82805 |     0.0169998 |
-    +---------+--------+------------+------------+----------------+-----------------+---------------+
+    +-----------------+-------------+-------------+--------------+
+    | variant         |           A |           B |            C |
+    +=================+=============+=============+==============+
+    | totals          | 1000        |  800        |  500         |
+    +-----------------+-------------+-------------+--------------+
+    | sum_values      | 7294.68     | 5685.86     | 3736.92      |
+    +-----------------+-------------+-------------+--------------+
+    | avg_values      |    7.29468  |    7.10733  |    7.47383   |
+    +-----------------+-------------+-------------+--------------+
+    | posterior_mean  |    7.29462  |    7.10725  |    7.4737    |
+    +-----------------+-------------+-------------+--------------+
+    | prob_being_best |    0.1707   |    0.00125  |    0.82805   |
+    +-----------------+-------------+-------------+--------------+
+    | expected_loss   |    0.196874 |    0.385112 |    0.0169998 |
+    +-----------------+-------------+-------------+--------------+
 
 ### DeltaLognormalDataTest
 Class for a Bayesian A/B test for the delta-lognormal data (log-normal with zeros).
@@ -199,16 +212,28 @@ test.add_variant_data_agg(
 
 # evaluate test:
 results = test.evaluate(seed=21)
-results # print(pd.DataFrame(results).to_markdown(tablefmt="grid", index=False))
+results # print(pd.DataFrame(results).set_index('variant').T.to_markdown(tablefmt="grid"))
 ```
 
-    +---------+--------+-----------+------------+------------+---------------------+-----------------+---------------+
-    | variant | totals | positives | sum_values | avg_values | avg_positive_values | prob_being_best | expected_loss |
-    +=========+========+===========+============+============+=====================+=================+===============+
-    | A       |     24 |        13 |       43.4 |    1.80833 |             3.33846 |         0.04815 |      4.09411  |
-    +---------+--------+-----------+------------+------------+---------------------+-----------------+---------------+
-    | B       |     25 |        12 |      146.7 |    5.868   |            12.225   |         0.95185 |      0.158863 |
-    +---------+--------+-----------+------------+------------+---------------------+-----------------+---------------+
+    +---------------------+----------+------------+
+    | variant             |        A |          B |
+    +=====================+==========+============+
+    | totals              | 24       |  25        |
+    +---------------------+----------+------------+
+    | positives           | 13       |  12        |
+    +---------------------+----------+------------+
+    | sum_values          | 43.4     | 146.7      |
+    +---------------------+----------+------------+
+    | avg_values          |  1.80833 |   5.868    |
+    +---------------------+----------+------------+
+    | avg_positive_values |  3.33846 |  12.225    |
+    +---------------------+----------+------------+
+    | posterior_mean      |  2.09766 |   6.19017  |
+    +---------------------+----------+------------+
+    | prob_being_best     |  0.04815 |   0.95185  |
+    +---------------------+----------+------------+
+    | expected_loss       |  4.09411 |   0.158863 |
+    +---------------------+----------+------------+
 
 ***Note**: Alternatively, `DeltaNormalDataTest` can be used for a case when conversions are not
 necessarily positive values.*
@@ -244,15 +269,15 @@ results = test.evaluate(sim_count=20000, seed=52, min_is_best=False)
 results # print(pd.DataFrame(results).to_markdown(tablefmt="grid", index=False))
 ```
 
-    +---------+--------------------------------------------------+---------------+-----------------+---------------+
-    | variant | concentration                                    | average_value | prob_being_best | expected_loss |
-    +=========+==================================================+===============+=================+===============+
-    | A       | {1: 2.0, 2: 4.0, 3: 4.0, 4: 2.0, 5: 2.0, 6: 6.0} |           3.8 |         0.54685 |      0.199953 |
-    +---------+--------------------------------------------------+---------------+-----------------+---------------+
-    | B       | {1: 1.0, 2: 6.0, 3: 2.0, 4: 1.0, 5: 0.0, 6: 0.0} |           2.3 |         0.008   |      1.18268  |
-    +---------+--------------------------------------------------+---------------+-----------------+---------------+
-    | C       | {1: 1.0, 2: 0.0, 3: 1.0, 4: 1.0, 5: 1.0, 6: 1.0} |           3.8 |         0.44515 |      0.287025 |
-    +---------+--------------------------------------------------+---------------+-----------------+---------------+
+    +---------+--------------------------------------+---------------+----------------+-----------------+---------------+
+    | variant | concentration                        | average_value | posterior_mean | prob_being_best | expected_loss |
+    +=========+======================================+===============+================+=================+===============+
+    | A       | {1: 2, 2: 4, 3: 4, 4: 2, 5: 2, 6: 6} |           3.8 |        3.73077 |         0.54685 |      0.199953 |
+    +---------+--------------------------------------+---------------+----------------+-----------------+---------------+
+    | B       | {1: 1, 2: 6, 3: 2, 4: 1, 5: 0, 6: 0} |           2.3 |        2.75    |         0.008   |      1.18268  |
+    +---------+--------------------------------------+---------------+----------------+-----------------+---------------+
+    | C       | {1: 1, 2: 0, 3: 1, 4: 1, 5: 1, 6: 1} |           3.8 |        3.63636 |         0.44515 |      0.287025 |
+    +---------+--------------------------------------+---------------+----------------+-----------------+---------------+
 
 ### PoissonDataTest
 Class for a Bayesian A/B test for the poisson data.
@@ -282,18 +307,24 @@ test.add_variant_data_agg("bayern", len(bayern_goals_against), sum(bayern_goals_
 
 # evaluate test (since fewer goals is better, we explicitly set the min_is_best to True)
 results = test.evaluate(sim_count=20000, seed=52, min_is_best=True)
-results # print(pd.DataFrame(results).to_markdown(tablefmt="grid", index=False))
+results # print(pd.DataFrame(results).set_index('variant').T.to_markdown(tablefmt="grid"))
 ```
 
-    +---------+--------+------------+------------------+----------------+-----------------+---------------+
-    | variant | totals | sum_values | observed_average | posterior_mean | prob_being_best | expected_loss |
-    +=========+========+============+==================+================+=================+===============+
-    | psg     |     15 |          9 |          0.6     |        0.60265 |         0.78175 |     0.0369998 |
-    +---------+--------+------------+------------------+----------------+-----------------+---------------+
-    | city    |     14 |         14 |          1       |        1.13333 |         0.0344  |     0.562055  |
-    +---------+--------+------------+------------------+----------------+-----------------+---------------+
-    | bayern  |     15 |         13 |          0.86667 |        0.86755 |         0.18385 |     0.300335  |
-    +---------+--------+------------+------------------+----------------+-----------------+---------------+
+    +------------------+------------+-----------+-----------+
+    | variant          |        psg |      city |    bayern |
+    +==================+============+===========+===========+
+    | totals           | 15         | 14        | 15        |
+    +------------------+------------+-----------+-----------+
+    | sum_values       |  9         | 14        | 13        |
+    +------------------+------------+-----------+-----------+
+    | observed_average |  0.6       |  1        |  0.86667  |
+    +------------------+------------+-----------+-----------+
+    | posterior_mean   |  0.60265   |  1.13333  |  0.86755  |
+    +------------------+------------+-----------+-----------+
+    | prob_being_best  |  0.78175   |  0.0344   |  0.18385  |
+    +------------------+------------+-----------+-----------+
+    | expected_loss    |  0.0369998 |  0.562055 |  0.300335 |
+    +------------------+------------+-----------+-----------+
 
 _note: Since we set `min_is_best=True` (because received goals are "bad"), probability and loss are
 in a favor of variants with lower posterior means._
@@ -324,18 +355,24 @@ test.add_variant_data('C', waiting_times_c)
 
 # evaluate test (since a lower waiting time is better, we explicitly set the min_is_best to True)
 results = test.evaluate(sim_count=20000, min_is_best=True)
-results # print(pd.DataFrame(results).to_markdown(tablefmt="grid", index=False))
+results # print(pd.DataFrame(results).set_index('variant').T.to_markdown(tablefmt="grid"))
 ```
 
-    +---------+--------+------------+------------------+----------------+-----------------+---------------+
-    | variant | totals | sum_values | observed_average | posterior_mean | prob_being_best | expected_loss |
-    +=========+========+============+==================+================+=================+===============+
-    | A       |    200 |    1884.18 |          9.42092 |        9.41671 |         0.89785 |     0.0395505 |
-    +---------+--------+------------+------------------+----------------+-----------------+---------------+
-    | B       |    210 |    2350.03 |         11.1906  |       11.1858  |         0.03405 |     1.80781   |
-    +---------+--------+------------+------------------+----------------+-----------------+---------------+
-    | C       |    220 |    2380.65 |         10.8211  |       10.8167  |         0.0681  |     1.4408    |
-    +---------+--------+------------+------------------+----------------+-----------------+---------------+
+    +------------------+-------------+------------+-------------+
+    | variant          |           A |          B |           C |
+    +==================+=============+============+=============+
+    | totals           |  200        |  210       |  220        |
+    +------------------+-------------+------------+-------------+
+    | sum_values       | 1937.3      | 2451.68    | 2266.11     |
+    +------------------+-------------+------------+-------------+
+    | observed_average |    9.68649  |   11.6747  |   10.3005   |
+    +------------------+-------------+------------+-------------+
+    | posterior_mean   |    9.68215  |   11.6696  |   10.2963   |
+    +------------------+-------------+------------+-------------+
+    | prob_being_best  |    0.72605  |    0.0122  |    0.26175  |
+    +------------------+-------------+------------+-------------+
+    | expected_loss    |    0.146675 |    2.13691 |    0.755893 |
+    +------------------+-------------+------------+-------------+
 
 ## Development
 To set up a development environment, use [Poetry](https://python-poetry.org/) and [pre-commit](https://pre-commit.com):
@@ -349,6 +386,7 @@ poetry run pre-commit install
 
 Additional metrics:
 - `Potential Value Remaining`
+- `Credible Interval`
 
 ## References
 - `bayesian_testing` package itself depends only on [numpy](https://numpy.org) package.

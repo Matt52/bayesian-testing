@@ -321,14 +321,14 @@ PBB_EXPONENTIAL_AGG_INPUTS = [
 PBB_DELTA_NORMAL_AGG_INPUTS = [
     {
         "input": {
-            "totals": [31500, 32000],
-            "non_zeros": [10, 20],
-            "sums": [102.02561, 273.02],
-            "sums_2": [1700.8, 3567.5],
+            "totals": [10000, 1000],
+            "non_zeros": [1009, 111],
+            "sums": [7026.30599, 801.53947],
+            "sums_2": [49993.4988, 5891.6073],
             "sim_count": 20000,
             "seed": 52,
         },
-        "expected_output": ([0.0024, 0.9976], [4.4e-06, 0.0]),
+        "expected_output": ([0.08285, 0.91715], [0.1045921, 0.0026141]),
     },
     {
         "input": {

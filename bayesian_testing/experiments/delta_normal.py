@@ -126,11 +126,24 @@ class DeltaNormalDataTest(BaseDataTest):
             "sum_values",
             "avg_values",
             "avg_non_zero_values",
+            "posterior_mean",
             "prob_being_best",
             "expected_loss",
         ]
         avg_values = [round(i[0] / i[1], 5) for i in zip(self.sum_values, self.totals)]
         avg_pos_values = [round(i[0] / i[1], 5) for i in zip(self.sum_values, self.non_zeros)]
+        posterior_mean = [
+            round(((i[0] + i[3] * i[4]) / (i[1] + i[4])) * ((i[5] + i[1]) / (i[6] + i[2])), 5)
+            for i in zip(
+                self.sum_values,
+                self.non_zeros,
+                self.totals,
+                self.m_priors,
+                self.w_priors,
+                self.a_priors_beta,
+                self.b_priors_beta,
+            )
+        ]
         eval_pbbs, eval_loss = self.eval_simulation(sim_count, seed, min_is_best)
         pbbs = list(eval_pbbs.values())
         loss = list(eval_loss.values())
@@ -141,6 +154,7 @@ class DeltaNormalDataTest(BaseDataTest):
             [round(i, 5) for i in self.sum_values],
             avg_values,
             avg_pos_values,
+            posterior_mean,
             pbbs,
             loss,
         ]
@@ -194,8 +208,10 @@ class DeltaNormalDataTest(BaseDataTest):
             raise ValueError("Both [a_prior_beta, b_prior_beta] have to be positive numbers.")
         if m_prior < 0 or a_prior_ig < 0 or b_prior_ig < 0 or w_prior < 0:
             raise ValueError("All priors of [m, a_ig, b_ig, w] have to be non-negative numbers.")
+        if non_zeros == 0:
+            raise ValueError("Variant has to have some non-zero values.")
         if non_zeros < 0:
-            raise ValueError("Input variable 'non_zeros' is expected to be non-zero integer.")
+            raise ValueError("Input variable 'non_zeros' is expected to be positive integer.")
         if totals < non_zeros:
             raise ValueError("Not possible to have more non_zero numbers that totals!")
 

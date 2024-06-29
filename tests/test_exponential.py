@@ -128,16 +128,16 @@ def test_evaluate(exponential_test):
 
 
 def test_wrong_inputs():
-    pois = ExponentialDataTest()
+    exp_test = ExponentialDataTest()
     with pytest.raises(ValueError):
-        pois.add_variant_data(10, [1, 2, 3])
+        exp_test.add_variant_data(10, [1, 2, 3])
     with pytest.raises(ValueError):
-        pois.add_variant_data("A", [1, 2, 3], a_prior=-1)
+        exp_test.add_variant_data("A", [1, 2, 3], a_prior=-1)
     with pytest.raises(ValueError):
-        pois.add_variant_data_agg("A", -1, 7)
+        exp_test.add_variant_data_agg("A", -1, 7)
     with pytest.raises(ValueError):
-        pois.add_variant_data_agg("A", 1, -7)
+        exp_test.add_variant_data_agg("A", 1, -7)
     with pytest.raises(ValueError):
-        pois.add_variant_data("A", [])
+        exp_test.add_variant_data("A", [])
     with pytest.raises(ValueError):
-        pois.add_variant_data("A", [1, 2, -3])
+        exp_test.add_variant_data("A", [1, 2, -3])

@@ -132,11 +132,48 @@ class DeltaLognormalDataTest(BaseDataTest):
             "sum_values",
             "avg_values",
             "avg_positive_values",
+            "posterior_mean",
             "prob_being_best",
             "expected_loss",
         ]
         avg_values = [round(i[0] / i[1], 5) for i in zip(self.sum_values, self.totals)]
         avg_pos_values = [round(i[0] / i[1], 5) for i in zip(self.sum_values, self.positives)]
+        a_posterior_ig = [i[0] + (i[1] / 2) for i in zip(self.a_priors_ig, self.positives)]
+        x_ig = [i[0] / i[1] for i in zip(self.sum_logs, self.positives)]
+        b_posterior_ig = [
+            (
+                i[6]
+                + (1 / 2) * (i[1] - 2 * i[0] * i[3] + i[2] * (i[3] ** 2))
+                + ((i[2] * i[5]) / (2 * (i[2] + i[5]))) * ((i[3] - i[4]) ** 2)
+            )
+            for i in zip(
+                self.sum_logs,
+                self.sum_logs_2,
+                self.positives,
+                x_ig,
+                self.m_priors,
+                self.w_priors,
+                self.b_priors_ig,
+            )
+        ]
+        posterior_mean = [
+            round(
+                np.exp(((i[0] + i[3] * i[4]) / (i[1] + i[4])) + i[8] / (2 * i[7]))
+                * ((i[5] + i[1]) / (i[6] + i[2])),
+                5,
+            )
+            for i in zip(
+                self.sum_logs,
+                self.positives,
+                self.totals,
+                self.m_priors,
+                self.w_priors,
+                self.a_priors_beta,
+                self.b_priors_beta,
+                a_posterior_ig,
+                b_posterior_ig,
+            )
+        ]
         eval_pbbs, eval_loss = self.eval_simulation(sim_count, seed, min_is_best)
         pbbs = list(eval_pbbs.values())
         loss = list(eval_loss.values())
@@ -147,6 +184,7 @@ class DeltaLognormalDataTest(BaseDataTest):
             [round(i, 5) for i in self.sum_values],
             avg_values,
             avg_pos_values,
+            posterior_mean,
             pbbs,
             loss,
         ]
@@ -202,8 +240,10 @@ class DeltaLognormalDataTest(BaseDataTest):
             raise ValueError("Both [a_prior_beta, b_prior_beta] have to be positive numbers.")
         if m_prior < 0 or a_prior_ig < 0 or b_prior_ig < 0 or w_prior < 0:
             raise ValueError("All priors of [m, a_ig, b_ig, w] have to be non-negative numbers.")
+        if positives == 0:
+            raise ValueError("Variant has to have some non-zero (positive) values.")
         if positives < 0:
-            raise ValueError("Input variable 'positives' is expected to be non-negative integer.")
+            raise ValueError("Input variable 'positives' is expected to be a positive integer.")
         if totals < positives:
             raise ValueError("Not possible to have more positives that totals!")
 

@@ -124,3 +124,17 @@ def test_evaluate(rev_test):
             "expected_loss": 0.0008639,
         },
     ]
+
+
+def test_wrong_inputs():
+    dl_test = DeltaLognormalDataTest()
+    with pytest.raises(ValueError):
+        dl_test.add_variant_data(10, [1, 2, 3])
+    with pytest.raises(ValueError):
+        dl_test.add_variant_data("A", [1, 2, 3], a_prior_beta=-1)
+    with pytest.raises(ValueError):
+        dl_test.add_variant_data("A", [])
+    with pytest.raises(ValueError):
+        dl_test.add_variant_data("A", [0, 0, 0])
+    with pytest.raises(ValueError):
+        dl_test.add_variant_data("C", [0, 10.7, -1])

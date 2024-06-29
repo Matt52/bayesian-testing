@@ -240,8 +240,10 @@ class DeltaLognormalDataTest(BaseDataTest):
             raise ValueError("Both [a_prior_beta, b_prior_beta] have to be positive numbers.")
         if m_prior < 0 or a_prior_ig < 0 or b_prior_ig < 0 or w_prior < 0:
             raise ValueError("All priors of [m, a_ig, b_ig, w] have to be non-negative numbers.")
+        if positives == 0:
+            raise ValueError("Variant has to have some non-zero (positive) values.")
         if positives < 0:
-            raise ValueError("Input variable 'positives' is expected to be non-negative integer.")
+            raise ValueError("Input variable 'positives' is expected to be a positive integer.")
         if totals < positives:
             raise ValueError("Not possible to have more positives that totals!")
 

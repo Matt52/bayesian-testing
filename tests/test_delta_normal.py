@@ -114,16 +114,18 @@ def test_evaluate(delta_norm_test):
 
 
 def test_wrong_inputs():
-    pois = DeltaNormalDataTest()
+    dn_test = DeltaNormalDataTest()
     with pytest.raises(ValueError):
-        pois.add_variant_data(10, [1, 2, 3])
+        dn_test.add_variant_data(10, [1, 2, 3])
     with pytest.raises(ValueError):
-        pois.add_variant_data("A", [1, 2, 3], a_prior_beta=-1)
+        dn_test.add_variant_data("A", [1, 2, 3], a_prior_beta=-1)
     with pytest.raises(ValueError):
-        pois.add_variant_data_agg("A", 2, 3, 6, 21)
+        dn_test.add_variant_data_agg("A", 2, 3, 6, 21)
     with pytest.raises(ValueError):
-        pois.add_variant_data_agg("A", 1, -7, 6, 21)
+        dn_test.add_variant_data_agg("A", 1, -7, 6, 21)
     with pytest.raises(ValueError):
-        pois.add_variant_data("A", [])
+        dn_test.add_variant_data("A", [])
     with pytest.raises(ValueError):
-        pois.add_variant_data("C", [0, 10.7, -1], a_prior_ig=-1)
+        dn_test.add_variant_data("A", [0, 0, 0])
+    with pytest.raises(ValueError):
+        dn_test.add_variant_data("C", [0, 10.7, -1], a_prior_ig=-1)

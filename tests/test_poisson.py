@@ -80,16 +80,16 @@ def test_evaluate(poisson_test):
 
 
 def test_wrong_inputs():
-    pois = PoissonDataTest()
+    pois_test = PoissonDataTest()
     with pytest.raises(ValueError):
-        pois.add_variant_data(10, [1, 2, 3])
+        pois_test.add_variant_data(10, [1, 2, 3])
     with pytest.raises(ValueError):
-        pois.add_variant_data("A", [1, 2, 3], a_prior=-1)
+        pois_test.add_variant_data("A", [1, 2, 3], a_prior=-1)
     with pytest.raises(ValueError):
-        pois.add_variant_data_agg("A", -1, 7)
+        pois_test.add_variant_data_agg("A", -1, 7)
     with pytest.raises(ValueError):
-        pois.add_variant_data_agg("A", 1, -7)
+        pois_test.add_variant_data_agg("A", 1, -7)
     with pytest.raises(ValueError):
-        pois.add_variant_data("A", [])
+        pois_test.add_variant_data("A", [])
     with pytest.raises(ValueError):
-        pois.add_variant_data("A", [1, 2, -3])
+        pois_test.add_variant_data("A", [1, 2, -3])

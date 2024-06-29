@@ -126,11 +126,24 @@ class DeltaNormalDataTest(BaseDataTest):
             "sum_values",
             "avg_values",
             "avg_non_zero_values",
+            "posterior_mean",
             "prob_being_best",
             "expected_loss",
         ]
         avg_values = [round(i[0] / i[1], 5) for i in zip(self.sum_values, self.totals)]
         avg_pos_values = [round(i[0] / i[1], 5) for i in zip(self.sum_values, self.non_zeros)]
+        posterior_mean = [
+            round(((i[0] + i[3] * i[4]) / (i[1] + i[4])) * ((i[5] + i[1]) / (i[6] + i[2])), 5)
+            for i in zip(
+                self.sum_values,
+                self.non_zeros,
+                self.totals,
+                self.m_priors,
+                self.w_priors,
+                self.a_priors_beta,
+                self.b_priors_beta,
+            )
+        ]
         eval_pbbs, eval_loss = self.eval_simulation(sim_count, seed, min_is_best)
         pbbs = list(eval_pbbs.values())
         loss = list(eval_loss.values())
@@ -141,6 +154,7 @@ class DeltaNormalDataTest(BaseDataTest):
             [round(i, 5) for i in self.sum_values],
             avg_values,
             avg_pos_values,
+            posterior_mean,
             pbbs,
             loss,
         ]

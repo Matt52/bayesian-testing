@@ -89,7 +89,22 @@ class DiscreteDataTest(BaseDataTest):
         -------
         res : List of dictionaries with results per variant.
         """
-        keys = ["variant", "concentration", "average_value", "prob_being_best", "expected_loss"]
+        keys = [
+            "variant",
+            "concentration",
+            "average_value",
+            "posterior_mean",
+            "prob_being_best",
+            "expected_loss",
+        ]
+        posterior_alphas = [
+            list(np.array(i[0]) + np.array(i[1]))
+            for i in zip(self.concentrations, self.prior_alphas)
+        ]
+        posterior_mean = [
+            round(sum(np.multiply(np.array(self.states), np.array(i[0]) / sum(np.array(i[0])))), 5)
+            for i in zip(posterior_alphas)
+        ]
         eval_pbbs, eval_loss = self.eval_simulation(sim_count, seed, min_is_best)
         pbbs = list(eval_pbbs.values())
         loss = list(eval_loss.values())
@@ -100,6 +115,7 @@ class DiscreteDataTest(BaseDataTest):
             self.variant_names,
             [dict(zip(self.states, i)) for i in self.concentrations],
             average_values,
+            posterior_mean,
             pbbs,
             loss,
         ]

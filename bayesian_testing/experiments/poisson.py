@@ -55,7 +55,7 @@ class PoissonDataTest(BaseDataTest):
         res_pbbs : Dictionary with probabilities of being best for all variants in experiment.
         res_loss : Dictionary with expected loss for all variants in experiment.
         """
-        pbbs, loss = eval_poisson_agg(
+        pbbs, loss, intervals = eval_poisson_agg(
             self.totals, self.sum_values, self.a_priors, self.b_priors, sim_count, seed, min_is_best
         )
         res_pbbs = dict(zip(self.variant_names, pbbs))

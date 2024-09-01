@@ -83,7 +83,7 @@ class DeltaNormalDataTest(BaseDataTest):
         res_pbbs : Dictionary with probabilities of being best for all variants in experiment.
         res_loss : Dictionary with expected loss for all variants in experiment.
         """
-        pbbs, loss = eval_delta_normal_agg(
+        pbbs, loss, intervals = eval_delta_normal_agg(
             self.totals,
             self.non_zeros,
             self.sum_values,

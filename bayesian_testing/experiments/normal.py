@@ -69,7 +69,7 @@ class NormalDataTest(BaseDataTest):
         res_pbbs : Dictionary with probabilities of being best for all variants in experiment.
         res_loss : Dictionary with expected loss for all variants in experiment.
         """
-        pbbs, loss = eval_normal_agg(
+        pbbs, loss, intervals = eval_normal_agg(
             self.totals,
             self.sum_values,
             self.sum_values_2,

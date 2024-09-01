@@ -78,6 +78,28 @@ def estimate_expected_loss(
     return res
 
 
+def estimate_credible_intervals(
+    data: Union[List[List[Number]], np.ndarray], alpha: float
+) -> List[List[float]]:
+    """
+    Compute quantile-based credible intervals for all variants based on the simulated data for a
+    given probability alpha.
+
+    Parameters
+    ----------
+    data : List of simulated data for each variant.
+    alpha : Probability of credible interval.
+
+    Returns
+    -------
+    res : List of credible intervals (in a form of list) for each variant.
+    """
+    low_end = (1 - alpha) / 2
+    top_end = (1 + alpha) / 2
+    res = np.round(np.quantile(data, [low_end, top_end], axis=1).T, 7).tolist()
+    return res
+
+
 def eval_bernoulli_agg(
     totals: List[int],
     positives: List[int],
@@ -86,7 +108,8 @@ def eval_bernoulli_agg(
     sim_count: int = 20000,
     seed: int = None,
     min_is_best: bool = False,
-) -> Tuple[List[float], List[float]]:
+    interval_alpha: float = 0.95,
+) -> Tuple[List[float], List[float], List[List[float]]]:
     """
     Method estimating probabilities of being best and expected loss for Beta-Bernoulli
     aggregated data per variant.
@@ -100,16 +123,18 @@ def eval_bernoulli_agg(
     b_priors_beta : List of prior beta parameters of Beta distributions for each variant.
     seed : Random seed.
     min_is_best : Option to change "being best" to a minimum. Default is maximum.
+    interval_alpha : Credible interval probability.
 
     Returns
     -------
     res_pbbs : List of probabilities of being best for each variant.
     res_loss : List of expected loss for each variant.
+    res_interval : List of credible intervals for each variant.
     """
     validate_bernoulli_input(totals, positives)
 
     if len(totals) == 0:
-        return [], []
+        return [], [], []
 
     # Default prior for all variants is Beta(0.5, 0.5) which is non-information prior.
     if not a_priors_beta:
@@ -123,8 +148,9 @@ def eval_bernoulli_agg(
 
     res_pbbs = estimate_probabilities(beta_samples, min_is_best)
     res_loss = estimate_expected_loss(beta_samples, min_is_best)
+    res_interval = estimate_credible_intervals(beta_samples, interval_alpha)
 
-    return res_pbbs, res_loss
+    return res_pbbs, res_loss, res_interval
 
 
 def eval_normal_agg(
@@ -138,7 +164,8 @@ def eval_normal_agg(
     w_priors: List[Number] = None,
     seed: int = None,
     min_is_best: bool = False,
-) -> Tuple[List[float], List[float]]:
+    interval_alpha: float = 0.95,
+) -> Tuple[List[float], List[float], List[List[float]]]:
     """
     Method estimating probabilities of being best and expected loss for Normal
     aggregated data per variant.
@@ -155,14 +182,16 @@ def eval_normal_agg(
     w_priors : List of prior effective sample sizes for each variant.
     seed : Random seed.
     min_is_best : Option to change "being best" to a minimum. Default is maximum.
+    interval_alpha : Credible interval probability.
 
     Returns
     -------
     res_pbbs : List of probabilities of being best for each variant.
     res_loss : List of expected loss for each variant.
+    res_interval : List of credible intervals for each variant.
     """
     if len(totals) == 0:
-        return [], []
+        return [], [], []
     # Same default priors for all variants if they are not provided.
     if not m_priors:
         m_priors = [1] * len(totals)
@@ -197,8 +226,9 @@ def eval_normal_agg(
 
     res_pbbs = estimate_probabilities(normal_samples, min_is_best)
     res_loss = estimate_expected_loss(normal_samples, min_is_best)
+    res_interval = estimate_credible_intervals(normal_samples, interval_alpha)
 
-    return res_pbbs, res_loss
+    return res_pbbs, res_loss, res_interval
 
 
 def eval_delta_lognormal_agg(
@@ -215,7 +245,8 @@ def eval_delta_lognormal_agg(
     w_priors: List[Number] = None,
     seed: int = None,
     min_is_best: bool = False,
-) -> Tuple[List[float], List[float]]:
+    interval_alpha: float = 0.95,
+) -> Tuple[List[float], List[float], List[List[float]]]:
     """
     Method estimating probabilities of being best and expected loss for Delta-Lognormal
     aggregated data per variant. For that reason, the method works with both totals and non_zeros.
@@ -235,14 +266,16 @@ def eval_delta_lognormal_agg(
     w_priors : List of prior effective sample sizes for each variant.
     seed : Random seed.
     min_is_best : Option to change "being best" to a minimum. Default is maximum.
+    interval_alpha : Credible interval probability.
 
     Returns
     -------
     res_pbbs : List of probabilities of being best for each variant.
     res_loss : List of expected loss for each variant.
+    res_interval : List of credible intervals for each variant.
     """
     if len(totals) == 0:
-        return [], []
+        return [], [], []
     # Same default priors for all variants if they are not provided.
     if not a_priors_beta:
         a_priors_beta = [0.5] * len(totals)
@@ -261,7 +294,8 @@ def eval_delta_lognormal_agg(
         # if only zeros in all variants
         res_pbbs = list(np.full(len(totals), round(1 / len(totals), 7)))
         res_loss = [np.nan] * len(totals)
-        return res_pbbs, res_loss
+        res_interval = [[np.nan, np.nan]] * len(totals)
+        return res_pbbs, res_loss, res_interval
     else:
         # we will need different generators for each call of lognormal_posteriors
         ss = np.random.SeedSequence(seed)
@@ -292,8 +326,9 @@ def eval_delta_lognormal_agg(
 
         res_pbbs = estimate_probabilities(combined_samples, min_is_best)
         res_loss = estimate_expected_loss(combined_samples, min_is_best)
+        res_interval = estimate_credible_intervals(combined_samples, interval_alpha)
 
-        return res_pbbs, res_loss
+        return res_pbbs, res_loss, res_interval
 
 
 def eval_numerical_dirichlet_agg(
@@ -303,7 +338,8 @@ def eval_numerical_dirichlet_agg(
     sim_count: int = 20000,
     seed: int = None,
     min_is_best: bool = False,
-):
+    interval_alpha: float = 0.95,
+) -> Tuple[List[float], List[float], List[List[float]]]:
     """
     Method estimating probabilities of being best and expected loss for Dirichlet-multinomial
     aggregated data per variant. States in this case are expected to be a numerical values
@@ -317,14 +353,16 @@ def eval_numerical_dirichlet_agg(
     sim_count : Number of simulations.
     seed : Random seed.
     min_is_best : Option to change "being best" to a minimum. Default is maximum.
+    interval_alpha : Credible interval probability.
 
     Returns
     -------
     res_pbbs : List of probabilities of being best for each variant.
     res_loss : List of expected loss for each variant.
+    res_interval : List of credible intervals for each variant.
     """
     if len(concentrations) == 0:
-        return [], []
+        return [], [], []
 
     # default prior will be expecting 1 observation in all states for all variants
     if not prior_alphas:
@@ -344,8 +382,9 @@ def eval_numerical_dirichlet_agg(
 
     res_pbbs = estimate_probabilities(means_samples, min_is_best)
     res_loss = estimate_expected_loss(means_samples, min_is_best)
+    res_interval = estimate_credible_intervals(means_samples, interval_alpha)
 
-    return res_pbbs, res_loss
+    return res_pbbs, res_loss, res_interval
 
 
 def eval_poisson_agg(
@@ -356,7 +395,8 @@ def eval_poisson_agg(
     sim_count: int = 20000,
     seed: int = None,
     min_is_best: bool = False,
-) -> Tuple[List[float], List[float]]:
+    interval_alpha: float = 0.95,
+) -> Tuple[List[float], List[float], List[List[float]]]:
     """
     Method estimating probabilities of being best and expected loss for
     Poisson aggregated data per variant.
@@ -370,15 +410,17 @@ def eval_poisson_agg(
     b_priors_gamma : List of prior beta parameters (rates) of Gamma distributions for each variant.
     seed : Random seed.
     min_is_best : Option to change "being best" to a minimum. Default is maximum.
+    interval_alpha : Credible interval probability.
 
     Returns
     -------
     res_pbbs : List of probabilities of being best for each variant.
     res_loss : List of expected loss for each variant.
+    res_interval : List of credible intervals for each variant.
     """
 
     if len(totals) == 0:
-        return [], []
+        return [], [], []
 
     # Default prior for all variants is Gamma(0.1, 0.1) which is on purpose quite vague.
     if not a_priors_gamma:
@@ -392,8 +434,9 @@ def eval_poisson_agg(
 
     res_pbbs = estimate_probabilities(gamma_samples, min_is_best)
     res_loss = estimate_expected_loss(gamma_samples, min_is_best)
+    res_interval = estimate_credible_intervals(gamma_samples, interval_alpha)
 
-    return res_pbbs, res_loss
+    return res_pbbs, res_loss, res_interval
 
 
 def eval_delta_normal_agg(
@@ -410,7 +453,8 @@ def eval_delta_normal_agg(
     w_priors: List[Number] = None,
     seed: int = None,
     min_is_best: bool = False,
-) -> Tuple[List[float], List[float]]:
+    interval_alpha: float = 0.95,
+) -> Tuple[List[float], List[float], List[List[float]]]:
     """
     Method estimating probabilities of being best and expected loss for Delta-Normal
     aggregated data per variant. For that reason, the method works with both totals and non_zeros.
@@ -430,13 +474,16 @@ def eval_delta_normal_agg(
     w_priors : List of prior effective sample sizes for each variant.
     seed : Random seed.
     min_is_best : Option to change "being best" to a minimum. Default is maximum.
+    interval_alpha : Credible interval probability.
+
     Returns
     -------
     res_pbbs : List of probabilities of being best for each variant.
     res_loss : List of expected loss for each variant.
+    res_interval : List of credible intervals for each variant.
     """
     if len(totals) == 0:
-        return [], []
+        return [], [], []
     # Same default priors for all variants if they are not provided.
     if not a_priors_beta:
         a_priors_beta = [0.5] * len(totals)
@@ -455,7 +502,8 @@ def eval_delta_normal_agg(
         # if only zeros in all variants
         res_pbbs = list(np.full(len(totals), round(1 / len(totals), 7)))
         res_loss = [np.nan] * len(totals)
-        return res_pbbs, res_loss
+        res_interval = [[np.nan, np.nan]] * len(totals)
+        return res_pbbs, res_loss, res_interval
     else:
         # we will need different generators for each call of normal_posteriors
         ss = np.random.SeedSequence(seed)
@@ -486,8 +534,9 @@ def eval_delta_normal_agg(
 
         res_pbbs = estimate_probabilities(combined_samples, min_is_best)
         res_loss = estimate_expected_loss(combined_samples, min_is_best)
+        res_interval = estimate_credible_intervals(combined_samples, interval_alpha)
 
-        return res_pbbs, res_loss
+        return res_pbbs, res_loss, res_interval
 
 
 def eval_exponential_agg(
@@ -498,7 +547,8 @@ def eval_exponential_agg(
     sim_count: int = 20000,
     seed: int = None,
     min_is_best: bool = False,
-) -> Tuple[List[float], List[float]]:
+    interval_alpha: float = 0.95,
+) -> Tuple[List[float], List[float], List[List[float]]]:
     """
     Method estimating probabilities of being best and expected loss for
     Exponential aggregated data per variant.
@@ -512,15 +562,17 @@ def eval_exponential_agg(
     b_priors_gamma : List of prior beta parameters (rates) of Gamma distributions for each variant.
     seed : Random seed.
     min_is_best : Option to change "being best" to a minimum. Default is maximum.
+    interval_alpha : Credible interval probability.
 
     Returns
     -------
     res_pbbs : List of probabilities of being best for each variant.
     res_loss : List of expected loss for each variant.
+    res_interval : List of credible intervals for each variant.
     """
 
     if len(totals) == 0:
-        return [], []
+        return [], [], []
 
     # Default prior for all variants is Gamma(0.1, 0.1) which is on purpose quite vague.
     if not a_priors_gamma:
@@ -550,4 +602,6 @@ def eval_exponential_agg(
 
     res_loss = [round(x, 7) for x in res_loss_scale]
 
-    return res_pbbs, res_loss
+    res_interval = estimate_credible_intervals(gamma_samples, interval_alpha)
+
+    return res_pbbs, res_loss, res_interval

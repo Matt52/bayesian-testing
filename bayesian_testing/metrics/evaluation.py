@@ -94,6 +94,9 @@ def estimate_credible_intervals(
     -------
     res : List of credible intervals (in a form of list) for each variant.
     """
+    if not 0 <= alpha <= 1:
+        raise ValueError("Credible interval's probability alpha has to be between 0 and 1.")
+
     low_end = (1 - alpha) / 2
     top_end = (1 + alpha) / 2
     res = np.round(np.quantile(data, [low_end, top_end], axis=1).T, 7).tolist()
@@ -129,7 +132,7 @@ def eval_bernoulli_agg(
     -------
     res_pbbs : List of probabilities of being best for each variant.
     res_loss : List of expected loss for each variant.
-    res_interval : List of credible intervals for each variant.
+    res_intervals : List of credible intervals for each variant.
     """
     validate_bernoulli_input(totals, positives)
 
@@ -148,9 +151,9 @@ def eval_bernoulli_agg(
 
     res_pbbs = estimate_probabilities(beta_samples, min_is_best)
     res_loss = estimate_expected_loss(beta_samples, min_is_best)
-    res_interval = estimate_credible_intervals(beta_samples, interval_alpha)
+    res_intervals = estimate_credible_intervals(beta_samples, interval_alpha)
 
-    return res_pbbs, res_loss, res_interval
+    return res_pbbs, res_loss, res_intervals
 
 
 def eval_normal_agg(
@@ -188,7 +191,7 @@ def eval_normal_agg(
     -------
     res_pbbs : List of probabilities of being best for each variant.
     res_loss : List of expected loss for each variant.
-    res_interval : List of credible intervals for each variant.
+    res_intervals : List of credible intervals for each variant.
     """
     if len(totals) == 0:
         return [], [], []
@@ -226,9 +229,9 @@ def eval_normal_agg(
 
     res_pbbs = estimate_probabilities(normal_samples, min_is_best)
     res_loss = estimate_expected_loss(normal_samples, min_is_best)
-    res_interval = estimate_credible_intervals(normal_samples, interval_alpha)
+    res_intervals = estimate_credible_intervals(normal_samples, interval_alpha)
 
-    return res_pbbs, res_loss, res_interval
+    return res_pbbs, res_loss, res_intervals
 
 
 def eval_delta_lognormal_agg(
@@ -272,7 +275,7 @@ def eval_delta_lognormal_agg(
     -------
     res_pbbs : List of probabilities of being best for each variant.
     res_loss : List of expected loss for each variant.
-    res_interval : List of credible intervals for each variant.
+    res_intervals : List of credible intervals for each variant.
     """
     if len(totals) == 0:
         return [], [], []
@@ -294,8 +297,8 @@ def eval_delta_lognormal_agg(
         # if only zeros in all variants
         res_pbbs = list(np.full(len(totals), round(1 / len(totals), 7)))
         res_loss = [np.nan] * len(totals)
-        res_interval = [[np.nan, np.nan]] * len(totals)
-        return res_pbbs, res_loss, res_interval
+        res_intervals = [[np.nan, np.nan]] * len(totals)
+        return res_pbbs, res_loss, res_intervals
     else:
         # we will need different generators for each call of lognormal_posteriors
         ss = np.random.SeedSequence(seed)
@@ -326,9 +329,9 @@ def eval_delta_lognormal_agg(
 
         res_pbbs = estimate_probabilities(combined_samples, min_is_best)
         res_loss = estimate_expected_loss(combined_samples, min_is_best)
-        res_interval = estimate_credible_intervals(combined_samples, interval_alpha)
+        res_intervals = estimate_credible_intervals(combined_samples, interval_alpha)
 
-        return res_pbbs, res_loss, res_interval
+        return res_pbbs, res_loss, res_intervals
 
 
 def eval_numerical_dirichlet_agg(
@@ -359,7 +362,7 @@ def eval_numerical_dirichlet_agg(
     -------
     res_pbbs : List of probabilities of being best for each variant.
     res_loss : List of expected loss for each variant.
-    res_interval : List of credible intervals for each variant.
+    res_intervals : List of credible intervals for each variant.
     """
     if len(concentrations) == 0:
         return [], [], []
@@ -382,9 +385,9 @@ def eval_numerical_dirichlet_agg(
 
     res_pbbs = estimate_probabilities(means_samples, min_is_best)
     res_loss = estimate_expected_loss(means_samples, min_is_best)
-    res_interval = estimate_credible_intervals(means_samples, interval_alpha)
+    res_intervals = estimate_credible_intervals(means_samples, interval_alpha)
 
-    return res_pbbs, res_loss, res_interval
+    return res_pbbs, res_loss, res_intervals
 
 
 def eval_poisson_agg(
@@ -416,7 +419,7 @@ def eval_poisson_agg(
     -------
     res_pbbs : List of probabilities of being best for each variant.
     res_loss : List of expected loss for each variant.
-    res_interval : List of credible intervals for each variant.
+    res_intervals : List of credible intervals for each variant.
     """
 
     if len(totals) == 0:
@@ -434,9 +437,9 @@ def eval_poisson_agg(
 
     res_pbbs = estimate_probabilities(gamma_samples, min_is_best)
     res_loss = estimate_expected_loss(gamma_samples, min_is_best)
-    res_interval = estimate_credible_intervals(gamma_samples, interval_alpha)
+    res_intervals = estimate_credible_intervals(gamma_samples, interval_alpha)
 
-    return res_pbbs, res_loss, res_interval
+    return res_pbbs, res_loss, res_intervals
 
 
 def eval_delta_normal_agg(
@@ -480,7 +483,7 @@ def eval_delta_normal_agg(
     -------
     res_pbbs : List of probabilities of being best for each variant.
     res_loss : List of expected loss for each variant.
-    res_interval : List of credible intervals for each variant.
+    res_intervals : List of credible intervals for each variant.
     """
     if len(totals) == 0:
         return [], [], []
@@ -502,8 +505,8 @@ def eval_delta_normal_agg(
         # if only zeros in all variants
         res_pbbs = list(np.full(len(totals), round(1 / len(totals), 7)))
         res_loss = [np.nan] * len(totals)
-        res_interval = [[np.nan, np.nan]] * len(totals)
-        return res_pbbs, res_loss, res_interval
+        res_intervals = [[np.nan, np.nan]] * len(totals)
+        return res_pbbs, res_loss, res_intervals
     else:
         # we will need different generators for each call of normal_posteriors
         ss = np.random.SeedSequence(seed)
@@ -534,9 +537,9 @@ def eval_delta_normal_agg(
 
         res_pbbs = estimate_probabilities(combined_samples, min_is_best)
         res_loss = estimate_expected_loss(combined_samples, min_is_best)
-        res_interval = estimate_credible_intervals(combined_samples, interval_alpha)
+        res_intervals = estimate_credible_intervals(combined_samples, interval_alpha)
 
-        return res_pbbs, res_loss, res_interval
+        return res_pbbs, res_loss, res_intervals
 
 
 def eval_exponential_agg(
@@ -568,7 +571,7 @@ def eval_exponential_agg(
     -------
     res_pbbs : List of probabilities of being best for each variant.
     res_loss : List of expected loss for each variant.
-    res_interval : List of credible intervals for each variant.
+    res_intervals : List of credible intervals for each variant.
     """
 
     if len(totals) == 0:
@@ -580,28 +583,15 @@ def eval_exponential_agg(
     if not b_priors_gamma:
         b_priors_gamma = [0.1] * len(totals)
 
-    gamma_samples = exp_gamma_posteriors_all(
+    gamma_samples_rate = exp_gamma_posteriors_all(
         totals, sums, sim_count, a_priors_gamma, b_priors_gamma, seed
     )
 
-    # Reversing min_is_best to get back to a scale comparison (instead of a rate which is inverse).
-    res_pbbs = estimate_probabilities(gamma_samples, not min_is_best)
-    # Reversing also expected loss for the same reason (to see the loss on a scale, not on a rate).
-    res_loss_rate = estimate_expected_loss(gamma_samples, not min_is_best)
-    post_mean_rate = [
-        (i[2] + i[0]) / (i[3] + i[1]) for i in zip(totals, sums, a_priors_gamma, b_priors_gamma)
-    ]
+    # Reversing gamma samples to get from a rate to a scale.
+    gamma_samples = np.reciprocal(gamma_samples_rate)
 
-    res_loss_scale = [
-        # To convert from a rate to a scale loss:
-        #     when "max is best": 1/(mean_rate + loss_rate) - 1/mean_rate
-        #     when "min is best": 1/mean_rate - 1/(mean_rate - loss_rate)
-        1 / (i[0] - i[1]) - 1 / i[0] if not min_is_best else 1 / i[0] - 1 / (i[0] + i[1])
-        for i in zip(post_mean_rate, res_loss_rate)
-    ]
+    res_pbbs = estimate_probabilities(gamma_samples, min_is_best)
+    res_loss = estimate_expected_loss(gamma_samples, min_is_best)
+    res_intervals = estimate_credible_intervals(gamma_samples, interval_alpha)
 
-    res_loss = [round(x, 7) for x in res_loss_scale]
-
-    res_interval = estimate_credible_intervals(gamma_samples, interval_alpha)
-
-    return res_pbbs, res_loss, res_interval
+    return res_pbbs, res_loss, res_intervals

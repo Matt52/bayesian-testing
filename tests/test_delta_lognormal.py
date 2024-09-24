@@ -87,6 +87,24 @@ def test_expected_loss(rev_test):
     assert loss == {"A": 0.2214416, "B": 0.1212818, "C": 0.0008639}
 
 
+def test_credible_intervals_95(rev_test):
+    ci = rev_test.credible_intervals(sim_count=20000, seed=152)
+    assert ci == {
+        "A": [0.9084717, 1.0661301],
+        "B": [1.0038179, 1.1705975],
+        "C": [1.1097381, 1.3084524],
+    }
+
+
+def test_credible_intervals_99(rev_test):
+    ci = rev_test.credible_intervals(sim_count=20000, seed=152, interval_alpha=0.99)
+    assert ci == {
+        "A": [0.8847602, 1.0948976],
+        "B": [0.9789665, 1.1996421],
+        "C": [1.0813447, 1.3416523],
+    }
+
+
 def test_evaluate(rev_test):
     eval_report = rev_test.evaluate(sim_count=20000, seed=152)
     assert eval_report == [
@@ -100,6 +118,7 @@ def test_evaluate(rev_test):
             "posterior_mean": 0.98309,
             "prob_being_best": 0.0004,
             "expected_loss": 0.2214416,
+            "credible_interval": [0.9084717, 1.0661301],
         },
         {
             "variant": "B",
@@ -111,6 +130,7 @@ def test_evaluate(rev_test):
             "posterior_mean": 1.08266,
             "prob_being_best": 0.03355,
             "expected_loss": 0.1212818,
+            "credible_interval": [1.0038179, 1.1705975],
         },
         {
             "variant": "C",
@@ -122,6 +142,7 @@ def test_evaluate(rev_test):
             "posterior_mean": 1.20276,
             "prob_being_best": 0.96605,
             "expected_loss": 0.0008639,
+            "credible_interval": [1.1097381, 1.3084524],
         },
     ]
 

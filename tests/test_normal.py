@@ -134,6 +134,24 @@ def test_expected_loss(norm_test):
     assert loss == {"A": 2.2696341, "B": 1.4580033, "C": 0.4464154}
 
 
+def test_credible_intervals_95(norm_test):
+    ci = norm_test.credible_intervals(sim_count=20000, seed=52)
+    assert ci == {
+        "A": [8.5300072, 10.8231841],
+        "B": [8.5577171, 12.3448628],
+        "C": [7.8915125, 15.1179586],
+    }
+
+
+def test_credible_intervals_99(norm_test):
+    ci = norm_test.credible_intervals(sim_count=20000, seed=52, interval_alpha=0.99)
+    assert ci == {
+        "A": [8.1196181, 11.2023581],
+        "B": [7.8792145, 13.0964176],
+        "C": [6.5669908, 16.5226358],
+    }
+
+
 def test_evaluate(norm_test):
     eval_report = norm_test.evaluate(sim_count=20000, seed=52)
     assert eval_report == [
@@ -145,6 +163,7 @@ def test_evaluate(norm_test):
             "posterior_mean": 9.66483,
             "prob_being_best": 0.05105,
             "expected_loss": 2.2696341,
+            "credible_interval": [8.5300072, 10.8231841],
         },
         {
             "variant": "B",
@@ -154,6 +173,7 @@ def test_evaluate(norm_test):
             "posterior_mean": 10.48419,
             "prob_being_best": 0.27935,
             "expected_loss": 1.4580033,
+            "credible_interval": [8.5577171, 12.3448628],
         },
         {
             "variant": "C",
@@ -163,5 +183,6 @@ def test_evaluate(norm_test):
             "posterior_mean": 11.4816,
             "prob_being_best": 0.6696,
             "expected_loss": 0.4464154,
+            "credible_interval": [7.8915125, 15.1179586],
         },
     ]

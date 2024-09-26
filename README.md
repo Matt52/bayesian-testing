@@ -33,7 +33,7 @@ etc.).
 - `Posterior Mean`
   - Expected value from the posterior distribution for a given variant.
 - `Credible Interval`
-  - Quantile-based credible intervals based on simulations from the posterior distribution (i.e.
+  - Quantile-based credible intervals based on simulations from posterior distributions (i.e.
 empirical).
   - Interval probability (`interval_alpha`) can be set during the evaluation (default value is 95%).
 - `Probability of Being Best`

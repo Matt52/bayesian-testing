@@ -117,7 +117,8 @@ test.add_variant_data_agg("C", totals=1000, positives=50)
 
 # evaluate test:
 results = test.evaluate()
-results # print(pd.DataFrame(results).set_index('variant').T.to_markdown(tablefmt="grid"))
+results
+# print(pd.DataFrame(results).set_index('variant').T.to_markdown(tablefmt="grid"))
 ```
 
     +-------------------+-----------+-------------+-------------+
@@ -166,7 +167,8 @@ test.add_variant_data_agg("C", len(data_c), sum(data_c), sum(np.square(data_c)))
 
 # evaluate test:
 results = test.evaluate(sim_count=20000, seed=52, min_is_best=False, interval_alpha=0.99)
-results # print(pd.DataFrame(results).set_index('variant').T.to_markdown(tablefmt="grid"))
+results
+# print(pd.DataFrame(results).set_index('variant').T.to_markdown(tablefmt="grid"))
 ```
 
     +-------------------+-------------+-------------+-------------+
@@ -202,8 +204,10 @@ from bayesian_testing.experiments import DeltaLognormalDataTest
 
 test = DeltaLognormalDataTest()
 
-data_a = [7.1, 0.3, 5.9, 0, 1.3, 0.3, 0, 1.2, 0, 3.6, 0, 1.5, 2.2, 0, 4.9, 0, 0, 1.1, 0, 0, 7.1, 0, 6.9, 0]
-data_b = [4.0, 0, 3.3, 19.3, 18.5, 0, 0, 0, 12.9, 0, 0, 0, 10.2, 0, 0, 23.1, 0, 3.7, 0, 0, 11.3, 10.0, 0, 18.3, 12.1]
+data_a = [7.1, 0.3, 5.9, 0, 1.3, 0.3, 0, 1.2, 0, 3.6, 0, 1.5,
+          2.2, 0, 4.9, 0, 0, 1.1, 0, 0, 7.1, 0, 6.9, 0]
+data_b = [4.0, 0, 3.3, 19.3, 18.5, 0, 0, 0, 12.9, 0, 0, 0, 10.2,
+          0, 0, 23.1, 0, 3.7, 0, 0, 11.3, 10.0, 0, 18.3, 12.1]
 
 # adding variant using raw data:
 test.add_variant_data("A", data_a)
@@ -222,7 +226,8 @@ test.add_variant_data_agg(
 
 # evaluate test:
 results = test.evaluate(seed=21)
-results # print(pd.DataFrame(results).set_index('variant').T.to_markdown(tablefmt="grid"))
+results
+# print(pd.DataFrame(results).set_index('variant').T.to_markdown(tablefmt="grid"))
 ```
 
     +---------------------+-------------+-------------+
@@ -279,7 +284,8 @@ test.add_variant_data("C", data_c)
 
 # evaluate test:
 results = test.evaluate(sim_count=20000, seed=52, min_is_best=False, interval_alpha=0.95)
-results # print(pd.DataFrame(results).set_index('variant').T.to_markdown(tablefmt="grid"))
+results
+# print(pd.DataFrame(results).set_index('variant').T.to_markdown(tablefmt="grid"))
 ```
 
     +-------------------+------------------+------------------+------------------+
@@ -329,7 +335,8 @@ test.add_variant_data_agg("bayern", len(bayern_goals_against), sum(bayern_goals_
 
 # evaluate test (since fewer goals is better, we explicitly set the min_is_best to True)
 results = test.evaluate(sim_count=20000, seed=52, min_is_best=True)
-results # print(pd.DataFrame(results).set_index('variant').T.to_markdown(tablefmt="grid"))
+results
+# print(pd.DataFrame(results).set_index('variant').T.to_markdown(tablefmt="grid"))
 ```
 
     +-------------------+-------------+-------------+------------+
@@ -380,7 +387,8 @@ test.add_variant_data('C', waiting_times_c)
 
 # evaluate test (since a lower waiting time is better, we explicitly set the min_is_best to True)
 results = test.evaluate(sim_count=20000, min_is_best=True)
-results # print(pd.DataFrame(results).set_index('variant').T.to_markdown(tablefmt="grid"))
+results
+# print(pd.DataFrame(results).set_index('variant').T.to_markdown(tablefmt="grid"))
 ```
 
     +-------------------+-------------+-------------+-------------+

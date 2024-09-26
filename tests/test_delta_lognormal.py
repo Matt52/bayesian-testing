@@ -116,9 +116,9 @@ def test_evaluate(rev_test):
             "avg_values": 0.97873,
             "avg_positive_values": 19.51267,
             "posterior_mean": 0.98309,
+            "credible_interval": [0.9084717, 1.0661301],
             "prob_being_best": 0.0004,
             "expected_loss": 0.2214416,
-            "credible_interval": [0.9084717, 1.0661301],
         },
         {
             "variant": "B",
@@ -128,9 +128,9 @@ def test_evaluate(rev_test):
             "avg_values": 1.1001,
             "avg_positive_values": 20.70777,
             "posterior_mean": 1.08266,
+            "credible_interval": [1.0038179, 1.1705975],
             "prob_being_best": 0.03355,
             "expected_loss": 0.1212818,
-            "credible_interval": [1.0038179, 1.1705975],
         },
         {
             "variant": "C",
@@ -140,9 +140,9 @@ def test_evaluate(rev_test):
             "avg_values": 1.20192,
             "avg_positive_values": 24.03843,
             "posterior_mean": 1.20276,
+            "credible_interval": [1.1097381, 1.3084524],
             "prob_being_best": 0.96605,
             "expected_loss": 0.0008639,
-            "credible_interval": [1.1097381, 1.3084524],
         },
     ]
 

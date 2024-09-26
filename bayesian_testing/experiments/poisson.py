@@ -104,9 +104,9 @@ class PoissonDataTest(BaseDataTest):
             "sum_values",
             "observed_average",
             "posterior_mean",
+            "credible_interval",
             "prob_being_best",
             "expected_loss",
-            "credible_interval",
         ]
         observed_average = [round(i[0] / i[1], 5) for i in zip(self.sum_values, self.totals)]
         posterior_mean = [
@@ -125,9 +125,9 @@ class PoissonDataTest(BaseDataTest):
             self.sum_values,
             observed_average,
             posterior_mean,
+            intervals,
             pbbs,
             loss,
-            intervals,
         ]
         res = [dict(zip(keys, item)) for item in zip(*data)]
 

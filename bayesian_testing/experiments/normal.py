@@ -121,9 +121,9 @@ class NormalDataTest(BaseDataTest):
             "sum_values",
             "avg_values",
             "posterior_mean",
+            "credible_interval",
             "prob_being_best",
             "expected_loss",
-            "credible_interval",
         ]
         avg_values = [round(i[0] / i[1], 5) for i in zip(self.sum_values, self.totals)]
         posterior_mean = [
@@ -142,9 +142,9 @@ class NormalDataTest(BaseDataTest):
             [round(i, 5) for i in self.sum_values],
             avg_values,
             posterior_mean,
+            intervals,
             pbbs,
             loss,
-            intervals,
         ]
         res = [dict(zip(keys, item)) for item in zip(*data)]
 

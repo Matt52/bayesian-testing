@@ -104,9 +104,9 @@ class BinaryDataTest(BaseDataTest):
             "positives",
             "positive_rate",
             "posterior_mean",
+            "credible_interval",
             "prob_being_best",
             "expected_loss",
-            "credible_interval",
         ]
         positive_rate = [round(i[0] / i[1], 5) for i in zip(self.positives, self.totals)]
         posterior_mean = [
@@ -125,9 +125,9 @@ class BinaryDataTest(BaseDataTest):
             self.positives,
             positive_rate,
             posterior_mean,
+            intervals,
             pbbs,
             loss,
-            intervals,
         ]
         res = [dict(zip(keys, item)) for item in zip(*data)]
 

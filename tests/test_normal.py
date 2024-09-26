@@ -161,9 +161,9 @@ def test_evaluate(norm_test):
             "sum_values": 386.6,
             "avg_values": 9.665,
             "posterior_mean": 9.66483,
+            "credible_interval": [8.5300072, 10.8231841],
             "prob_being_best": 0.05105,
             "expected_loss": 2.2696341,
-            "credible_interval": [8.5300072, 10.8231841],
         },
         {
             "variant": "B",
@@ -171,9 +171,9 @@ def test_evaluate(norm_test):
             "sum_values": 189.0,
             "avg_values": 10.5,
             "posterior_mean": 10.48419,
+            "credible_interval": [8.5577171, 12.3448628],
             "prob_being_best": 0.27935,
             "expected_loss": 1.4580033,
-            "credible_interval": [8.5577171, 12.3448628],
         },
         {
             "variant": "C",
@@ -181,8 +181,8 @@ def test_evaluate(norm_test):
             "sum_values": 252.7,
             "avg_values": 11.48636,
             "posterior_mean": 11.4816,
+            "credible_interval": [7.8915125, 15.1179586],
             "prob_being_best": 0.6696,
             "expected_loss": 0.4464154,
-            "credible_interval": [7.8915125, 15.1179586],
         },
     ]

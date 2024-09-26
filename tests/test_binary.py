@@ -73,9 +73,9 @@ def test_evaluate(conv_test):
             "positives": 3,
             "positive_rate": 0.3,
             "posterior_mean": 0.31818,
+            "credible_interval": [0.0917579, 0.6028411],
             "prob_being_best": 0.57225,
             "expected_loss": 0.0529281,
-            "credible_interval": [0.0917579, 0.6028411],
         },
         {
             "variant": "B",
@@ -83,9 +83,9 @@ def test_evaluate(conv_test):
             "positives": 2,
             "positive_rate": 0.2,
             "posterior_mean": 0.22727,
+            "credible_interval": [0.0442435, 0.5032699],
             "prob_being_best": 0.233,
             "expected_loss": 0.1452113,
-            "credible_interval": [0.0442435, 0.5032699],
         },
         {
             "variant": "C",
@@ -93,9 +93,9 @@ def test_evaluate(conv_test):
             "positives": 2,
             "positive_rate": 0.18182,
             "posterior_mean": 0.21429,
+            "credible_interval": [0.0522996, 0.452392],
             "prob_being_best": 0.19475,
             "expected_loss": 0.1557502,
-            "credible_interval": [0.0522996, 0.452392],
         },
     ]
 

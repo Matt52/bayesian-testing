@@ -112,9 +112,9 @@ def test_evaluate(delta_norm_test):
             "avg_values": 0.00324,
             "avg_non_zero_values": 10.20256,
             "posterior_mean": 0.00356,
+            "credible_interval": [0.0011935, 0.0070944],
             "prob_being_best": 0.02235,
             "expected_loss": 0.005,
-            "credible_interval": [0.0011935, 0.0070944],
         },
         {
             "variant": "B",
@@ -124,9 +124,9 @@ def test_evaluate(delta_norm_test):
             "avg_values": 0.00853,
             "avg_non_zero_values": 6.8255,
             "posterior_mean": 0.00853,
+            "credible_interval": [0.0051651, 0.0125917],
             "prob_being_best": 0.97765,
             "expected_loss": 2.46e-05,
-            "credible_interval": [0.0051651, 0.0125917],
         },
     ]
 

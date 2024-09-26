@@ -121,9 +121,9 @@ def test_evaluate(exponential_test):
             "sum_values": 45.13,
             "observed_average": 2.2565,
             "posterior_mean": 2.25025,
+            "credible_interval": [1.5151401, 3.6571069],
             "prob_being_best": 0.0414,
             "expected_loss": 1.5907038,
-            "credible_interval": [1.5151401, 3.6571069],
         },
         {
             "variant": "B",
@@ -131,9 +131,9 @@ def test_evaluate(exponential_test):
             "sum_values": 60.68,
             "observed_average": 3.034,
             "posterior_mean": 3.02388,
+            "credible_interval": [2.0455239, 4.9692854],
             "prob_being_best": 0.29885,
             "expected_loss": 0.7596064,
-            "credible_interval": [2.0455239, 4.9692854],
         },
         {
             "variant": "C",
@@ -141,9 +141,9 @@ def test_evaluate(exponential_test):
             "sum_values": 72.27,
             "observed_average": 3.6135,
             "posterior_mean": 3.53667,
+            "credible_interval": [2.4059958, 5.6846722],
             "prob_being_best": 0.65975,
             "expected_loss": 0.2414208,
-            "credible_interval": [2.4059958, 5.6846722],
         },
     ]
 

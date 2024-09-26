@@ -140,9 +140,9 @@ class DeltaNormalDataTest(BaseDataTest):
             "avg_values",
             "avg_non_zero_values",
             "posterior_mean",
+            "credible_interval",
             "prob_being_best",
             "expected_loss",
-            "credible_interval",
         ]
         avg_values = [round(i[0] / i[1], 5) for i in zip(self.sum_values, self.totals)]
         avg_pos_values = [round(i[0] / i[1], 5) for i in zip(self.sum_values, self.non_zeros)]
@@ -172,9 +172,9 @@ class DeltaNormalDataTest(BaseDataTest):
             avg_values,
             avg_pos_values,
             posterior_mean,
+            intervals,
             pbbs,
             loss,
-            intervals,
         ]
         res = [dict(zip(keys, item)) for item in zip(*data)]
 

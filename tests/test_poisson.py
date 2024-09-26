@@ -73,9 +73,9 @@ def test_evaluate(poisson_test):
             "sum_values": 43,
             "observed_average": 2.86667,
             "posterior_mean": 2.8543,
+            "credible_interval": [2.0742056, 3.7731115],
             "prob_being_best": 0.30945,
             "expected_loss": 0.3936672,
-            "credible_interval": [2.0742056, 3.7731115],
         },
         {
             "variant": "B",
@@ -83,9 +83,9 @@ def test_evaluate(poisson_test):
             "sum_values": 40,
             "observed_average": 2.85714,
             "posterior_mean": 2.84397,
+            "credible_interval": [2.0264899, 3.7822918],
             "prob_being_best": 0.29665,
             "expected_loss": 0.4144949,
-            "credible_interval": [2.0264899, 3.7822918],
         },
         {
             "variant": "C",
@@ -93,9 +93,9 @@ def test_evaluate(poisson_test):
             "sum_values": 49,
             "observed_average": 3.26667,
             "posterior_mean": 2.94118,
+            "credible_interval": [2.1895805, 3.8084984],
             "prob_being_best": 0.3939,
             "expected_loss": 0.3109256,
-            "credible_interval": [2.1895805, 3.8084984],
         },
     ]
 

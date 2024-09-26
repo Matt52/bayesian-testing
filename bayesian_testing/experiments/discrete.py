@@ -112,9 +112,9 @@ class DiscreteDataTest(BaseDataTest):
             "concentration",
             "average_value",
             "posterior_mean",
+            "credible_interval",
             "prob_being_best",
             "expected_loss",
-            "credible_interval",
         ]
         posterior_alphas = [
             list(np.array(i[0]) + np.array(i[1]))
@@ -138,9 +138,9 @@ class DiscreteDataTest(BaseDataTest):
             [dict(zip(self.states, i)) for i in self.concentrations],
             average_values,
             posterior_mean,
+            intervals,
             pbbs,
             loss,
-            intervals,
         ]
         res = [dict(zip(keys, item)) for item in zip(*data)]
 

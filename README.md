@@ -385,7 +385,7 @@ test.add_variant_data('C', waiting_times_c)
 # alternatively, add variants using aggregated data:
 # test.add_variant_data_agg('A', len(waiting_times_a), sum(waiting_times_a))
 
-# evaluate test (since a lower waiting time is better, we explicitly set the min_is_best to True)
+# evaluate test (since a lower waiting time is better, we set the min_is_best to True)
 results = test.evaluate(sim_count=20000, min_is_best=True)
 results
 # print(pd.DataFrame(results).set_index('variant').T.to_markdown(tablefmt="grid"))

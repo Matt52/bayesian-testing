@@ -92,7 +92,7 @@ def estimate_credible_intervals(
 
     Returns
     -------
-    res : List of credible intervals (in a form of list) for each variant.
+    res : List of credible intervals (in a form of a list) for each variant.
     """
     if not 0 <= alpha <= 1:
         raise ValueError("Credible interval's probability alpha has to be between 0 and 1.")
@@ -114,8 +114,8 @@ def eval_bernoulli_agg(
     interval_alpha: float = 0.95,
 ) -> Tuple[List[float], List[float], List[List[float]]]:
     """
-    Method estimating probabilities of being best and expected loss for Beta-Bernoulli
-    aggregated data per variant.
+    Method estimating probabilities of being best, expected loss and credible intervals for
+    Beta-Bernoulli aggregated data per variant.
 
     Parameters
     ----------
@@ -170,7 +170,7 @@ def eval_normal_agg(
     interval_alpha: float = 0.95,
 ) -> Tuple[List[float], List[float], List[List[float]]]:
     """
-    Method estimating probabilities of being best and expected loss for Normal
+    Method estimating probabilities of being best, expected loss and credible intervals for Normal
     aggregated data per variant.
 
     Parameters
@@ -251,8 +251,9 @@ def eval_delta_lognormal_agg(
     interval_alpha: float = 0.95,
 ) -> Tuple[List[float], List[float], List[List[float]]]:
     """
-    Method estimating probabilities of being best and expected loss for Delta-Lognormal
-    aggregated data per variant. For that reason, the method works with both totals and non_zeros.
+    Method estimating probabilities of being best, expected loss and credible intervals for
+    Delta-Lognormal aggregated data per variant. For that reason, the method works with both totals
+    and non_zeros.
 
     Parameters
     ----------
@@ -344,9 +345,9 @@ def eval_numerical_dirichlet_agg(
     interval_alpha: float = 0.95,
 ) -> Tuple[List[float], List[float], List[List[float]]]:
     """
-    Method estimating probabilities of being best and expected loss for Dirichlet-multinomial
-    aggregated data per variant. States in this case are expected to be a numerical values
-    (e.g. dice numbers, number of stars in a rating, etc.).
+    Method estimating probabilities of being best, expected loss and credible intervals for
+    Dirichlet-multinomial aggregated data per variant. States in this case are expected to be a
+    numerical values (e.g. dice numbers, number of stars in a rating, etc.).
 
     Parameters
     ----------
@@ -401,8 +402,8 @@ def eval_poisson_agg(
     interval_alpha: float = 0.95,
 ) -> Tuple[List[float], List[float], List[List[float]]]:
     """
-    Method estimating probabilities of being best and expected loss for
-    Poisson aggregated data per variant.
+    Method estimating probabilities of being best, expected loss and credible intervals for Poisson
+    aggregated data per variant.
 
     Parameters
     ----------
@@ -459,8 +460,9 @@ def eval_delta_normal_agg(
     interval_alpha: float = 0.95,
 ) -> Tuple[List[float], List[float], List[List[float]]]:
     """
-    Method estimating probabilities of being best and expected loss for Delta-Normal
-    aggregated data per variant. For that reason, the method works with both totals and non_zeros.
+    Method estimating probabilities of being best, expected loss and credible intervals for
+    Delta-Normal aggregated data per variant. For that reason, the method works with both totals
+    and non_zeros.
 
     Parameters
     ----------
@@ -553,7 +555,7 @@ def eval_exponential_agg(
     interval_alpha: float = 0.95,
 ) -> Tuple[List[float], List[float], List[List[float]]]:
     """
-    Method estimating probabilities of being best and expected loss for
+    Method estimating probabilities of being best, expected loss and credible intervals for
     Exponential aggregated data per variant.
 
     Parameters

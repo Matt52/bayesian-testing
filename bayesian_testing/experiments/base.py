@@ -87,7 +87,7 @@ class BaseDataTest:
         interval_alpha: float = 0.95,
     ) -> dict:
         """
-        Calculate expected loss for a current class state.
+        Calculate quantile-based credible intervals for a current class state.
 
         Parameters
         ----------

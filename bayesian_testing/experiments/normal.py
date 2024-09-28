@@ -60,7 +60,8 @@ class NormalDataTest(BaseDataTest):
         interval_alpha: float = 0.95,
     ) -> Tuple[dict, dict, dict]:
         """
-        Calculate probabilities of being best and expected loss for a current class state.
+        Calculate probabilities of being best, expected loss and credible intervals for a current
+        class state.
 
         Parameters
         ----------

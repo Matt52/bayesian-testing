@@ -49,32 +49,50 @@ class DiscreteDataTest(BaseDataTest):
         return res
 
     def eval_simulation(
-        self, sim_count: int = 20000, seed: int = None, min_is_best: bool = False
-    ) -> Tuple[dict, dict]:
+        self,
+        sim_count: int = 20000,
+        seed: int = None,
+        min_is_best: bool = False,
+        interval_alpha: float = 0.95,
+    ) -> Tuple[dict, dict, dict]:
         """
-        Calculate probabilities of being best and expected loss for a current class state.
+        Calculate probabilities of being best, expected loss and credible intervals for a current
+        class state.
 
         Parameters
         ----------
         sim_count : Number of simulations to be used for probability estimation.
         seed : Random seed.
         min_is_best : Option to change "being best" to a minimum. Default is maximum.
+        interval_alpha : Credible interval probability (value between 0 and 1).
 
         Returns
         -------
         res_pbbs : Dictionary with probabilities of being best for all variants in experiment.
         res_loss : Dictionary with expected loss for all variants in experiment.
+        res_intervals : Dictionary with quantile-based credible intervals for all variants.
         """
-        pbbs, loss = eval_numerical_dirichlet_agg(
-            self.states, self.concentrations, self.prior_alphas, sim_count, seed, min_is_best
+        pbbs, loss, intervals = eval_numerical_dirichlet_agg(
+            self.states,
+            self.concentrations,
+            self.prior_alphas,
+            sim_count,
+            seed,
+            min_is_best,
+            interval_alpha,
         )
         res_pbbs = dict(zip(self.variant_names, pbbs))
         res_loss = dict(zip(self.variant_names, loss))
+        res_intervals = dict(zip(self.variant_names, intervals))
 
-        return res_pbbs, res_loss
+        return res_pbbs, res_loss, res_intervals
 
     def evaluate(
-        self, sim_count: int = 20000, seed: int = None, min_is_best: bool = False
+        self,
+        sim_count: int = 20000,
+        seed: int = None,
+        min_is_best: bool = False,
+        interval_alpha: float = 0.95,
     ) -> List[dict]:
         """
         Evaluation of experiment.
@@ -84,6 +102,7 @@ class DiscreteDataTest(BaseDataTest):
         sim_count : Number of simulations to be used for probability estimation.
         seed : Random seed.
         min_is_best : Option to change "being best" to a minimum. Default is maximum.
+        interval_alpha : Credible interval probability (value between 0 and 1).
 
         Returns
         -------
@@ -94,6 +113,7 @@ class DiscreteDataTest(BaseDataTest):
             "concentration",
             "average_value",
             "posterior_mean",
+            "credible_interval",
             "prob_being_best",
             "expected_loss",
         ]
@@ -105,9 +125,12 @@ class DiscreteDataTest(BaseDataTest):
             round(sum(np.multiply(np.array(self.states), np.array(i[0]) / sum(np.array(i[0])))), 5)
             for i in zip(posterior_alphas)
         ]
-        eval_pbbs, eval_loss = self.eval_simulation(sim_count, seed, min_is_best)
+        eval_pbbs, eval_loss, eval_intervals = self.eval_simulation(
+            sim_count, seed, min_is_best, interval_alpha
+        )
         pbbs = list(eval_pbbs.values())
         loss = list(eval_loss.values())
+        intervals = list(eval_intervals.values())
         average_values = [
             np.sum(np.multiply(i, self.states)) / np.sum(i) for i in self.concentrations
         ]
@@ -116,6 +139,7 @@ class DiscreteDataTest(BaseDataTest):
             [dict(zip(self.states, i)) for i in self.concentrations],
             average_values,
             posterior_mean,
+            intervals,
             pbbs,
             loss,
         ]

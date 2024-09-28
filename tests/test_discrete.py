@@ -42,6 +42,24 @@ def test_expected_loss(discrete_test):
     assert loss == {"A": 0.3053921, "B": 0.1560257, "C": 0.5328904}
 
 
+def test_credible_intervals_95(discrete_test):
+    ci = discrete_test.credible_intervals(sim_count=20000, seed=52)
+    assert ci == {
+        "A": [3.122705, 4.3265574],
+        "B": [2.9826238, 4.7094185],
+        "C": [3.3681015, 3.6302274],
+    }
+
+
+def test_credible_intervals_99(discrete_test):
+    ci = discrete_test.credible_intervals(sim_count=20000, seed=52, interval_alpha=0.99)
+    assert ci == {
+        "A": [2.9260719, 4.5245231],
+        "B": [2.7013326, 4.9277036],
+        "C": [3.3281699, 3.6751105],
+    }
+
+
 def test_evaluate(discrete_test):
     eval_report = discrete_test.evaluate(sim_count=20000, seed=52)
     assert eval_report == [
@@ -50,6 +68,7 @@ def test_evaluate(discrete_test):
             "concentration": {1: 1.0, 2: 5.0, 3: 2.0, 4: 5.0, 5: 3.0, 6: 4.0},
             "average_value": 3.8,
             "posterior_mean": 3.73077,
+            "credible_interval": [3.122705, 4.3265574],
             "prob_being_best": 0.35595,
             "expected_loss": 0.3053921,
         },
@@ -58,6 +77,7 @@ def test_evaluate(discrete_test):
             "concentration": {1: 2.0, 2: 0.0, 3: 1.0, 4: 3.0, 5: 0.0, 6: 4.0},
             "average_value": 4.1,
             "posterior_mean": 3.875,
+            "credible_interval": [2.9826238, 4.7094185],
             "prob_being_best": 0.59325,
             "expected_loss": 0.1560257,
         },
@@ -66,6 +86,7 @@ def test_evaluate(discrete_test):
             "concentration": {1: 10, 2: 10, 3: 10, 4: 10, 5: 10, 6: 10},
             "average_value": 3.5,
             "posterior_mean": 3.5,
+            "credible_interval": [3.3681015, 3.6302274],
             "prob_being_best": 0.0508,
             "expected_loss": 0.5328904,
         },

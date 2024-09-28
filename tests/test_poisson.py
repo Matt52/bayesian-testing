@@ -46,6 +46,24 @@ def test_expected_loss(poisson_test):
     assert loss == {"A": 0.3936672, "B": 0.4144949, "C": 0.3109256}
 
 
+def test_credible_intervals_95(poisson_test):
+    ci = poisson_test.credible_intervals(sim_count=20000, seed=52)
+    assert ci == {
+        "A": [2.0742056, 3.7731115],
+        "B": [2.0264899, 3.7822918],
+        "C": [2.1895805, 3.8084984],
+    }
+
+
+def test_credible_intervals_99(poisson_test):
+    ci = poisson_test.credible_intervals(sim_count=20000, seed=52, interval_alpha=0.99)
+    assert ci == {
+        "A": [1.8569798, 4.0897961],
+        "B": [1.8082962, 4.1242607],
+        "C": [1.9771075, 4.1434489],
+    }
+
+
 def test_evaluate(poisson_test):
     eval_report = poisson_test.evaluate(sim_count=20000, seed=52)
     assert eval_report == [
@@ -55,6 +73,7 @@ def test_evaluate(poisson_test):
             "sum_values": 43,
             "observed_average": 2.86667,
             "posterior_mean": 2.8543,
+            "credible_interval": [2.0742056, 3.7731115],
             "prob_being_best": 0.30945,
             "expected_loss": 0.3936672,
         },
@@ -64,6 +83,7 @@ def test_evaluate(poisson_test):
             "sum_values": 40,
             "observed_average": 2.85714,
             "posterior_mean": 2.84397,
+            "credible_interval": [2.0264899, 3.7822918],
             "prob_being_best": 0.29665,
             "expected_loss": 0.4144949,
         },
@@ -73,6 +93,7 @@ def test_evaluate(poisson_test):
             "sum_values": 49,
             "observed_average": 3.26667,
             "posterior_mean": 2.94118,
+            "credible_interval": [2.1895805, 3.8084984],
             "prob_being_best": 0.3939,
             "expected_loss": 0.3109256,
         },

@@ -53,23 +53,30 @@ class NormalDataTest(BaseDataTest):
         return [self.data[k]["w_prior"] for k in self.data]
 
     def eval_simulation(
-        self, sim_count: int = 20000, seed: int = None, min_is_best: bool = False
-    ) -> Tuple[dict, dict]:
+        self,
+        sim_count: int = 20000,
+        seed: int = None,
+        min_is_best: bool = False,
+        interval_alpha: float = 0.95,
+    ) -> Tuple[dict, dict, dict]:
         """
-        Calculate probabilities of being best and expected loss for a current class state.
+        Calculate probabilities of being best, expected loss and credible intervals for a current
+        class state.
 
         Parameters
         ----------
         sim_count : Number of simulations to be used for probability estimation.
         seed : Random seed.
         min_is_best : Option to change "being best" to a minimum. Default is maximum.
+        interval_alpha : Credible interval probability (value between 0 and 1).
 
         Returns
         -------
         res_pbbs : Dictionary with probabilities of being best for all variants in experiment.
         res_loss : Dictionary with expected loss for all variants in experiment.
+        res_intervals : Dictionary with quantile-based credible intervals for all variants.
         """
-        pbbs, loss = eval_normal_agg(
+        pbbs, loss, intervals = eval_normal_agg(
             self.totals,
             self.sum_values,
             self.sum_values_2,
@@ -80,14 +87,20 @@ class NormalDataTest(BaseDataTest):
             w_priors=self.w_priors,
             seed=seed,
             min_is_best=min_is_best,
+            interval_alpha=interval_alpha,
         )
         res_pbbs = dict(zip(self.variant_names, pbbs))
         res_loss = dict(zip(self.variant_names, loss))
+        res_intervals = dict(zip(self.variant_names, intervals))
 
-        return res_pbbs, res_loss
+        return res_pbbs, res_loss, res_intervals
 
     def evaluate(
-        self, sim_count: int = 20000, seed: int = None, min_is_best: bool = False
+        self,
+        sim_count: int = 20000,
+        seed: int = None,
+        min_is_best: bool = False,
+        interval_alpha: float = 0.95,
     ) -> List[dict]:
         """
         Evaluation of experiment.
@@ -97,6 +110,7 @@ class NormalDataTest(BaseDataTest):
         sim_count : Number of simulations to be used for probability estimation.
         seed : Random seed.
         min_is_best : Option to change "being best" to a minimum. Default is maximum.
+        interval_alpha : Credible interval probability (value between 0 and 1).
 
         Returns
         -------
@@ -108,6 +122,7 @@ class NormalDataTest(BaseDataTest):
             "sum_values",
             "avg_values",
             "posterior_mean",
+            "credible_interval",
             "prob_being_best",
             "expected_loss",
         ]
@@ -116,15 +131,19 @@ class NormalDataTest(BaseDataTest):
             round((i[0] + i[3] * i[2]) / (i[1] + i[3]), 5)
             for i in zip(self.sum_values, self.totals, self.m_priors, self.w_priors)
         ]
-        eval_pbbs, eval_loss = self.eval_simulation(sim_count, seed, min_is_best)
+        eval_pbbs, eval_loss, eval_intervals = self.eval_simulation(
+            sim_count, seed, min_is_best, interval_alpha
+        )
         pbbs = list(eval_pbbs.values())
         loss = list(eval_loss.values())
+        intervals = list(eval_intervals.values())
         data = [
             self.variant_names,
             self.totals,
             [round(i, 5) for i in self.sum_values],
             avg_values,
             posterior_mean,
+            intervals,
             pbbs,
             loss,
         ]

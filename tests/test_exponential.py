@@ -91,7 +91,25 @@ def test_probabs_of_being_best(exponential_test):
 
 def test_expected_loss(exponential_test):
     loss = exponential_test.expected_loss(sim_count=20000, seed=52)
-    assert loss == {"A": 1.574346, "B": 0.7704876, "C": 0.2741126}
+    assert loss == {"A": 1.5907038, "B": 0.7596064, "C": 0.2414208}
+
+
+def test_credible_intervals_95(exponential_test):
+    ci = exponential_test.credible_intervals(sim_count=20000, seed=52)
+    assert ci == {
+        "A": [1.5151401, 3.6571069],
+        "B": [2.0455239, 4.9692854],
+        "C": [2.4059958, 5.6846722],
+    }
+
+
+def test_credible_intervals_99(exponential_test):
+    ci = exponential_test.credible_intervals(sim_count=20000, seed=52, interval_alpha=0.99)
+    assert ci == {
+        "A": [1.3525642, 4.3405547],
+        "B": [1.8175504, 5.9001709],
+        "C": [2.124576, 6.7291228],
+    }
 
 
 def test_evaluate(exponential_test):
@@ -103,8 +121,9 @@ def test_evaluate(exponential_test):
             "sum_values": 45.13,
             "observed_average": 2.2565,
             "posterior_mean": 2.25025,
+            "credible_interval": [1.5151401, 3.6571069],
             "prob_being_best": 0.0414,
-            "expected_loss": 1.574346,
+            "expected_loss": 1.5907038,
         },
         {
             "variant": "B",
@@ -112,8 +131,9 @@ def test_evaluate(exponential_test):
             "sum_values": 60.68,
             "observed_average": 3.034,
             "posterior_mean": 3.02388,
+            "credible_interval": [2.0455239, 4.9692854],
             "prob_being_best": 0.29885,
-            "expected_loss": 0.7704876,
+            "expected_loss": 0.7596064,
         },
         {
             "variant": "C",
@@ -121,8 +141,9 @@ def test_evaluate(exponential_test):
             "sum_values": 72.27,
             "observed_average": 3.6135,
             "posterior_mean": 3.53667,
+            "credible_interval": [2.4059958, 5.6846722],
             "prob_being_best": 0.65975,
-            "expected_loss": 0.2741126,
+            "expected_loss": 0.2414208,
         },
     ]
 

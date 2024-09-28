@@ -85,6 +85,22 @@ def test_expected_loss(delta_norm_test):
     assert loss == {"A": 0.005, "B": 2.46e-05}
 
 
+def test_credible_intervals_95(delta_norm_test):
+    ci = delta_norm_test.credible_intervals(sim_count=20000, seed=152)
+    assert ci == {
+        "A": [0.0011935, 0.0070944],
+        "B": [0.0051651, 0.0125917],
+    }
+
+
+def test_credible_intervals_99(delta_norm_test):
+    ci = delta_norm_test.credible_intervals(sim_count=20000, seed=152, interval_alpha=0.99)
+    assert ci == {
+        "A": [0.0006048, 0.0087352],
+        "B": [0.0043509, 0.0142946],
+    }
+
+
 def test_evaluate(delta_norm_test):
     eval_report = delta_norm_test.evaluate(sim_count=20000, seed=152)
     assert eval_report == [
@@ -96,6 +112,7 @@ def test_evaluate(delta_norm_test):
             "avg_values": 0.00324,
             "avg_non_zero_values": 10.20256,
             "posterior_mean": 0.00356,
+            "credible_interval": [0.0011935, 0.0070944],
             "prob_being_best": 0.02235,
             "expected_loss": 0.005,
         },
@@ -107,6 +124,7 @@ def test_evaluate(delta_norm_test):
             "avg_values": 0.00853,
             "avg_non_zero_values": 6.8255,
             "posterior_mean": 0.00853,
+            "credible_interval": [0.0051651, 0.0125917],
             "prob_being_best": 0.97765,
             "expected_loss": 2.46e-05,
         },

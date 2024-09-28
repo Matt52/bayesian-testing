@@ -46,6 +46,24 @@ def test_expected_loss(conv_test):
     assert loss == {"A": 0.0529281, "B": 0.1452113, "C": 0.1557502}
 
 
+def test_credible_intervals_95(conv_test):
+    ci = conv_test.credible_intervals(sim_count=20000, seed=52)
+    assert ci == {
+        "A": [0.0917579, 0.6028411],
+        "B": [0.0442435, 0.5032699],
+        "C": [0.0522996, 0.452392],
+    }
+
+
+def test_credible_intervals_99(conv_test):
+    ci = conv_test.credible_intervals(sim_count=20000, seed=52, interval_alpha=0.99)
+    assert ci == {
+        "A": [0.0552614, 0.6892976],
+        "B": [0.0214602, 0.6045644],
+        "C": [0.0300364, 0.5320378],
+    }
+
+
 def test_evaluate(conv_test):
     eval_report = conv_test.evaluate(sim_count=20000, seed=52)
     assert eval_report == [
@@ -55,6 +73,7 @@ def test_evaluate(conv_test):
             "positives": 3,
             "positive_rate": 0.3,
             "posterior_mean": 0.31818,
+            "credible_interval": [0.0917579, 0.6028411],
             "prob_being_best": 0.57225,
             "expected_loss": 0.0529281,
         },
@@ -64,6 +83,7 @@ def test_evaluate(conv_test):
             "positives": 2,
             "positive_rate": 0.2,
             "posterior_mean": 0.22727,
+            "credible_interval": [0.0442435, 0.5032699],
             "prob_being_best": 0.233,
             "expected_loss": 0.1452113,
         },
@@ -73,6 +93,7 @@ def test_evaluate(conv_test):
             "positives": 2,
             "positive_rate": 0.18182,
             "posterior_mean": 0.21429,
+            "credible_interval": [0.0522996, 0.452392],
             "prob_being_best": 0.19475,
             "expected_loss": 0.1557502,
         },
@@ -93,3 +114,10 @@ def test_wrong_inputs():
         cv.add_variant_data("A", [])
     with pytest.raises(ValueError):
         cv.add_variant_data("A", [1, 2, 0])
+
+
+def test_wrong_credible_interval_input(conv_test):
+    with pytest.raises(ValueError):
+        conv_test.evaluate(interval_alpha=2)
+    with pytest.raises(ValueError):
+        conv_test.evaluate(interval_alpha=-1)

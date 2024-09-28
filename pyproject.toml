@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "bayesian-testing"
-version = "0.7.0"
+version = "0.8.0"
 description = "Bayesian A/B testing with simple probabilities."
 authors = ["Matus Baniar"]
 license = "MIT"
@@ -22,7 +22,7 @@ numpy = "^1.19.0"
 
 [tool.poetry.dev-dependencies]
 jupyter = "^1.0.0"
-jupyterlab = "^3.5.1"
+jupyterlab = "^3.6.8"
 black = "^22.3"
 pytest = "^6.2.4"
 coverage = "^6.1.1"

@@ -5,6 +5,7 @@ from .discrete import DiscreteDataTest
 from .poisson import PoissonDataTest
 from .delta_normal import DeltaNormalDataTest
 from .exponential import ExponentialDataTest
+from .delta_exponential import DeltaExponentialDataTest
 
 __all__ = [
     "BinaryDataTest",
@@ -14,4 +15,5 @@ __all__ = [
     "DiscreteDataTest",
     "PoissonDataTest",
     "ExponentialDataTest",
+    "DeltaExponentialDataTest"
 ]

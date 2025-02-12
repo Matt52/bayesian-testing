@@ -597,3 +597,71 @@ def eval_exponential_agg(
     res_intervals = estimate_credible_intervals(gamma_samples, interval_alpha)
 
     return res_pbbs, res_loss, res_intervals
+
+def eval_delta_exponential_agg(
+    totals: List[int],
+    sums: List[Union[float, int]],
+    non_zeros: List[int],
+    a_priors_gamma: List[Number] = None,
+    b_priors_gamma: List[Number] = None,
+    sim_count: int = 20000,
+    seed: int = None,
+    min_is_best: bool = False,
+    interval_alpha: float = 0.95,
+    a_priors_beta: List[Number] = None,
+    b_priors_beta: List[Number] = None,
+) -> Tuple[List[float], List[float], List[List[float]]]:
+    """
+    Method estimating probabilities of being best, expected loss and credible intervals for
+    Exponential aggregated data per variant.
+
+    Parameters
+    ----------
+    totals : List of total experiment observations (e.g. number of sessions) for each variant.
+    sums : List of sums of observations (e.g. session time) for each variant.
+    sim_count : Number of simulations to be used for probability estimation.
+    a_priors_gamma : List of prior alpha parameters of Gamma distributions for each variant.
+    b_priors_gamma : List of prior beta parameters (rates) of Gamma distributions for each variant.
+    seed : Random seed.
+    min_is_best : Option to change "being best" to a minimum. Default is maximum.
+    interval_alpha : Credible interval probability.
+
+    Returns
+    -------
+    res_pbbs : List of probabilities of being best for each variant.
+    res_loss : List of expected loss for each variant.
+    res_intervals : List of credible intervals for each variant.
+    """
+
+    if len(totals) == 0:
+        return [], [], []
+
+    # Default prior for all variants is Gamma(0.1, 0.1) which is on purpose quite vague.
+    # Beata 0.5, 0.5 same reason
+    if not a_priors_gamma:
+        a_priors_gamma = [0.1] * len(totals)
+    if not b_priors_gamma:
+        b_priors_gamma = [0.1] * len(totals)
+    if not a_priors_beta:
+        a_priors_beta = [0.5] * len(totals)
+    if not b_priors_beta:
+        b_priors_beta = [0.5] * len(totals)
+
+    gamma_samples_rate = exp_gamma_posteriors_all(
+        totals, sums, sim_count, a_priors_gamma, b_priors_gamma, seed
+    )
+    beta_samples = beta_posteriors_all(
+        totals, non_zeros, sim_count, a_priors_beta, b_priors_beta, seed
+    )
+
+
+    # Reversing gamma samples to get from a rate to a scale.
+    gamma_samples = np.reciprocal(gamma_samples_rate)
+
+    combined_samples = beta_samples * gamma_samples
+
+    res_pbbs = estimate_probabilities(combined_samples, min_is_best)
+    res_loss = estimate_expected_loss(combined_samples, min_is_best)
+    res_intervals = estimate_credible_intervals(combined_samples, interval_alpha)
+
+    return res_pbbs, res_loss, res_intervals

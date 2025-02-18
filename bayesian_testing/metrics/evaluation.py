@@ -102,6 +102,34 @@ def estimate_credible_intervals(
     res = np.round(np.quantile(data, [low_end, top_end], axis=1).T, 7).tolist()
     return res
 
+def estimate_hdi(
+    data: Union[List[List[Number]], np.ndarray], alpha: float
+) -> List[List[float]]:
+    """
+    Write docstring
+
+    Parameters
+    ----------
+    data : List of simulated data for each variant.
+    alpha : width of HDI.
+
+    Returns
+    -------
+    res : List of High density intervals (in a form of a list) for each variant.
+    """
+    if not 0 <= alpha <= 1:
+        raise ValueError("Credible interval's probability alpha has to be between 0 and 1.")   
+
+    x_sorted = [np.sort(x) for x in data]
+    window_size = [np.ceil(alpha * len(x)).astype("int") for x in x_sorted]
+    nCIs = [len(x) - ws for x, ws in zip(x_sorted, window_size)]
+    ciWidths = [x[ws:] - x[:nc] for x, ws, nc in zip(x_sorted, window_size, nCIs)]
+    min_indices = [np.argmin(cw) for cw in ciWidths]
+    hdi_lows = [x_sorted[i][min_indices[i]] for i in range(len(x_sorted))]
+    hdi_highs = [x_sorted[i][min_indices[i] + window_size[i]] for i in range(len(x_sorted))]
+    res = [list(np.round([hdi_lows[i], hdi_highs[i]], 7)) for i in range(len(x_sorted))]
+
+    return res
 
 def eval_bernoulli_agg(
     totals: List[int],
@@ -152,8 +180,9 @@ def eval_bernoulli_agg(
     res_pbbs = estimate_probabilities(beta_samples, min_is_best)
     res_loss = estimate_expected_loss(beta_samples, min_is_best)
     res_intervals = estimate_credible_intervals(beta_samples, interval_alpha)
+    res_hdis = estimate_hdi(beta_samples, interval_alpha)
 
-    return res_pbbs, res_loss, res_intervals
+    return res_pbbs, res_loss, res_intervals, res_hdis
 
 
 def eval_normal_agg(
@@ -192,6 +221,7 @@ def eval_normal_agg(
     res_pbbs : List of probabilities of being best for each variant.
     res_loss : List of expected loss for each variant.
     res_intervals : List of credible intervals for each variant.
+    res_hdis : List of high density intervals for each variant.
     """
     if len(totals) == 0:
         return [], [], []
@@ -230,8 +260,9 @@ def eval_normal_agg(
     res_pbbs = estimate_probabilities(normal_samples, min_is_best)
     res_loss = estimate_expected_loss(normal_samples, min_is_best)
     res_intervals = estimate_credible_intervals(normal_samples, interval_alpha)
+    res_hdis = estimate_hdi(normal_samples, interval_alpha)
 
-    return res_pbbs, res_loss, res_intervals
+    return res_pbbs, res_loss, res_intervals, res_hdis
 
 
 def eval_delta_lognormal_agg(
@@ -331,8 +362,9 @@ def eval_delta_lognormal_agg(
         res_pbbs = estimate_probabilities(combined_samples, min_is_best)
         res_loss = estimate_expected_loss(combined_samples, min_is_best)
         res_intervals = estimate_credible_intervals(combined_samples, interval_alpha)
+        res_hdis = estimate_hdi(combined_samples, interval_alpha)
 
-        return res_pbbs, res_loss, res_intervals
+        return res_pbbs, res_loss, res_intervals, res_hdis
 
 
 def eval_numerical_dirichlet_agg(
@@ -387,8 +419,10 @@ def eval_numerical_dirichlet_agg(
     res_pbbs = estimate_probabilities(means_samples, min_is_best)
     res_loss = estimate_expected_loss(means_samples, min_is_best)
     res_intervals = estimate_credible_intervals(means_samples, interval_alpha)
+    res_hdis = estimate_hdi(means_samples, interval_alpha)
 
-    return res_pbbs, res_loss, res_intervals
+    return res_pbbs, res_loss, res_intervals, res_hdis
+
 
 
 def eval_poisson_agg(
@@ -439,8 +473,10 @@ def eval_poisson_agg(
     res_pbbs = estimate_probabilities(gamma_samples, min_is_best)
     res_loss = estimate_expected_loss(gamma_samples, min_is_best)
     res_intervals = estimate_credible_intervals(gamma_samples, interval_alpha)
+    res_hdis = estimate_hdi(gamma_samples, interval_alpha)
 
-    return res_pbbs, res_loss, res_intervals
+    return res_pbbs, res_loss, res_intervals, res_hdis
+
 
 
 def eval_delta_normal_agg(
@@ -540,8 +576,9 @@ def eval_delta_normal_agg(
         res_pbbs = estimate_probabilities(combined_samples, min_is_best)
         res_loss = estimate_expected_loss(combined_samples, min_is_best)
         res_intervals = estimate_credible_intervals(combined_samples, interval_alpha)
+        res_hdis = estimate_hdi(combined_samples, interval_alpha)
 
-        return res_pbbs, res_loss, res_intervals
+        return res_pbbs, res_loss, res_intervals, res_hdis
 
 
 def eval_exponential_agg(
@@ -595,8 +632,10 @@ def eval_exponential_agg(
     res_pbbs = estimate_probabilities(gamma_samples, min_is_best)
     res_loss = estimate_expected_loss(gamma_samples, min_is_best)
     res_intervals = estimate_credible_intervals(gamma_samples, interval_alpha)
+    res_hdis = estimate_hdi(gamma_samples, interval_alpha)
 
-    return res_pbbs, res_loss, res_intervals
+    return res_pbbs, res_loss, res_intervals, res_hdis
+
 
 def eval_delta_exponential_agg(
     totals: List[int],
@@ -663,5 +702,6 @@ def eval_delta_exponential_agg(
     res_pbbs = estimate_probabilities(combined_samples, min_is_best)
     res_loss = estimate_expected_loss(combined_samples, min_is_best)
     res_intervals = estimate_credible_intervals(combined_samples, interval_alpha)
+    res_hdis = estimate_hdi(combined_samples, interval_alpha)
 
-    return res_pbbs, res_loss, res_intervals
+    return res_pbbs, res_loss, res_intervals, res_hdis

@@ -62,7 +62,7 @@ class PoissonDataTest(BaseDataTest):
         res_loss : Dictionary with expected loss for all variants in experiment.
         res_intervals : Dictionary with quantile-based credible intervals for all variants.
         """
-        pbbs, loss, intervals = eval_poisson_agg(
+        pbbs, loss, intervals, hdis = eval_poisson_agg(
             self.totals,
             self.sum_values,
             self.a_priors,
@@ -75,8 +75,9 @@ class PoissonDataTest(BaseDataTest):
         res_pbbs = dict(zip(self.variant_names, pbbs))
         res_loss = dict(zip(self.variant_names, loss))
         res_intervals = dict(zip(self.variant_names, intervals))
+        res_hdis = dict(zip(self.variant_names, hdis))
 
-        return res_pbbs, res_loss, res_intervals
+        return res_pbbs, res_loss, res_intervals, res_hdis
 
     def evaluate(
         self,
@@ -106,6 +107,7 @@ class PoissonDataTest(BaseDataTest):
             "observed_average",
             "posterior_mean",
             "credible_interval",
+            "high_density_interval",
             "prob_being_best",
             "expected_loss",
         ]
@@ -114,12 +116,14 @@ class PoissonDataTest(BaseDataTest):
             round((i[2] + i[0]) / (i[3] + i[1]), 5)
             for i in zip(self.sum_values, self.totals, self.a_priors, self.b_priors)
         ]
-        eval_pbbs, eval_loss, eval_intervals = self.eval_simulation(
+        eval_pbbs, eval_loss, eval_intervals, eval_hdis = self.eval_simulation(
             sim_count, seed, min_is_best, interval_alpha
         )
         pbbs = list(eval_pbbs.values())
         loss = list(eval_loss.values())
         intervals = list(eval_intervals.values())
+        hdis = list(eval_hdis.values())
+
         data = [
             self.variant_names,
             self.totals,
@@ -127,6 +131,7 @@ class PoissonDataTest(BaseDataTest):
             observed_average,
             posterior_mean,
             intervals,
+            hdis,
             pbbs,
             loss,
         ]

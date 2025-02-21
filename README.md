@@ -411,7 +411,8 @@ results
     +-------------------+-------------+-------------+-------------+
 
 ## Development
-To set up a development environment, use [Poetry](https://python-poetry.org/) and [pre-commit](https://pre-commit.com):
+To set up a development environment, use [Poetry](https://python-poetry.org/)
+and [pre-commit](https://pre-commit.com):
 ```console
 pip install poetry
 poetry install

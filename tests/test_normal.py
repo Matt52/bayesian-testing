@@ -101,11 +101,11 @@ def test_totals(norm_test):
 
 
 def test_sum_values(norm_test):
-    assert norm_test.sum_values == [386.6, 188.99999999999997, 252.69999999999996]
+    assert norm_test.sum_values == pytest.approx([386.6, 189.0, 252.7])
 
 
 def test_sum_values_2(norm_test):
-    assert norm_test.sum_values_2 == [4255.42, 2244.8200000000006, 4421.87]
+    assert norm_test.sum_values_2 == pytest.approx([4255.42, 2244.82, 4421.87])
 
 
 def test_m_priors(norm_test):
